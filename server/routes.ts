@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -86,6 +86,25 @@ export async function registerRoutes(
         budget: data.budget,
         scenario: data.scenario,
       });
+      
+      // Create default challenges
+      const challenges = [
+        { title: "Économe", description: "Dépense moins de 30% de ton budget", type: "spending" as const, target: Math.round(data.budget * 0.3) },
+        { title: "Essentiel d'abord", description: "Achète 3 articles essentiels", type: "essential" as const, target: 3 },
+        { title: "Responsable", description: "Paye toutes tes dépenses fixes", type: "fixed" as const, target: 100 },
+        { title: "Sage", description: "Économise 50% de ton budget", type: "savings" as const, target: Math.round(data.budget * 0.5) },
+      ];
+      
+      for (const ch of challenges) {
+        await storage.createChallenge({
+          studentId: student.id,
+          title: ch.title,
+          description: ch.description,
+          type: ch.type,
+          targetValue: ch.target,
+        });
+      }
+      
       res.json(student);
     } catch (error) {
       res.status(400).json({ error: "Invalid student data" });
@@ -299,6 +318,38 @@ export async function registerRoutes(
       res.json(expense);
     } catch (error) {
       res.status(500).json({ error: "Failed to update expense" });
+    }
+  });
+
+  // Challenge endpoints
+  app.post("/api/challenges", async (req, res) => {
+    try {
+      const data = createChallengeSchema.parse(req.body);
+      const challenge = await storage.createChallenge(data);
+      res.json(challenge);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid challenge data" });
+    }
+  });
+
+  app.get("/api/challenges/:studentId", async (req, res) => {
+    try {
+      const challenges = await storage.getStudentChallenges(req.params.studentId);
+      res.json(challenges);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch challenges" });
+    }
+  });
+
+  app.patch("/api/challenges/:id/complete", async (req, res) => {
+    try {
+      const challenge = await storage.completeChallenge(req.params.id);
+      if (!challenge) {
+        return res.status(404).json({ error: "Challenge not found" });
+      }
+      res.json(challenge);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete challenge" });
     }
   });
 

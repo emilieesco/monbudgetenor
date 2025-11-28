@@ -63,6 +63,17 @@ export interface BonusExpense {
   isPaid: boolean;
 }
 
+export interface Challenge {
+  id: string;
+  studentId: string;
+  title: string;
+  description: string;
+  type: "spending" | "essential" | "fixed" | "savings";
+  targetValue: number;
+  completed: boolean;
+  createdAt: Date;
+}
+
 // Zod schemas for validation
 export const studentSchema = z.object({
   id: z.string(),
@@ -98,6 +109,16 @@ export const createBonusExpenseSchema = z.object({
   description: z.string().min(1),
   amount: z.number().positive(),
 });
+
+export const createChallengeSchema = z.object({
+  studentId: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  type: z.enum(["spending", "essential", "fixed", "savings"]),
+  targetValue: z.number().positive(),
+});
+
+export type CreateChallenge = z.infer<typeof createChallengeSchema>;
 
 export const catalogItemSchema = z.object({
   id: z.string(),
@@ -135,3 +156,4 @@ export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type CreateClass = z.infer<typeof createClassSchema>;
 export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;
+export type CreateChallenge = z.infer<typeof createChallengeSchema>;

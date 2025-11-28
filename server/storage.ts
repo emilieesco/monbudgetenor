@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -28,6 +28,9 @@ export interface IStorage {
   getStudentBonusExpenses(studentId: string): Promise<BonusExpense[]>;
   payBonusExpense(id: string): Promise<BonusExpense | undefined>;
   deleteClassBonusExpenses(classId: string): Promise<void>;
+  createChallenge(input: CreateChallenge): Promise<Challenge>;
+  getStudentChallenges(studentId: string): Promise<Challenge[]>;
+  completeChallenge(id: string): Promise<Challenge | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -37,6 +40,7 @@ export class MemStorage implements IStorage {
   private expenses: Map<string, Expense>;
   private fixedExpenses: Map<string, FixedExpense>;
   private bonusExpenses: Map<string, BonusExpense> = new Map();
+  private challenges: Map<string, Challenge> = new Map();
   private expenseSequence: Expense[] = [];
   private defaultExpenseAmounts: Map<string, number> = new Map();
 
@@ -375,6 +379,30 @@ export class MemStorage implements IStorage {
         this.bonusExpenses.delete(id);
       }
     }
+  }
+
+  async createChallenge(input: CreateChallenge): Promise<Challenge> {
+    const id = randomUUID();
+    const challenge: Challenge = {
+      id,
+      ...input,
+      completed: false,
+      createdAt: new Date(),
+    };
+    this.challenges.set(id, challenge);
+    return challenge;
+  }
+
+  async getStudentChallenges(studentId: string): Promise<Challenge[]> {
+    return Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
+  }
+
+  async completeChallenge(id: string): Promise<Challenge | undefined> {
+    const challenge = this.challenges.get(id);
+    if (!challenge) return undefined;
+    const updated = { ...challenge, completed: true };
+    this.challenges.set(id, updated);
+    return updated;
   }
 }
 

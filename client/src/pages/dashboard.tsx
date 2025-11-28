@@ -6,8 +6,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home } from "lucide-react";
-import type { Student, Expense, BonusExpense } from "@shared/schema";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap } from "lucide-react";
+import type { Student, Expense, BonusExpense, Challenge } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
@@ -29,6 +29,20 @@ export default function Dashboard() {
     queryKey: ["/api/bonus-expenses", studentId],
   });
 
+  const challengesQuery = useQuery({
+    queryKey: ["/api/challenges", studentId],
+  });
+
+  const completeChallengeMutation = useMutation({
+    mutationFn: async (challengeId: string) => {
+      const res = await apiRequest("PATCH", `/api/challenges/${challengeId}/complete`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/challenges", studentId] });
+    },
+  });
+
   const payRentMutation = useMutation({
     mutationFn: async (expenseId: string) => {
       const res = await apiRequest("PATCH", `/api/fixed-expenses/${expenseId}/pay`);
@@ -44,6 +58,7 @@ export default function Dashboard() {
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
   const bonusExpenses = bonusExpensesQuery.data || [];
+  const challenges = challengesQuery.data as Challenge[] || [];
 
   if (!student) {
     return <div className="p-8">Chargement...</div>;
@@ -275,6 +290,54 @@ export default function Dashboard() {
               </ResponsiveContainer>
             </Card>
           </div>
+        )}
+
+        {/* Challenges */}
+        {challenges.length > 0 && (
+          <Card className="p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Target className="w-6 h-6 text-primary" />
+              <h2 className="text-xl font-semibold">Défis Budgétaires</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {challenges.map(challenge => (
+                <div
+                  key={challenge.id}
+                  className={`p-4 rounded-lg border-2 transition ${
+                    challenge.completed
+                      ? "bg-green-50 dark:bg-green-950 border-green-500"
+                      : "bg-muted border-border hover-elevate"
+                  }`}
+                >
+                  <div className="flex items-start justify-between">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2 mb-2">
+                        {challenge.type === "spending" && <Zap className="w-4 h-4 text-amber-500" />}
+                        {challenge.type === "essential" && <ShoppingBag className="w-4 h-4 text-blue-500" />}
+                        {challenge.type === "fixed" && <DollarSign className="w-4 h-4 text-green-500" />}
+                        {challenge.type === "savings" && <Award className="w-4 h-4 text-purple-500" />}
+                        <p className="font-bold text-sm">{challenge.title}</p>
+                      </div>
+                      <p className="text-sm text-muted-foreground">{challenge.description}</p>
+                      <p className="text-xs text-muted-foreground mt-1">Objectif: {challenge.targetValue}</p>
+                    </div>
+                    {challenge.completed ? (
+                      <Badge className="bg-green-500 text-white ml-2">✓ Complété!</Badge>
+                    ) : (
+                      <Button
+                        size="sm"
+                        onClick={() => completeChallengeMutation.mutate(challenge.id)}
+                        disabled={completeChallengeMutation.isPending}
+                        className="ml-2"
+                      >
+                        Valider
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Card>
         )}
 
         {/* Decision History */}

@@ -15,6 +15,64 @@ const CATEGORIES = [
   { id: "leisure", name: "Loisirs", icon: "🎮", color: "from-purple-400 to-purple-600" },
 ];
 
+// Function to get emoji based on product name
+function getProductEmoji(name: string, category: string): string {
+  const lower = name.toLowerCase();
+  
+  // Food emojis
+  if (category === "food") {
+    if (lower.includes("lait")) return "🥛";
+    if (lower.includes("pain")) return "🍞";
+    if (lower.includes("œuf")) return "🥚";
+    if (lower.includes("poulet")) return "🍗";
+    if (lower.includes("fromage")) return "🧀";
+    if (lower.includes("riz")) return "🍚";
+    if (lower.includes("pâte")) return "🍝";
+    if (lower.includes("banane")) return "🍌";
+    if (lower.includes("pomme")) return "🍎";
+    if (lower.includes("orange")) return "🍊";
+    if (lower.includes("carotte")) return "🥕";
+    if (lower.includes("brocoli")) return "🥦";
+    if (lower.includes("tomate")) return "🍅";
+    if (lower.includes("salade")) return "🥗";
+    if (lower.includes("pizza")) return "🍕";
+    if (lower.includes("chips")) return "🥔";
+    if (lower.includes("chocolat")) return "🍫";
+    if (lower.includes("bonbon")) return "🍬";
+    if (lower.includes("yaourt")) return "🥛";
+    if (lower.includes("beurre")) return "🧈";
+    if (lower.includes("miel")) return "🍯";
+    if (lower.includes("jus")) return "🧃";
+    if (lower.includes("soda")) return "🥤";
+    return "🍕";
+  }
+  
+  // Clothing emojis
+  if (category === "clothing") {
+    if (lower.includes("t-shirt")) return "👕";
+    if (lower.includes("jeans")) return "👖";
+    if (lower.includes("chaussure")) return "👟";
+    if (lower.includes("chaussette")) return "🧦";
+    if (lower.includes("veste")) return "🧥";
+    if (lower.includes("pull")) return "🧶";
+    if (lower.includes("bermuda")) return "🩳";
+    return "👕";
+  }
+  
+  // Leisure emojis
+  if (category === "leisure") {
+    if (lower.includes("cinéma")) return "🎬";
+    if (lower.includes("jeu")) return "🎮";
+    if (lower.includes("piscine")) return "🏊";
+    if (lower.includes("café")) return "☕";
+    if (lower.includes("livre")) return "📚";
+    if (lower.includes("concert")) return "🎵";
+    return "🎮";
+  }
+  
+  return "🍕";
+}
+
 export default function Catalog() {
   const { studentId } = useParams();
   const [location, navigate] = useLocation();
@@ -147,7 +205,7 @@ export default function Catalog() {
                   {/* Product Image/Icon Area */}
                   <div className="h-40 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center border-b-2 border-muted">
                     <div className="text-6xl group-hover:scale-110 transition-transform">
-                      {item.category === "food" ? "🍕" : item.category === "clothing" ? "👔" : "🎮"}
+                      {getProductEmoji(item.name, item.category)}
                     </div>
                   </div>
 
@@ -214,7 +272,7 @@ export default function Catalog() {
               <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border-2 border-primary/20">
                 <div className="text-center mb-4">
                   <div className="text-5xl mb-2">
-                    {selectedItem.category === "food" ? "🍕" : selectedItem.category === "clothing" ? "👔" : "🎮"}
+                    {getProductEmoji(selectedItem.name, selectedItem.category)}
                   </div>
                   <h3 className="font-black text-xl">{selectedItem.name}</h3>
                   <p className="text-sm text-muted-foreground mt-1">{selectedItem.description}</p>

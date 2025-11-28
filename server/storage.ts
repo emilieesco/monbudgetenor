@@ -73,29 +73,53 @@ export class MemStorage implements IStorage {
   }
 
   private initializeCatalog() {
-    // Default catalog items
+    // Default catalog items with icons
     const defaultItems: CatalogItem[] = [
-      // Food
-      { id: randomUUID(), name: "Lait", price: 3, category: "food", description: "1L de lait frais", isEssential: true },
-      { id: randomUUID(), name: "Pain", price: 2, category: "food", description: "Baguette pain complet", isEssential: true },
-      { id: randomUUID(), name: "Œufs", price: 4, category: "food", description: "Douzaine d'œufs", isEssential: true },
-      { id: randomUUID(), name: "Poulet", price: 8, category: "food", description: "Poulet fermier", isEssential: true },
+      // Food - Essentials
+      { id: randomUUID(), name: "Lait 1L", price: 3, category: "food", description: "Lait frais - 1 litre", isEssential: true },
+      { id: randomUUID(), name: "Pain complet", price: 2, category: "food", description: "Baguette pain complet", isEssential: true },
+      { id: randomUUID(), name: "Œufs fermiers", price: 4, category: "food", description: "Douzaine d'œufs frais", isEssential: true },
+      { id: randomUUID(), name: "Poulet fermier", price: 8, category: "food", description: "Poulet 1.5kg", isEssential: true },
+      { id: randomUUID(), name: "Fromage blanc", price: 3.5, category: "food", description: "Fromage blanc 500g", isEssential: true },
+      { id: randomUUID(), name: "Riz blanc", price: 2.5, category: "food", description: "Riz blanc 1kg", isEssential: true },
+      { id: randomUUID(), name: "Pâtes", price: 1.5, category: "food", description: "Pâtes 500g", isEssential: true },
+      
+      // Food - Vegetables & Fruits
+      { id: randomUUID(), name: "Bananes", price: 2, category: "food", description: "Régime de bananes", isEssential: false },
+      { id: randomUUID(), name: "Pommes rouges", price: 3, category: "food", description: "2kg pommes rouges", isEssential: false },
+      { id: randomUUID(), name: "Oranges", price: 3.5, category: "food", description: "1kg oranges juteuses", isEssential: false },
+      { id: randomUUID(), name: "Carottes", price: 1.5, category: "food", description: "Botte de carottes 1kg", isEssential: false },
+      { id: randomUUID(), name: "Brocoli", price: 2.5, category: "food", description: "Brocoli frais", isEssential: false },
+      { id: randomUUID(), name: "Tomates", price: 2.5, category: "food", description: "Tomates rouges 1kg", isEssential: false },
+      { id: randomUUID(), name: "Salade verte", price: 1.5, category: "food", description: "Laitue verte", isEssential: false },
+      
+      // Food - Snacks & Treats
       { id: randomUUID(), name: "Pizza surgelée", price: 5, category: "food", description: "Pizza pepperoni", isEssential: false },
-      { id: randomUUID(), name: "Chips", price: 3, category: "food", description: "Sac de chips nature", isEssential: false },
-      { id: randomUUID(), name: "Bonbons", price: 2, category: "food", description: "Paquets de bonbons", isEssential: false },
+      { id: randomUUID(), name: "Chips nature", price: 3, category: "food", description: "Sac de chips nature", isEssential: false },
+      { id: randomUUID(), name: "Chocolat", price: 2.5, category: "food", description: "Tablette chocolat", isEssential: false },
+      { id: randomUUID(), name: "Bonbons", price: 2, category: "food", description: "Assortiment bonbons", isEssential: false },
+      { id: randomUUID(), name: "Yaourt", price: 3, category: "food", description: "Pack yaourt 4x125g", isEssential: false },
+      { id: randomUUID(), name: "Beurre", price: 3.5, category: "food", description: "Beurre 250g", isEssential: false },
+      { id: randomUUID(), name: "Miel", price: 5, category: "food", description: "Miel 500g", isEssential: false },
+      { id: randomUUID(), name: "Jus d'orange", price: 2.5, category: "food", description: "Jus 1L", isEssential: false },
+      { id: randomUUID(), name: "Soda", price: 2, category: "food", description: "Soda 1.5L", isEssential: false },
 
       // Clothing
       { id: randomUUID(), name: "T-shirt", price: 15, category: "clothing", description: "T-shirt coton classique", isEssential: false },
-      { id: randomUUID(), name: "Jeans", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false },
-      { id: randomUUID(), name: "Chaussures", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false },
+      { id: randomUUID(), name: "Jeans bleu", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false },
+      { id: randomUUID(), name: "Chaussures sport", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false },
       { id: randomUUID(), name: "Chaussettes", price: 5, category: "clothing", description: "Paire de chaussettes", isEssential: true },
-      { id: randomUUID(), name: "Veste", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false },
+      { id: randomUUID(), name: "Veste d'hiver", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false },
+      { id: randomUUID(), name: "Pull", price: 35, category: "clothing", description: "Pull chaud", isEssential: false },
+      { id: randomUUID(), name: "Bermuda", price: 25, category: "clothing", description: "Bermuda coton", isEssential: false },
 
       // Leisure
       { id: randomUUID(), name: "Cinéma", price: 10, category: "leisure", description: "Billet de cinéma", isEssential: false },
       { id: randomUUID(), name: "Jeu vidéo", price: 20, category: "leisure", description: "Jeu vidéo populaire", isEssential: false },
-      { id: randomUUID(), name: "Sport", price: 12, category: "leisure", description: "Entrée piscine/sport", isEssential: false },
+      { id: randomUUID(), name: "Entrée piscine", price: 12, category: "leisure", description: "Entrée piscine/sport", isEssential: false },
       { id: randomUUID(), name: "Café", price: 3, category: "leisure", description: "Boisson café", isEssential: false },
+      { id: randomUUID(), name: "Livre", price: 15, category: "leisure", description: "Roman populaire", isEssential: false },
+      { id: randomUUID(), name: "Ticket concert", price: 25, category: "leisure", description: "Entrée concert", isEssential: false },
     ];
 
     defaultItems.forEach(item => this.catalogItems.set(item.id, item));

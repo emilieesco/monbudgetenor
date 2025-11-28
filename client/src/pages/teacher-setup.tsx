@@ -71,16 +71,8 @@ export default function TeacherSetup() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-md mx-auto">
-        {/* Header */}
-        <Button
-          onClick={() => navigate("/landing")}
-          variant="outline"
-          className="mb-6 flex items-center gap-2"
-        >
-          <HomeIcon className="w-4 h-4" />
-          Accueil
-        </Button>
-        <div className="mb-8">
+        {/* Header Navigation */}
+        <div className="mb-8 flex gap-2">
           {mode !== "choice" && (
             <Button
               onClick={() => {
@@ -90,18 +82,20 @@ export default function TeacherSetup() {
                 setClassCode("");
               }}
               variant="outline"
-              className="mb-6 flex items-center gap-2"
+              size="sm"
+              className="flex items-center gap-2"
             >
               <ArrowLeft className="w-4 h-4" />
               Retour
             </Button>
           )}
           <Button
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/landing")}
             variant="outline"
-            className="mb-6 flex items-center gap-2"
+            size="sm"
+            className="flex items-center gap-2"
           >
-            <ArrowLeft className="w-4 h-4" />
+            <HomeIcon className="w-4 h-4" />
             Accueil
           </Button>
         </div>

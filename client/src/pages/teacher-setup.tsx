@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { ArrowLeft, Plus, LogIn, Home } from "lucide-react";
+import { ArrowLeft, Plus, LogIn, Home as HomeIcon } from "lucide-react";
 
 export default function TeacherSetup() {
   const [_location, navigate] = useLocation();
@@ -77,7 +77,7 @@ export default function TeacherSetup() {
           variant="outline"
           className="mb-6 flex items-center gap-2"
         >
-          <Home className="w-4 h-4" />
+          <HomeIcon className="w-4 h-4" />
           Accueil
         </Button>
         <div className="mb-8">

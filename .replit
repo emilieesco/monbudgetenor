@@ -40,3 +40,8 @@ waitForPort = 5000
 
 [agent]
 integrations = ["javascript_mem_db:1.0.0"]
+
+[userenv]
+
+[userenv.production]
+DATABASE_URL = "postgresql://postgres:pdmydabIDOiDBRSrpKRLbBEHQVAKnaIZ@trolley.proxy.rlwy.net:22563/railway?sslmode=require"

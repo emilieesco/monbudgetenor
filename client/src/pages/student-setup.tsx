@@ -10,17 +10,18 @@ import { ArrowLeft } from "lucide-react";
 import type { Class } from "@shared/schema";
 
 const SCENARIOS = {
-  student: { budget: 40, name: "Étudiant" },
-  worker: { budget: 80, name: "Travailleur" },
-  parent: { budget: 150, name: "Parent" },
+  student: { budget: 40, name: "Étudiant", desc: "Budget étudiant limité" },
+  worker: { budget: 80, name: "Travailleur", desc: "Salaire stable" },
+  parent: { budget: 150, name: "Parent", desc: "Budget avec responsabilités" },
 };
 
 export default function StudentSetup() {
   const [_location, navigate] = useLocation();
   const classCode = new URLSearchParams(window.location.search).get("classCode");
   const [studentName, setStudentName] = useState("");
+  const [mode, setMode] = useState<"predefined" | "custom" | "scenario">("predefined");
   const [customBudget, setCustomBudget] = useState("");
-  const [selectedScenario, setSelectedScenario] = useState<string>("");
+  const [selectedScenario, setSelectedScenario] = useState<string>("student");
   
   const classQuery = useQuery({
     queryKey: ["/api/classes/code", classCode],
@@ -39,13 +40,23 @@ export default function StudentSetup() {
   });
 
   const classData = classQuery.data as Class | undefined;
-  const mode = classData?.mode || "predefined";
 
-  const handleJoin = (budget: number, scenario?: string) => {
+  const handleJoin = () => {
     if (!studentName) {
       alert("Entre ton prénom");
       return;
     }
+
+    let budget = 50;
+    let scenario = undefined;
+
+    if (mode === "custom") {
+      budget = parseInt(customBudget) || 50;
+    } else if (mode === "scenario") {
+      budget = SCENARIOS[selectedScenario as keyof typeof SCENARIOS]?.budget || 50;
+      scenario = selectedScenario;
+    }
+
     joinMutation.mutate({
       name: studentName,
       classCode,
@@ -58,9 +69,11 @@ export default function StudentSetup() {
     return <div className="p-8 text-center">Chargement de la classe...</div>;
   }
 
+  const defaultBudget = Math.round(Object.values(classData.expenseAmounts).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         <Button
           onClick={() => navigate("/")}
           variant="outline"
@@ -77,6 +90,7 @@ export default function StudentSetup() {
 
         <Card className="p-8">
           <div className="space-y-6">
+            {/* Name Input */}
             <div>
               <Label htmlFor="name">Ton Prénom</Label>
               <Input
@@ -87,63 +101,105 @@ export default function StudentSetup() {
               />
             </div>
 
-            {mode === "predefined" && (
-              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                <p className="font-semibold mb-2">Budget: ${classData.expenseAmounts["Loyer"] ? Math.round(Object.values(classData.expenseAmounts).reduce((a: any, b: any) => a + b, 0) * 1.5) : 50}</p>
-                <p className="text-sm text-muted-foreground">Dépenses fixées par ton enseignant</p>
-              </div>
-            )}
+            {/* Mode Selection */}
+            <div>
+              <Label className="mb-4 block">Choisir ton Mode Budgétaire</Label>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                {/* Prédéfini */}
+                <button
+                  onClick={() => setMode("predefined")}
+                  className={`p-4 rounded-lg border-2 text-left transition ${
+                    mode === "predefined"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold mb-1">Budget Prédéfini</p>
+                  <p className="text-sm text-muted-foreground mb-3">Défini par ton prof</p>
+                  <p className="text-lg font-bold text-primary">${defaultBudget}</p>
+                </button>
 
+                {/* Personnalisé */}
+                <button
+                  onClick={() => setMode("custom")}
+                  className={`p-4 rounded-lg border-2 text-left transition ${
+                    mode === "custom"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold mb-1">Budget Personnel</p>
+                  <p className="text-sm text-muted-foreground mb-3">Ta propre réalité</p>
+                  <p className="text-lg font-bold text-primary">Personnalisé</p>
+                </button>
+
+                {/* Scénario */}
+                <button
+                  onClick={() => setMode("scenario")}
+                  className={`p-4 rounded-lg border-2 text-left transition ${
+                    mode === "scenario"
+                      ? "border-primary bg-primary/10"
+                      : "border-border hover:border-primary/50"
+                  }`}
+                >
+                  <p className="font-semibold mb-1">Profils Réalistes</p>
+                  <p className="text-sm text-muted-foreground mb-3">Choisir un profil</p>
+                  <p className="text-lg font-bold text-primary">Scénario</p>
+                </button>
+              </div>
+            </div>
+
+            {/* Mode-specific content */}
             {mode === "custom" && (
-              <div className="space-y-4">
-                <div>
-                  <Label htmlFor="budget">Ton Budget Personnel ($)</Label>
-                  <Input
-                    id="budget"
-                    type="number"
-                    placeholder="Ex: 75"
-                    value={customBudget}
-                    onChange={(e) => setCustomBudget(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground mt-2">
-                    Entre le montant qui correspond à ta réalité
-                  </p>
-                </div>
+              <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                <Label htmlFor="budget">Ton Budget Personnel ($)</Label>
+                <Input
+                  id="budget"
+                  type="number"
+                  placeholder="Ex: 75"
+                  value={customBudget}
+                  onChange={(e) => setCustomBudget(e.target.value)}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Entre le montant qui correspond à ta réalité
+                </p>
               </div>
             )}
 
             {mode === "scenario" && (
-              <div className="space-y-4">
-                <Label>Choisis ton Profil</Label>
+              <div className="space-y-4 p-4 bg-green-50 dark:bg-green-950 rounded-lg border border-green-200 dark:border-green-800">
+                <Label className="mb-4">Profil</Label>
                 <div className="grid grid-cols-1 gap-3">
-                  {Object.entries(SCENARIOS).map(([key, { budget, name }]) => (
+                  {Object.entries(SCENARIOS).map(([key, { budget, name, desc }]) => (
                     <button
                       key={key}
                       onClick={() => setSelectedScenario(key)}
                       className={`p-4 rounded-lg border-2 text-left transition ${
                         selectedScenario === key
-                          ? "border-primary bg-primary/10"
-                          : "border-border hover:border-primary/50"
+                          ? "border-green-600 bg-green-100 dark:bg-green-900"
+                          : "border-green-200 dark:border-green-800 hover:border-green-400"
                       }`}
                     >
                       <p className="font-semibold">{name}</p>
-                      <p className="text-sm text-muted-foreground">Budget: ${budget}</p>
+                      <p className="text-xs text-muted-foreground">{desc}</p>
+                      <p className="text-lg font-bold text-green-600 dark:text-green-400 mt-2">
+                        ${budget}
+                      </p>
                     </button>
                   ))}
                 </div>
               </div>
             )}
 
+            {mode === "predefined" && (
+              <div className="p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                <p className="font-semibold mb-2">Budget: ${defaultBudget}</p>
+                <p className="text-sm text-muted-foreground">Dépenses fixées par ton enseignant</p>
+              </div>
+            )}
+
             <Button
-              onClick={() => {
-                const budget =
-                  mode === "custom"
-                    ? parseInt(customBudget) || 50
-                    : mode === "scenario"
-                    ? SCENARIOS[selectedScenario as keyof typeof SCENARIOS]?.budget || 50
-                    : 50;
-                handleJoin(budget, mode === "scenario" ? selectedScenario : undefined);
-              }}
+              onClick={handleJoin}
               disabled={
                 joinMutation.isPending ||
                 !studentName ||
@@ -151,8 +207,9 @@ export default function StudentSetup() {
                 (mode === "scenario" && !selectedScenario)
               }
               className="w-full bg-primary hover:bg-primary/90"
+              data-testid="button-join-class"
             >
-              Rejoindre
+              Rejoindre la Classe
             </Button>
           </div>
         </Card>

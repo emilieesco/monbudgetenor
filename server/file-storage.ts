@@ -197,11 +197,16 @@ export class FileStorage implements IStorage {
 
   async createStudent(input: InsertStudent): Promise<Student> {
     const id = randomUUID();
-    const student: Student = { ...input, id, spent: 0, createdAt: new Date() };
+    const student: Student = { ...input, id, spent: 0, createdAt: new Date(), scenario: input.scenario, customExpenses: input.customExpenses };
     this.students.set(id, student);
 
     const classData = await this.getClass(input.classId);
-    const amounts = classData?.expenseAmounts || this.getDefaultAmounts();
+    let amounts = classData?.expenseAmounts || this.getDefaultAmounts();
+    
+    // Si l'élève a un budget personnalisé, adapter les dépenses proportionnellement
+    if (input.customExpenses) {
+      amounts = input.customExpenses;
+    }
 
     const fixedExpensesList = [
       { name: "Loyer", amount: amounts["Loyer"] || 15 },

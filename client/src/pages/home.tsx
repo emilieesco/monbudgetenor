@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Users, Plus, Edit2, Home } from "lucide-react";
+import { Users, Plus, Edit2 } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Student } from "@shared/schema";
 

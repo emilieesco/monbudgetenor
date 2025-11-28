@@ -12,7 +12,6 @@ import type { Class } from "@shared/schema";
 const SCENARIOS = {
   student: { budget: 40, name: "Étudiant", desc: "Budget étudiant limité" },
   worker: { budget: 80, name: "Travailleur", desc: "Salaire stable" },
-  parent: { budget: 150, name: "Parent", desc: "Budget avec responsabilités" },
 };
 
 export default function StudentSetup() {

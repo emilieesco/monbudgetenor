@@ -76,7 +76,8 @@ export async function registerRoutes(
       const student = await storage.createStudent({
         name: data.name,
         classId: classData.id,
-        budget: 50,
+        budget: data.budget,
+        scenario: data.scenario,
       });
       res.json(student);
     } catch (error) {

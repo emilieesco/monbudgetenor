@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Wallet, TrendingUp, ShoppingCart, Users } from "lucide-react";
+import walletImg from "@assets/poo_1764362219794.png";
 
 export default function Landing() {
   const [_location, navigate] = useLocation();
@@ -11,24 +12,33 @@ export default function Landing() {
       {/* Hero Section */}
       <div className="bg-gradient-to-br from-primary/10 via-background to-primary/5">
         <div className="max-w-6xl mx-auto px-4 md:px-8 py-20 md:py-32">
-          <div className="text-center">
-            <h1 className="text-6xl md:text-7xl font-bold text-primary mb-6">
-              Mon Budget en Or
-            </h1>
-            <p className="text-2xl md:text-3xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-              Apprenez à gérer votre argent avec sagesse
-            </p>
-            <p className="text-lg text-muted-foreground mb-12 max-w-2xl mx-auto">
-              Un jeu éducatif immersif où vous gérez des budgets réalistes, payez des dépenses et faites des choix intelligents
-            </p>
-            <Button
-              onClick={() => navigate("/auth")}
-              className="bg-primary hover:bg-primary/90 text-lg px-8 py-6"
-              size="lg"
-              data-testid="button-get-started"
-            >
-              Commencer Maintenant 🚀
-            </Button>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+            <div className="text-center md:text-left">
+              <h1 className="text-6xl md:text-7xl font-bold text-primary mb-6">
+                Mon Budget en Or
+              </h1>
+              <p className="text-2xl md:text-3xl text-muted-foreground mb-8">
+                Apprenez à gérer votre argent avec sagesse
+              </p>
+              <p className="text-lg text-muted-foreground mb-12">
+                Un jeu éducatif immersif où vous gérez des budgets réalistes, payez des dépenses et faites des choix intelligents
+              </p>
+              <Button
+                onClick={() => navigate("/auth")}
+                className="bg-primary hover:bg-primary/90 text-lg px-8 py-6"
+                size="lg"
+                data-testid="button-get-started"
+              >
+                Commencer Maintenant 🚀
+              </Button>
+            </div>
+            <div className="flex justify-center">
+              <img
+                src={walletImg}
+                alt="Portefeuille et pièces"
+                className="w-full max-w-md drop-shadow-lg"
+              />
+            </div>
           </div>
         </div>
       </div>

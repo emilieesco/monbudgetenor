@@ -1,7 +1,14 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
+  // Class operations
+  createClass(input: CreateClass): Promise<Class>;
+  getClassByCode(code: string): Promise<Class | undefined>;
+  getClass(id: string): Promise<Class | undefined>;
+  getClassStudents(classId: string): Promise<Student[]>;
+  updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined>;
+
   // Student operations
   getStudent(id: string): Promise<Student | undefined>;
   getAllStudents(): Promise<Student[]>;
@@ -29,6 +36,7 @@ export interface IStorage {
 }
 
 export class MemStorage implements IStorage {
+  private classes: Map<string, Class> = new Map();
   private students: Map<string, Student>;
   private catalogItems: Map<string, CatalogItem>;
   private expenses: Map<string, Expense>;
@@ -94,6 +102,69 @@ export class MemStorage implements IStorage {
     return Array.from(this.students.values());
   }
 
+  async createClass(input: CreateClass): Promise<Class> {
+    const id = randomUUID();
+    const classData: Class = {
+      id,
+      code: input.code.toUpperCase(),
+      teacherName: input.teacherName,
+      createdAt: new Date(),
+      expenseAmounts: {
+        "Loyer": 15,
+        "Internet": 5,
+        "Téléphone": 3,
+        "Hydro": 8,
+        "Assurance Voiture": 10,
+        "Assurance Maison": 7,
+        "Essence": 12,
+        "Nourriture": 20,
+        "Sortie": 5,
+      },
+    };
+    this.classes.set(id, classData);
+    return classData;
+  }
+
+  async getClassByCode(code: string): Promise<Class | undefined> {
+    const upperCode = code.toUpperCase();
+    return Array.from(this.classes.values()).find(c => c.code === upperCode);
+  }
+
+  async getClass(id: string): Promise<Class | undefined> {
+    return this.classes.get(id);
+  }
+
+  async getClassStudents(classId: string): Promise<Student[]> {
+    return Array.from(this.students.values()).filter(s => s.classId === classId);
+  }
+
+  async updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined> {
+    const classData = this.classes.get(classId);
+    if (!classData) return undefined;
+
+    const updated = {
+      ...classData,
+      expenseAmounts: Object.fromEntries(amounts),
+    };
+    this.classes.set(classId, updated);
+
+    // Update all expenses for students in this class
+    const classStudents = await this.getClassStudents(classId);
+    for (const student of classStudents) {
+      for (const [expenseId, expense] of this.fixedExpenses.entries()) {
+        if (expense.studentId === student.id) {
+          const newAmount = amounts.get(expense.category);
+          if (newAmount !== undefined) {
+            const updatedExpense = { ...expense, amount: newAmount };
+            this.fixedExpenses.set(expenseId, updatedExpense);
+          }
+        }
+      }
+    }
+
+    return updated;
+  }
+
   async createStudent(input: InsertStudent): Promise<Student> {
     const id = randomUUID();
     const student: Student = {
@@ -103,25 +174,43 @@ export class MemStorage implements IStorage {
       createdAt: new Date(),
     };
     this.students.set(id, student);
+
+    // Get class expense amounts
+    const classData = await this.getClass(input.classId);
+    const amounts = classData?.expenseAmounts || this.getDefaultAmounts();
     
-    // Create all fixed expenses
-    const fixedExpenses = [
-      { name: "Loyer", amount: 15 },
-      { name: "Internet", amount: 5 },
-      { name: "Téléphone", amount: 3 },
-      { name: "Hydro", amount: 8 },
-      { name: "Assurance Voiture", amount: 10 },
-      { name: "Assurance Maison", amount: 7 },
-      { name: "Essence", amount: 12 },
-      { name: "Nourriture", amount: 20 },
-      { name: "Sortie", amount: 5 },
+    // Create all fixed expenses with class-specific amounts
+    const fixedExpensesList = [
+      { name: "Loyer", amount: amounts["Loyer"] || 15 },
+      { name: "Internet", amount: amounts["Internet"] || 5 },
+      { name: "Téléphone", amount: amounts["Téléphone"] || 3 },
+      { name: "Hydro", amount: amounts["Hydro"] || 8 },
+      { name: "Assurance Voiture", amount: amounts["Assurance Voiture"] || 10 },
+      { name: "Assurance Maison", amount: amounts["Assurance Maison"] || 7 },
+      { name: "Essence", amount: amounts["Essence"] || 12 },
+      { name: "Nourriture", amount: amounts["Nourriture"] || 20 },
+      { name: "Sortie", amount: amounts["Sortie"] || 5 },
     ];
     
-    for (const expense of fixedExpenses) {
+    for (const expense of fixedExpensesList) {
       await this.createFixedExpense(id, expense.name, expense.amount);
     }
     
     return student;
+  }
+
+  private getDefaultAmounts(): { [key: string]: number } {
+    return {
+      "Loyer": 15,
+      "Internet": 5,
+      "Téléphone": 3,
+      "Hydro": 8,
+      "Assurance Voiture": 10,
+      "Assurance Maison": 7,
+      "Essence": 12,
+      "Nourriture": 20,
+      "Sortie": 5,
+    };
   }
 
   async updateStudentBudget(id: string, budget: number): Promise<Student | undefined> {

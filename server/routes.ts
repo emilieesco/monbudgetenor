@@ -1,12 +1,76 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  // Class endpoints
+  app.post("/api/classes", async (req, res) => {
+    try {
+      const data = createClassSchema.parse(req.body);
+      const classData = await storage.createClass(data);
+      res.json(classData);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid class data" });
+    }
+  });
+
+  app.get("/api/classes/:id", async (req, res) => {
+    try {
+      const classData = await storage.getClass(req.params.id);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      res.json(classData);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch class" });
+    }
+  });
+
+  app.get("/api/classes/:id/students", async (req, res) => {
+    try {
+      const students = await storage.getClassStudents(req.params.id);
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch students" });
+    }
+  });
+
+  app.patch("/api/classes/:id/expenses", async (req, res) => {
+    try {
+      const amounts = new Map(Object.entries(req.body));
+      const classData = await storage.updateClassExpenseAmounts(req.params.id, amounts);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      res.json(classData);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid data" });
+    }
+  });
+
+  // Student endpoints
+  app.post("/api/students/join", async (req, res) => {
+    try {
+      const data = joinClassSchema.parse(req.body);
+      const classData = await storage.getClassByCode(data.classCode);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      const student = await storage.createStudent({
+        name: data.name,
+        classId: classData.id,
+        budget: 50,
+      });
+      res.json(student);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid student data" });
+    }
+  });
+
   // Student endpoints
   app.get("/api/students", async (_req, res) => {
     try {
@@ -36,6 +100,15 @@ export async function registerRoutes(
       res.json(student);
     } catch (error) {
       res.status(400).json({ error: "Invalid student data" });
+    }
+  });
+
+  app.get("/api/students/class/:classId", async (req, res) => {
+    try {
+      const students = await storage.getClassStudents(req.params.classId);
+      res.json(students);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch students" });
     }
   });
 

@@ -1,9 +1,19 @@
 import { z } from "zod";
 
+// Classroom
+export interface Class {
+  id: string;
+  code: string;
+  teacherName: string;
+  createdAt: Date;
+  expenseAmounts: { [key: string]: number };
+}
+
 // Student with budget
 export interface Student {
   id: string;
   name: string;
+  classId: string;
   budget: number;
   spent: number;
   createdAt: Date;
@@ -50,7 +60,18 @@ export const studentSchema = z.object({
 
 export const insertStudentSchema = z.object({
   name: z.string().min(1),
+  classId: z.string().min(1),
   budget: z.number().positive(),
+});
+
+export const createClassSchema = z.object({
+  code: z.string().min(3).max(10),
+  teacherName: z.string().min(1),
+});
+
+export const joinClassSchema = z.object({
+  name: z.string().min(1),
+  classCode: z.string().min(1),
 });
 
 export const catalogItemSchema = z.object({
@@ -97,3 +118,5 @@ export const updateBudgetSchema = z.object({
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
+export type CreateClass = z.infer<typeof createClassSchema>;
+export type JoinClass = z.infer<typeof joinClassSchema>;

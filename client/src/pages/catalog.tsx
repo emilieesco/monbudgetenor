@@ -5,8 +5,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useState } from "react";
-import { ShoppingCart, AlertCircle, CheckCircle2 } from "lucide-react";
+import { useState, useEffect } from "react";
+import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
 import type { CatalogItem, Student } from "@shared/schema";
 
 const CATEGORIES = [
@@ -17,10 +17,19 @@ const CATEGORIES = [
 
 export default function Catalog() {
   const { studentId } = useParams();
-  const [location] = useLocation();
+  const [location, navigate] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("food");
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
+
+  // Get category from URL if provided
+  useEffect(() => {
+    const params = new URLSearchParams(location.split("?")[1] || "");
+    const cat = params.get("category");
+    if (cat === "food" || cat === "clothing" || cat === "leisure") {
+      setSelectedCategory(cat);
+    }
+  }, [location]);
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -64,12 +73,19 @@ export default function Catalog() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
-          <h1 className="text-3xl font-bold text-primary">Catalogue</h1>
-          <div className="flex items-center gap-2">
-            <ShoppingCart className="w-5 h-5" />
-            <span className="text-sm">Budget restant: <strong className={remaining < 0 ? "text-destructive" : "text-green-600"}>${remaining}</strong></span>
+        <div className="mb-8 flex items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-primary">Catalogue</h1>
+            <p className="text-muted-foreground mt-1">Budget restant: <strong className={remaining < 0 ? "text-destructive" : "text-green-600"}>${remaining}</strong></p>
           </div>
+          <Button
+            onClick={() => navigate(`/student/${studentId}`)}
+            variant="outline"
+            className="flex items-center gap-2"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Retour
+          </Button>
         </div>
 
         {/* Category Tabs */}

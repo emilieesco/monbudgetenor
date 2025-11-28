@@ -86,8 +86,22 @@ export class MemStorage implements IStorage {
     };
     this.students.set(id, student);
     
-    // Create fixed expense (rent)
-    await this.createFixedExpense(id, "rent", 15);
+    // Create all fixed expenses
+    const fixedExpenses = [
+      { name: "Loyer", amount: 15 },
+      { name: "Internet", amount: 5 },
+      { name: "Téléphone", amount: 3 },
+      { name: "Hydro", amount: 8 },
+      { name: "Assurance Voiture", amount: 10 },
+      { name: "Assurance Maison", amount: 7 },
+      { name: "Essence", amount: 12 },
+      { name: "Nourriture", amount: 20 },
+      { name: "Sortie", amount: 5 },
+    ];
+    
+    for (const expense of fixedExpenses) {
+      await this.createFixedExpense(id, expense.name, expense.amount);
+    }
     
     return student;
   }

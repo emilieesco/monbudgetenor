@@ -10,8 +10,8 @@ import { ArrowLeft } from "lucide-react";
 import type { Class } from "@shared/schema";
 
 const SCENARIOS = {
-  student: { budget: 40, name: "Étudiant", desc: "Budget étudiant limité" },
-  worker: { budget: 80, name: "Travailleur", desc: "Salaire stable" },
+  student: { budget: 1800, name: "Étudiant", desc: "Budget étudiant limité" },
+  worker: { budget: 2400, name: "Travailleur", desc: "Salaire stable" },
 };
 
 export default function StudentSetup() {

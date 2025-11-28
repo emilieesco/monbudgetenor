@@ -30,6 +30,18 @@ export async function registerRoutes(
     }
   });
 
+  app.get("/api/classes/code/:code", async (req, res) => {
+    try {
+      const classData = await storage.getClassByCode(req.params.code);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      res.json(classData);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch class" });
+    }
+  });
+
   app.get("/api/classes/:id/students", async (req, res) => {
     try {
       const students = await storage.getClassStudents(req.params.id);

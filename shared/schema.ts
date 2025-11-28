@@ -7,6 +7,7 @@ export interface Class {
   teacherName: string;
   createdAt: Date;
   expenseAmounts: { [key: string]: number };
+  mode: "predefined" | "custom" | "scenario";
 }
 
 // Student with budget
@@ -17,6 +18,8 @@ export interface Student {
   budget: number;
   spent: number;
   createdAt: Date;
+  customExpenses?: { [key: string]: number };
+  scenario?: string;
 }
 
 export interface CatalogItem {
@@ -73,6 +76,8 @@ export const insertStudentSchema = z.object({
   name: z.string().min(1),
   classId: z.string().min(1),
   budget: z.number().positive(),
+  customExpenses: z.record(z.number()).optional(),
+  scenario: z.string().optional(),
 });
 
 export const createClassSchema = z.object({
@@ -109,24 +114,14 @@ export const insertCatalogItemSchema = z.object({
   isEssential: z.boolean(),
 });
 
-export const expenseSchema = z.object({
-  id: z.string(),
-  studentId: z.string(),
-  itemId: z.string(),
+export const insertExpenseSchema = z.object({
+  studentId: z.string().min(1),
+  itemId: z.string().min(1),
   amount: z.number().positive(),
   category: z.enum(["food", "clothing", "leisure", "rent"]),
   isEssential: z.boolean(),
-  timestamp: z.date(),
   feedback: z.enum(["success", "warning"]),
   message: z.string(),
-});
-
-export const insertExpenseSchema = z.object({
-  studentId: z.string(),
-  itemId: z.string(),
-  amount: z.number().positive(),
-  category: z.enum(["food", "clothing", "leisure", "rent"]),
-  isEssential: z.boolean(),
 });
 
 export const updateBudgetSchema = z.object({
@@ -137,5 +132,4 @@ export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type CreateClass = z.infer<typeof createClassSchema>;
-export type JoinClass = z.infer<typeof joinClassSchema>;
 export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;

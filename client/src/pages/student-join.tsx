@@ -37,7 +37,8 @@ export default function StudentJoin() {
       return;
     }
     setError("");
-    joinMutation.mutate();
+    // Redirect to setup page based on class mode
+    navigate(`/student/setup?classCode=${classCode.toUpperCase()}`);
   };
 
   return (

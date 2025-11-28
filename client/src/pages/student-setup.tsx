@@ -17,7 +17,8 @@ const SCENARIOS = {
 export default function StudentSetup() {
   const [_location, navigate] = useLocation();
   const classCode = new URLSearchParams(window.location.search).get("classCode");
-  const [studentName, setStudentName] = useState("");
+  const nameParam = decodeURIComponent(new URLSearchParams(window.location.search).get("name") || "");
+  const [studentName, setStudentName] = useState(nameParam);
   const [mode, setMode] = useState<"predefined" | "custom" | "scenario">("predefined");
   const [customBudget, setCustomBudget] = useState("");
   const [selectedScenario, setSelectedScenario] = useState<string>("student");
@@ -83,9 +84,9 @@ export default function StudentSetup() {
         </Button>
 
         <h1 className="text-3xl font-bold text-primary mb-2">
-          Rejoindre {classData.teacherName}'s Classe
+          Choisis ton Mode Budgétaire
         </h1>
-        <p className="text-muted-foreground mb-8">Code: {classCode}</p>
+        <p className="text-muted-foreground mb-8">Classe: {classData.teacherName}</p>
 
         <Card className="p-8">
           <div className="space-y-6">

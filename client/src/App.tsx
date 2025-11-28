@@ -7,7 +7,6 @@ import NotFound from "@/pages/not-found";
 import Auth from "@/pages/auth";
 import Home from "@/pages/home";
 import StudentJoin from "@/pages/student-join";
-import StudentWelcome from "@/pages/student-welcome";
 import StudentSetup from "@/pages/student-setup";
 import TeacherSetup from "@/pages/teacher-setup";
 import Dashboard from "@/pages/dashboard";
@@ -19,7 +18,6 @@ function Router() {
     <Switch>
       <Route path="/" component={Auth} />
       <Route path="/student-join" component={StudentJoin} />
-      <Route path="/student/welcome" component={StudentWelcome} />
       <Route path="/student/setup" component={StudentSetup} />
       <Route path="/teacher-setup" component={TeacherSetup} />
       <Route path="/teacher/:classId" component={Home} />

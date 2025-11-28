@@ -25,6 +25,7 @@ export interface IStorage {
   updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined>;
   getDefaultExpenseAmounts(): Promise<Map<string, number>>;
   setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void>;
+  updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -228,6 +229,19 @@ export class MemStorage implements IStorage {
 
   async setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void> {
     this.defaultExpenseAmounts = new Map(amounts);
+    // Update all existing students' expenses
+    await this.updateAllStudentExpenseAmounts(amounts);
+  }
+
+  async updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void> {
+    // Update all fixed expenses with the new amounts
+    for (const [expenseId, expense] of this.fixedExpenses.entries()) {
+      const newAmount = amounts.get(expense.category);
+      if (newAmount !== undefined) {
+        const updated = { ...expense, amount: newAmount };
+        this.fixedExpenses.set(expenseId, updated);
+      }
+    }
   }
 }
 

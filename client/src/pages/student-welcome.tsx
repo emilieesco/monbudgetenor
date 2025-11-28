@@ -2,7 +2,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Wallet, TrendingUp, ShoppingCart } from "lucide-react";
-import walletImg from "@assets/u6899119312_digital_textured_cartoon_illustration_in_the_styl_f7dcd116-5c65-47a2-be2a-4231a926a1d4_0_1764361320697.png";
+import walletImg from "@assets/generated_images/wallet_and_coins_no_background.png";
 
 export default function StudentWelcome() {
   const [_location, navigate] = useLocation();

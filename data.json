@@ -1,0 +1,297 @@
+{
+  "classes": {},
+  "students": {},
+  "catalogItems": {
+    "7a014cdb-887a-4b6f-bd2b-6f55d0af4d90": {
+      "id": "7a014cdb-887a-4b6f-bd2b-6f55d0af4d90",
+      "name": "Lait 1L",
+      "price": 3,
+      "category": "food",
+      "description": "Lait frais - 1 litre",
+      "isEssential": true
+    },
+    "7f1834b2-f5db-414d-9aa9-75170cda9fd5": {
+      "id": "7f1834b2-f5db-414d-9aa9-75170cda9fd5",
+      "name": "Pain complet",
+      "price": 2,
+      "category": "food",
+      "description": "Baguette pain complet",
+      "isEssential": true
+    },
+    "ac372285-0a08-4990-94b6-c3ea64e9d1eb": {
+      "id": "ac372285-0a08-4990-94b6-c3ea64e9d1eb",
+      "name": "Œufs fermiers",
+      "price": 4,
+      "category": "food",
+      "description": "Douzaine d'œufs frais",
+      "isEssential": true
+    },
+    "5011002b-be36-4737-951f-960aa45ad628": {
+      "id": "5011002b-be36-4737-951f-960aa45ad628",
+      "name": "Poulet fermier",
+      "price": 8,
+      "category": "food",
+      "description": "Poulet 1.5kg",
+      "isEssential": true
+    },
+    "77bdd394-1790-43d4-9ad7-0c76a6d40a96": {
+      "id": "77bdd394-1790-43d4-9ad7-0c76a6d40a96",
+      "name": "Fromage blanc",
+      "price": 3.5,
+      "category": "food",
+      "description": "Fromage blanc 500g",
+      "isEssential": true
+    },
+    "3ced5e90-c6b1-481b-b5a3-069f46641899": {
+      "id": "3ced5e90-c6b1-481b-b5a3-069f46641899",
+      "name": "Riz blanc",
+      "price": 2.5,
+      "category": "food",
+      "description": "Riz blanc 1kg",
+      "isEssential": true
+    },
+    "af46e1ab-b341-4caa-a73a-6ed2d277dc49": {
+      "id": "af46e1ab-b341-4caa-a73a-6ed2d277dc49",
+      "name": "Pâtes",
+      "price": 1.5,
+      "category": "food",
+      "description": "Pâtes 500g",
+      "isEssential": true
+    },
+    "0acb8adf-6581-4de6-b1eb-e85454a68bbe": {
+      "id": "0acb8adf-6581-4de6-b1eb-e85454a68bbe",
+      "name": "Bananes",
+      "price": 2,
+      "category": "food",
+      "description": "Régime de bananes",
+      "isEssential": false
+    },
+    "58d1de70-66c7-4c11-8cc3-03633a4cea53": {
+      "id": "58d1de70-66c7-4c11-8cc3-03633a4cea53",
+      "name": "Pommes rouges",
+      "price": 3,
+      "category": "food",
+      "description": "2kg pommes rouges",
+      "isEssential": false
+    },
+    "49b0130f-d12c-4897-b87c-b4c8ce908ff3": {
+      "id": "49b0130f-d12c-4897-b87c-b4c8ce908ff3",
+      "name": "Oranges",
+      "price": 3.5,
+      "category": "food",
+      "description": "1kg oranges juteuses",
+      "isEssential": false
+    },
+    "01b3a271-0084-44e1-bfcd-b29cadf6e1c2": {
+      "id": "01b3a271-0084-44e1-bfcd-b29cadf6e1c2",
+      "name": "Carottes",
+      "price": 1.5,
+      "category": "food",
+      "description": "Botte de carottes 1kg",
+      "isEssential": false
+    },
+    "ad276b97-20db-47a5-8580-24bfe83acb31": {
+      "id": "ad276b97-20db-47a5-8580-24bfe83acb31",
+      "name": "Brocoli",
+      "price": 2.5,
+      "category": "food",
+      "description": "Brocoli frais",
+      "isEssential": false
+    },
+    "f04df647-63cb-4c27-85b3-54e09675e32a": {
+      "id": "f04df647-63cb-4c27-85b3-54e09675e32a",
+      "name": "Tomates",
+      "price": 2.5,
+      "category": "food",
+      "description": "Tomates rouges 1kg",
+      "isEssential": false
+    },
+    "0a37e86b-b3e3-4766-b62e-0a88fea04e53": {
+      "id": "0a37e86b-b3e3-4766-b62e-0a88fea04e53",
+      "name": "Salade verte",
+      "price": 1.5,
+      "category": "food",
+      "description": "Laitue verte",
+      "isEssential": false
+    },
+    "8f94f37a-fb1c-432d-b3c8-ab1faf75554c": {
+      "id": "8f94f37a-fb1c-432d-b3c8-ab1faf75554c",
+      "name": "Pizza surgelée",
+      "price": 5,
+      "category": "food",
+      "description": "Pizza pepperoni",
+      "isEssential": false
+    },
+    "2549eb5e-8fd0-47e0-8613-0cd208f2509d": {
+      "id": "2549eb5e-8fd0-47e0-8613-0cd208f2509d",
+      "name": "Chips nature",
+      "price": 3,
+      "category": "food",
+      "description": "Sac de chips nature",
+      "isEssential": false
+    },
+    "9f531c23-99e5-4a5b-9d46-14afabbf9a92": {
+      "id": "9f531c23-99e5-4a5b-9d46-14afabbf9a92",
+      "name": "Chocolat",
+      "price": 2.5,
+      "category": "food",
+      "description": "Tablette chocolat",
+      "isEssential": false
+    },
+    "6a819e56-a03c-4fed-a3b5-411aa9f04552": {
+      "id": "6a819e56-a03c-4fed-a3b5-411aa9f04552",
+      "name": "Bonbons",
+      "price": 2,
+      "category": "food",
+      "description": "Assortiment bonbons",
+      "isEssential": false
+    },
+    "bc3bf664-eb3d-45ac-a341-e5fecdd78566": {
+      "id": "bc3bf664-eb3d-45ac-a341-e5fecdd78566",
+      "name": "Yaourt",
+      "price": 3,
+      "category": "food",
+      "description": "Pack yaourt 4x125g",
+      "isEssential": false
+    },
+    "7a8a1afe-9e20-4cfe-b238-8040b118cb41": {
+      "id": "7a8a1afe-9e20-4cfe-b238-8040b118cb41",
+      "name": "Beurre",
+      "price": 3.5,
+      "category": "food",
+      "description": "Beurre 250g",
+      "isEssential": false
+    },
+    "56bc6f92-bdf5-4ab7-adeb-553fd8aa4d4b": {
+      "id": "56bc6f92-bdf5-4ab7-adeb-553fd8aa4d4b",
+      "name": "Miel",
+      "price": 5,
+      "category": "food",
+      "description": "Miel 500g",
+      "isEssential": false
+    },
+    "075e086a-b2b0-42d1-a1fe-5180db097518": {
+      "id": "075e086a-b2b0-42d1-a1fe-5180db097518",
+      "name": "Jus d'orange",
+      "price": 2.5,
+      "category": "food",
+      "description": "Jus 1L",
+      "isEssential": false
+    },
+    "47c99208-a87d-4639-a032-13de5a646c3e": {
+      "id": "47c99208-a87d-4639-a032-13de5a646c3e",
+      "name": "Soda",
+      "price": 2,
+      "category": "food",
+      "description": "Soda 1.5L",
+      "isEssential": false
+    },
+    "1ad70fa1-9414-49b6-870a-dcc78d6c8f22": {
+      "id": "1ad70fa1-9414-49b6-870a-dcc78d6c8f22",
+      "name": "T-shirt",
+      "price": 15,
+      "category": "clothing",
+      "description": "T-shirt coton classique",
+      "isEssential": false
+    },
+    "54f46ccb-4fed-455c-b6be-d49b528184f6": {
+      "id": "54f46ccb-4fed-455c-b6be-d49b528184f6",
+      "name": "Jeans bleu",
+      "price": 40,
+      "category": "clothing",
+      "description": "Jeans bleu slim",
+      "isEssential": false
+    },
+    "8685dba8-1766-4f67-90dc-d054ee6b8965": {
+      "id": "8685dba8-1766-4f67-90dc-d054ee6b8965",
+      "name": "Chaussures sport",
+      "price": 60,
+      "category": "clothing",
+      "description": "Sneakers décontractées",
+      "isEssential": false
+    },
+    "54c4e0cc-9c74-43ce-a960-ef6382ee4341": {
+      "id": "54c4e0cc-9c74-43ce-a960-ef6382ee4341",
+      "name": "Chaussettes",
+      "price": 5,
+      "category": "clothing",
+      "description": "Paire de chaussettes",
+      "isEssential": true
+    },
+    "ef5a90a1-5708-4cbf-be74-c0566497f45b": {
+      "id": "ef5a90a1-5708-4cbf-be74-c0566497f45b",
+      "name": "Veste d'hiver",
+      "price": 80,
+      "category": "clothing",
+      "description": "Veste d'hiver",
+      "isEssential": false
+    },
+    "8e1d043d-d8c5-427b-82b2-3d77e352c364": {
+      "id": "8e1d043d-d8c5-427b-82b2-3d77e352c364",
+      "name": "Pull",
+      "price": 35,
+      "category": "clothing",
+      "description": "Pull chaud",
+      "isEssential": false
+    },
+    "5be72d50-40fb-4420-a9fc-809a4a48f6ce": {
+      "id": "5be72d50-40fb-4420-a9fc-809a4a48f6ce",
+      "name": "Bermuda",
+      "price": 25,
+      "category": "clothing",
+      "description": "Bermuda coton",
+      "isEssential": false
+    },
+    "c7ac1186-ea0a-42fe-b394-5f575f1f96b9": {
+      "id": "c7ac1186-ea0a-42fe-b394-5f575f1f96b9",
+      "name": "Cinéma",
+      "price": 10,
+      "category": "leisure",
+      "description": "Billet de cinéma",
+      "isEssential": false
+    },
+    "91b0d24c-3b3f-4218-ba31-2e6f66148841": {
+      "id": "91b0d24c-3b3f-4218-ba31-2e6f66148841",
+      "name": "Jeu vidéo",
+      "price": 20,
+      "category": "leisure",
+      "description": "Jeu vidéo populaire",
+      "isEssential": false
+    },
+    "83f2ae17-768a-49dd-9ec7-96432d940d95": {
+      "id": "83f2ae17-768a-49dd-9ec7-96432d940d95",
+      "name": "Entrée piscine",
+      "price": 12,
+      "category": "leisure",
+      "description": "Entrée piscine/sport",
+      "isEssential": false
+    },
+    "17671b90-3965-420d-855e-1f935ec40491": {
+      "id": "17671b90-3965-420d-855e-1f935ec40491",
+      "name": "Café",
+      "price": 3,
+      "category": "leisure",
+      "description": "Boisson café",
+      "isEssential": false
+    },
+    "bc433b93-fa45-4b72-bfc6-2647e4cd5916": {
+      "id": "bc433b93-fa45-4b72-bfc6-2647e4cd5916",
+      "name": "Livre",
+      "price": 15,
+      "category": "leisure",
+      "description": "Roman populaire",
+      "isEssential": false
+    },
+    "48bab743-cdec-4460-91c0-2cffa97906b4": {
+      "id": "48bab743-cdec-4460-91c0-2cffa97906b4",
+      "name": "Ticket concert",
+      "price": 25,
+      "category": "leisure",
+      "description": "Entrée concert",
+      "isEssential": false
+    }
+  },
+  "expenses": {},
+  "fixedExpenses": {},
+  "bonusExpenses": {}
+}

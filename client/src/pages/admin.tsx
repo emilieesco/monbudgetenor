@@ -5,52 +5,80 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ArrowLeft, Save } from "lucide-react";
+import type { Class, Student } from "@shared/schema";
 
 interface ExpenseAmount {
   [key: string]: number;
 }
 
-export default function Admin() {
+interface AdminParams {
+  classId: string;
+}
+
+export default function Admin({ classId }: AdminParams) {
   const [_location, navigate] = useLocation();
   const [expenseAmounts, setExpenseAmounts] = useState<ExpenseAmount>({});
+  const [initialized, setInitialized] = useState(false);
 
-  const defaultExpensesQuery = useQuery({
-    queryKey: ["/api/admin/default-expenses"],
+  // Extract classId from URL if not provided as prop
+  const actualClassId = typeof window !== 'undefined' && !classId 
+    ? window.location.pathname.split('/').pop() 
+    : classId;
+
+  const classQuery = useQuery({
+    queryKey: ["/api/classes", actualClassId],
+    enabled: !!actualClassId,
+  });
+
+  const studentsQuery = useQuery({
+    queryKey: ["/api/classes", actualClassId, "students"],
+    enabled: !!actualClassId,
   });
 
   const updateExpensesMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("PATCH", "/api/admin/default-expenses", expenseAmounts);
+      const res = await apiRequest("PATCH", `/api/classes/${actualClassId}/expenses`, expenseAmounts);
       return res.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["/api/admin/default-expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", actualClassId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", actualClassId, "students"] });
       alert("Montants des dépenses mis à jour avec succès!");
     },
   });
 
-  // Initialize form with fetched data
-  const defaultExpenses = defaultExpensesQuery.data as ExpenseAmount || {};
-  
-  if (defaultExpensesQuery.isLoading) {
+  const classData = classQuery.data as Class | undefined;
+  const students = studentsQuery.data as Student[] || [];
+
+  // Initialize expenseAmounts from classData
+  useEffect(() => {
+    if (classData && !initialized) {
+      setExpenseAmounts(classData.expenseAmounts || {});
+      setInitialized(true);
+    }
+  }, [classData, initialized]);
+
+  if (!actualClassId || classQuery.isLoading) {
     return <div className="p-8 text-center">Chargement...</div>;
   }
 
-  // Initialize expenseAmounts from defaultExpenses if empty
-  if (Object.keys(expenseAmounts).length === 0 && Object.keys(defaultExpenses).length > 0) {
-    setExpenseAmounts(defaultExpenses);
+  if (!classData) {
+    return <div className="p-8 text-center text-destructive">Classe introuvable</div>;
   }
 
-  const expensesToEdit = Object.keys(expenseAmounts).length > 0 ? expenseAmounts : defaultExpenses;
+  const expensesToEdit = Object.keys(expenseAmounts).length > 0 ? expenseAmounts : classData.expenseAmounts || {};
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-2xl mx-auto">
+      <div className="max-w-4xl mx-auto">
         {/* Header */}
         <div className="mb-8 flex items-center justify-between gap-4">
-          <h1 className="text-4xl font-bold text-primary">Interface Enseignant</h1>
+          <div>
+            <h1 className="text-4xl font-bold text-primary">Classe: {classData.code}</h1>
+            <p className="text-muted-foreground">Enseignant: {classData.teacherName}</p>
+          </div>
           <Button
             onClick={() => navigate("/")}
             variant="outline"
@@ -64,7 +92,7 @@ export default function Admin() {
         {/* Info Card */}
         <Card className="p-6 mb-8 bg-primary/5 border-primary/20">
           <p className="text-sm font-semibold text-foreground">
-            Modifiez les montants des dépenses fixes pour tous les élèves
+            Modifiez les montants des dépenses fixes pour les élèves de cette classe ({students.length} élève{students.length > 1 ? 's' : ''})
           </p>
         </Card>
 
@@ -120,14 +148,29 @@ export default function Admin() {
           </Button>
         </Card>
 
+        {/* Students List */}
+        {students.length > 0 && (
+          <Card className="p-6 mt-8">
+            <h3 className="font-semibold mb-4">Élèves de la classe</h3>
+            <div className="space-y-2">
+              {students.map((student) => (
+                <div key={student.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                  <span className="font-medium">{student.name}</span>
+                  <span className="text-sm text-muted-foreground">Budget: ${student.budget}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
         {/* Instructions */}
         <Card className="p-6 mt-8 bg-muted/50">
           <h3 className="font-semibold mb-2">Comment ça fonctionne</h3>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>• Modifiez les montants des dépenses fixes</li>
             <li>• Cliquez sur "Enregistrer" pour appliquer les changements</li>
-            <li>• Les nouveaux élèves créés utiliseront ces montants</li>
-            <li>• Les élèves existants garderont leurs montants actuels</li>
+            <li>• Tous les élèves de cette classe recevront les nouveaux montants</li>
+            <li>• Les élèves d'autres classes ne seront pas affectés</li>
           </ul>
         </Card>
       </div>

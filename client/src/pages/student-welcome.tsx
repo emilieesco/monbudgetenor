@@ -11,15 +11,6 @@ export default function StudentWelcome() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
-        <Button
-          onClick={() => navigate("/")}
-          variant="outline"
-          className="mb-8 flex items-center gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          Retour
-        </Button>
-
         {/* Welcome Section */}
         <div className="mb-12">
           <h1 className="text-5xl font-bold text-primary mb-4">

@@ -2,6 +2,7 @@ import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Wallet, TrendingUp, ShoppingCart } from "lucide-react";
+import walletImg from "@assets/u6899119312_digital_textured_cartoon_illustration_in_the_styl_f7dcd116-5c65-47a2-be2a-4231a926a1d4_0_1764361320697.png";
 
 export default function StudentWelcome() {
   const [_location, navigate] = useLocation();
@@ -20,14 +21,23 @@ export default function StudentWelcome() {
           Retour
         </Button>
 
-        {/* Welcome Section */}
-        <div className="mb-12">
-          <h1 className="text-5xl font-bold text-primary mb-4">
-            Bienvenue, {studentName}! 👋
-          </h1>
-          <p className="text-xl text-muted-foreground">
-            Tu es sur le point de commencer une aventure budgétaire passionnante!
-          </p>
+        {/* Welcome Section with Image */}
+        <div className="mb-12 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div>
+            <h1 className="text-5xl font-bold text-primary mb-4">
+              Bienvenue, {studentName}! 👋
+            </h1>
+            <p className="text-xl text-muted-foreground">
+              Tu es sur le point de commencer une aventure budgétaire passionnante!
+            </p>
+          </div>
+          <div className="flex justify-center md:justify-end">
+            <img
+              src={walletImg}
+              alt="Portefeuille et pièces"
+              className="w-full max-w-sm drop-shadow-lg"
+            />
+          </div>
         </div>
 
         {/* Game Overview Cards */}

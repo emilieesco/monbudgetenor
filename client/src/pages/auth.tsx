@@ -11,8 +11,14 @@ export default function Auth() {
       <div className="max-w-4xl w-full">
         {/* Header */}
         <div className="text-center mb-12">
+          <button
+            onClick={() => navigate("/")}
+            className="mb-6 inline-flex items-center justify-center w-10 h-10 rounded-full bg-primary/10 hover:bg-primary/20 transition"
+          >
+            ←
+          </button>
           <h1 className="text-5xl font-bold text-primary mb-4">Mon Budget en Or</h1>
-          <p className="text-xl text-muted-foreground">Apprenez à gérer votre argent avec sagesse</p>
+          <p className="text-xl text-muted-foreground">Choisissez votre rôle</p>
         </div>
 
         {/* Choice Cards */}

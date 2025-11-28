@@ -112,10 +112,18 @@ export class MemStorage implements IStorage {
   }
 
   async createClass(input: CreateClass): Promise<Class> {
+    const upperCode = input.code.toUpperCase();
+    
+    // Check if class code already exists
+    const existingClass = await this.getClassByCode(upperCode);
+    if (existingClass) {
+      throw new Error("Le code de classe existe déjà. Utilise un code unique.");
+    }
+    
     const id = randomUUID();
     const classData: Class = {
       id,
-      code: input.code.toUpperCase(),
+      code: upperCode,
       teacherName: input.teacherName,
       createdAt: new Date(),
       expenseAmounts: {

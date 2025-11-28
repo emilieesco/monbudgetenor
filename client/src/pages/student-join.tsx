@@ -37,8 +37,8 @@ export default function StudentJoin() {
       return;
     }
     setError("");
-    // Redirect to setup page based on class mode
-    navigate(`/student/setup?classCode=${classCode.toUpperCase()}`);
+    // Redirect to welcome page
+    navigate(`/student/welcome?classCode=${classCode.toUpperCase()}&name=${encodeURIComponent(studentName)}`);
   };
 
   return (

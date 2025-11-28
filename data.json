@@ -26,6 +26,14 @@
       "id": "f955d948-b5ad-49b1-8a33-4e9426802bf3",
       "spent": 0,
       "createdAt": "2025-11-28T19:39:07.090Z"
+    },
+    "63b30bb4-1eb1-4593-9bbf-15cfb44d534f": {
+      "name": "Emilie",
+      "classId": "9b15a65f-8f9e-479b-b34d-7a1ac64032e1",
+      "budget": 50,
+      "id": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "spent": 0,
+      "createdAt": "2025-11-28T19:57:55.463Z"
     }
   },
   "catalogItems": {
@@ -391,6 +399,78 @@
       "amount": 5,
       "isPaid": false,
       "dueDate": "2025-12-28T19:39:07.091Z"
+    },
+    "2a92209f-347f-45a3-8380-a76937b218b9": {
+      "id": "2a92209f-347f-45a3-8380-a76937b218b9",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Loyer",
+      "amount": 300,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "92d64cdf-8b04-4d0a-ba2a-c6a8e1a41a8d": {
+      "id": "92d64cdf-8b04-4d0a-ba2a-c6a8e1a41a8d",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Internet",
+      "amount": 10,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "3aedf3d7-d2f2-4d62-90ee-4ac0196b9923": {
+      "id": "3aedf3d7-d2f2-4d62-90ee-4ac0196b9923",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Téléphone",
+      "amount": 30,
+      "isPaid": true,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "e14ae1c6-46ae-437f-9856-790301161e00": {
+      "id": "e14ae1c6-46ae-437f-9856-790301161e00",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Hydro",
+      "amount": 8,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "80d98020-d5ce-470a-9d6a-dd824c887b3e": {
+      "id": "80d98020-d5ce-470a-9d6a-dd824c887b3e",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Assurance Voiture",
+      "amount": 10,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "04f05477-ced6-4bef-b4ab-1b013d09668b": {
+      "id": "04f05477-ced6-4bef-b4ab-1b013d09668b",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Assurance Maison",
+      "amount": 7,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "b9408cbe-7560-40d7-8c90-daf049c5ad98": {
+      "id": "b9408cbe-7560-40d7-8c90-daf049c5ad98",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Essence",
+      "amount": 12,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "ecf804e0-9d22-40b1-afd6-1515ff360388": {
+      "id": "ecf804e0-9d22-40b1-afd6-1515ff360388",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Nourriture",
+      "amount": 20,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
+    },
+    "e9f88f2b-fe2e-4207-aaa3-15400528c874": {
+      "id": "e9f88f2b-fe2e-4207-aaa3-15400528c874",
+      "studentId": "63b30bb4-1eb1-4593-9bbf-15cfb44d534f",
+      "category": "Sortie",
+      "amount": 5,
+      "isPaid": false,
+      "dueDate": "2025-12-28T19:57:55.463Z"
     }
   },
   "bonusExpenses": {}

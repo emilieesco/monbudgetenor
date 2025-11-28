@@ -172,8 +172,7 @@ export default function Dashboard() {
                         <Button
                           size="sm"
                           onClick={() => payRentMutation.mutate(expense.id)}
-                          disabled={payRentMutation.isPending || remaining < expense.amount}
-                          variant={remaining < expense.amount ? "outline" : "default"}
+                          disabled={payRentMutation.isPending}
                         >
                           Payer
                         </Button>

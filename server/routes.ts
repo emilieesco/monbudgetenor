@@ -243,6 +243,14 @@ export async function registerRoutes(
       if (!expense) {
         return res.status(404).json({ error: "Expense not found" });
       }
+      
+      // Deduct from student budget and add to spent
+      const student = await storage.getStudent(expense.studentId);
+      if (student) {
+        const newSpent = student.spent + expense.amount;
+        await storage.updateStudentBudget(expense.studentId, student.budget - expense.amount);
+      }
+      
       res.json(expense);
     } catch (error) {
       res.status(500).json({ error: "Failed to pay expense" });

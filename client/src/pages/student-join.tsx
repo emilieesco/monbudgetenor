@@ -37,8 +37,19 @@ export default function StudentJoin() {
       return;
     }
     setError("");
-    // Redirect to welcome page
-    navigate(`/student/welcome?classCode=${classCode.toUpperCase()}&name=${encodeURIComponent(studentName)}`);
+    
+    // Validate that the class code exists
+    try {
+      const res = await fetch(`/api/classes/code/${classCode.toUpperCase()}`);
+      if (!res.ok) {
+        setError("Code de classe invalide. Vérifie et réessaie.");
+        return;
+      }
+      // If valid, redirect to welcome page
+      navigate(`/student/welcome?classCode=${classCode.toUpperCase()}&name=${encodeURIComponent(studentName)}`);
+    } catch (err) {
+      setError("Erreur lors de la vérification du code. Réessaie.");
+    }
   };
 
   return (

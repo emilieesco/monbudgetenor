@@ -27,7 +27,7 @@ export default function Catalog() {
   });
 
   const catalogQuery = useQuery({
-    queryKey: ["/api/catalog", selectedCategory],
+    queryKey: ["/api/catalog"],
   });
 
   const addExpenseMutation = useMutation({
@@ -50,7 +50,8 @@ export default function Catalog() {
   });
 
   const student = studentQuery.data as Student | undefined;
-  const items = catalogQuery.data as CatalogItem[] || [];
+  const allItems = catalogQuery.data as CatalogItem[] || [];
+  const items = allItems.filter(item => item.category === selectedCategory);
 
   if (!student) {
     return <div className="p-8">Chargement...</div>;

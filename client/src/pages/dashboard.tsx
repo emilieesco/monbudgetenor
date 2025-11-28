@@ -1,16 +1,17 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { useParams } from "wouter";
+import { useParams, useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart } from "lucide-react";
 import type { Student, Expense } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
+  const [_location, navigate] = useLocation();
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -59,10 +60,19 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8">
-          <h1 className="text-4xl font-bold text-primary mb-2">Mon Budget en Or</h1>
-          <p className="text-lg text-muted-foreground">Bienvenue, {student.name}</p>
+        {/* Header with Navigation */}
+        <div className="mb-8 flex items-center justify-between">
+          <div>
+            <h1 className="text-4xl font-bold text-primary mb-2">Mon Budget en Or</h1>
+            <p className="text-lg text-muted-foreground">Bienvenue, {student.name}</p>
+          </div>
+          <Button
+            onClick={() => navigate(`/student/${studentId}/catalog`)}
+            className="flex items-center gap-2 bg-primary hover:bg-primary/90"
+          >
+            <ShoppingCart className="w-5 h-5" />
+            Faire du Shopping
+          </Button>
         </div>
 
         {/* Budget Overview Cards */}

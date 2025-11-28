@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, Wallet, TrendingUp, ShoppingCart } from "lucide-react";
+import { ArrowLeft, Wallet, TrendingUp, ShoppingCart, CheckCircle2, AlertCircle, Eye, Target, PieChart, DollarSign } from "lucide-react";
 
 export default function StudentWelcome() {
   const [_location, navigate] = useLocation();
@@ -112,27 +112,142 @@ export default function StudentWelcome() {
         </Card>
 
         {/* Tips Section */}
-        <Card className="p-8 mb-12 bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800">
-          <h3 className="font-semibold text-lg mb-4">Conseils pour réussir 💡</h3>
-          <ul className="space-y-2 text-sm">
-            <li className="flex gap-2">
-              <span>✓</span>
-              <span>Planifie tes achats avant de commencer</span>
-            </li>
-            <li className="flex gap-2">
-              <span>✓</span>
-              <span>Paie d'abord tes dépenses obligatoires</span>
-            </li>
-            <li className="flex gap-2">
-              <span>✓</span>
-              <span>Garde de l'argent pour les surprises</span>
-            </li>
-            <li className="flex gap-2">
-              <span>✓</span>
-              <span>Distingue essentiels et désirs</span>
-            </li>
-          </ul>
-        </Card>
+        <div className="mb-12">
+          <h2 className="text-3xl font-bold mb-8">Conseils pour réussir</h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+            {/* Essential Expenses */}
+            <Card className="p-6 border-l-4 border-l-destructive">
+              <div className="flex items-start gap-4">
+                <AlertCircle className="w-8 h-8 text-destructive flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Dépenses Obligatoires d'Abord</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Les dépenses fixes (loyer, électricité, nourriture) doivent être payées en priorité. Sans celles-ci, tu ne peux pas survivre!
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Paie le loyer</li>
+                    <li>• Puis les services (électricité, Internet)</li>
+                    <li>• Puis la nourriture de base</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Planning Ahead */}
+            <Card className="p-6 border-l-4 border-l-primary">
+              <div className="flex items-start gap-4">
+                <Target className="w-8 h-8 text-primary flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Planifie Tes Achats</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Avant de cliquer, fais une liste mentale de ce dont tu as besoin. Cela évite les achats impulsifs!
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Liste tes besoins vs tes envies</li>
+                    <li>• Estime le coût total</li>
+                    <li>• Vérifie que tu as assez d'argent</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Budget Reserve */}
+            <Card className="p-6 border-l-4 border-l-yellow-500">
+              <div className="flex items-start gap-4">
+                <DollarSign className="w-8 h-8 text-yellow-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Garde une Réserve</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Ne dépense pas tout d'un coup! Les dépenses surprises peuvent arriver à tout moment.
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Essaie de garder 10-20% de ton budget</li>
+                    <li>• Sois prêt pour les urgences</li>
+                    <li>• C'est la sagesse du vrai monde</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Distinguish Needs vs Wants */}
+            <Card className="p-6 border-l-4 border-l-green-500">
+              <div className="flex items-start gap-4">
+                <Eye className="w-8 h-8 text-green-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Besoins vs Envies</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Essentiels = nourriture, vêtements, logement. Envies = sorties, jeux, extras.
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Essentiels: tu dois les payer</li>
+                    <li>• Envies: achète si tu en as les moyens</li>
+                    <li>• La vraie richesse, c'est le choix!</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Track Spending */}
+            <Card className="p-6 border-l-4 border-l-blue-500">
+              <div className="flex items-start gap-4">
+                <PieChart className="w-8 h-8 text-blue-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Suis tes Dépenses</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Le jeu te montre où va ton argent. Regarde les catégories qui te coûtent le plus.
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Où dépenses-tu le plus?</li>
+                    <li>• Peux-tu réduire certaines dépenses?</li>
+                    <li>• C'est comme ça qu'on apprend!</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+
+            {/* Make Smart Choices */}
+            <Card className="p-6 border-l-4 border-l-purple-500">
+              <div className="flex items-start gap-4">
+                <CheckCircle2 className="w-8 h-8 text-purple-500 flex-shrink-0 mt-1" />
+                <div>
+                  <h3 className="font-bold text-lg mb-2">Fais des Choix Intelligents</h3>
+                  <p className="text-sm text-muted-foreground mb-3">
+                    Chaque achat te rapporte des points ou des avertissements. Les choix responsables payent!
+                  </p>
+                  <ul className="text-xs space-y-1 text-muted-foreground">
+                    <li>• Achète des produits essentiels</li>
+                    <li>• Évite les dépenses inutiles</li>
+                    <li>• Regarde tes retours pour apprendre</li>
+                  </ul>
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Pro Tips */}
+          <Card className="p-8 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950 dark:to-orange-950 border-2 border-amber-200 dark:border-amber-800">
+            <h3 className="font-bold text-lg mb-4">Astuces Pro</h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">😊 Sois Responsable</p>
+                <p className="text-muted-foreground">Les bonnes décisions financières te rendront heureux et ton score augmentera!</p>
+              </div>
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">🎯 Fixe-toi des Objectifs</p>
+                <p className="text-muted-foreground">Essaie de terminer le mois sans dépasser ton budget. C'est un défi!</p>
+              </div>
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">📚 Apprends de Tes Erreurs</p>
+                <p className="text-muted-foreground">Si tu dépenses trop, l'app te le dit. C'est une leçon gratuite!</p>
+              </div>
+              <div>
+                <p className="font-semibold text-amber-900 dark:text-amber-100 mb-1">💪 Sois Persévérant</p>
+                <p className="text-muted-foreground">Chaque mois est une nouvelle chance de t'améliorer. Vas-y!</p>
+              </div>
+            </div>
+          </Card>
+        </div>
 
         {/* CTA Button */}
         <div className="flex justify-center">

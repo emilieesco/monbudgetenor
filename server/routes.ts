@@ -73,6 +73,13 @@ export async function registerRoutes(
       if (!classData) {
         return res.status(404).json({ error: "Class not found" });
       }
+      
+      // Check if student with same name already exists in this class
+      const existingStudent = await storage.getStudentByNameAndClass(data.name, classData.id);
+      if (existingStudent) {
+        return res.json(existingStudent);
+      }
+      
       const student = await storage.createStudent({
         name: data.name,
         classId: classData.id,

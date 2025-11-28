@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { ArrowLeft, Plus, LogIn } from "lucide-react";
+import { ArrowLeft, Plus, LogIn, Home } from "lucide-react";
 
 export default function TeacherSetup() {
   const [_location, navigate] = useLocation();
@@ -72,6 +72,14 @@ export default function TeacherSetup() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-md mx-auto">
         {/* Header */}
+        <Button
+          onClick={() => navigate("/landing")}
+          variant="outline"
+          className="mb-6 flex items-center gap-2"
+        >
+          <Home className="w-4 h-4" />
+          Accueil
+        </Button>
         <div className="mb-8">
           {mode !== "choice" && (
             <Button

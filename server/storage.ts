@@ -149,6 +149,10 @@ export class MemStorage implements IStorage {
     return Array.from(this.students.values()).filter(s => s.classId === classId);
   }
 
+  async getStudentByNameAndClass(name: string, classId: string): Promise<Student | undefined> {
+    return Array.from(this.students.values()).find(s => s.name === name && s.classId === classId);
+  }
+
   async updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined> {
     const classData = this.classes.get(classId);
     if (!classData) return undefined;

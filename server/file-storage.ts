@@ -216,8 +216,9 @@ export class FileStorage implements IStorage {
     ];
 
     for (const expense of fixedExpensesList) {
-      this.fixedExpenses.set(randomUUID(), {
-        id: randomUUID(),
+      const expenseId = randomUUID();
+      this.fixedExpenses.set(expenseId, {
+        id: expenseId,
         studentId: id,
         category: expense.name,
         amount: expense.amount,

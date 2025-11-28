@@ -4,10 +4,116 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { ArrowLeft, Save } from "lucide-react";
+import { ArrowLeft, Save, AlertCircle } from "lucide-react";
 import type { Class, Student } from "@shared/schema";
+
+function AddBonusExpenseForm({ classId, students }: { classId: string; students: Student[] }) {
+  const [studentId, setStudentId] = useState("");
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [amount, setAmount] = useState("");
+
+  const createBonusMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/bonus-expenses", {
+        studentId,
+        title,
+        description,
+        amount: parseFloat(amount),
+        classId,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bonus-expenses"] });
+      setStudentId("");
+      setTitle("");
+      setDescription("");
+      setAmount("");
+      alert("Dépense surprise créée!");
+    },
+  });
+
+  const handleSubmit = () => {
+    if (!studentId || !title || !description || !amount) {
+      alert("Tous les champs sont requis");
+      return;
+    }
+    createBonusMutation.mutate();
+  };
+
+  return (
+    <div className="space-y-4">
+      <div>
+        <Label htmlFor="student">Élève</Label>
+        <Select value={studentId} onValueChange={setStudentId}>
+          <SelectTrigger data-testid="select-student">
+            <SelectValue placeholder="Sélectionner un élève" />
+          </SelectTrigger>
+          <SelectContent>
+            {students.map((student) => (
+              <SelectItem key={student.id} value={student.id}>
+                {student.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div>
+        <Label htmlFor="title">Titre</Label>
+        <Input
+          id="title"
+          placeholder="Ex: Accident voiture, Impôts tardifs"
+          value={title}
+          onChange={(e) => setTitle(e.target.value)}
+          data-testid="input-bonus-title"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="description">Description</Label>
+        <Textarea
+          id="description"
+          placeholder="Décrivez la dépense surprise..."
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          data-testid="input-bonus-description"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor="amount">Montant ($)</Label>
+        <Input
+          id="amount"
+          type="number"
+          min="0"
+          step="0.01"
+          placeholder="10"
+          value={amount}
+          onChange={(e) => setAmount(e.target.value)}
+          data-testid="input-bonus-amount"
+        />
+      </div>
+
+      <Button
+        onClick={handleSubmit}
+        disabled={createBonusMutation.isPending || !studentId || !title || !description || !amount}
+        className="w-full bg-destructive hover:bg-destructive/90 flex items-center justify-center gap-2"
+        size="lg"
+        data-testid="button-add-bonus"
+      >
+        <AlertCircle className="w-5 h-5" />
+        {createBonusMutation.isPending ? "Création..." : "Ajouter Dépense Surprise"}
+      </Button>
+    </div>
+  );
+}
 
 interface ExpenseAmount {
   [key: string]: number;
@@ -148,10 +254,16 @@ export default function Admin({ classId }: AdminParams) {
           </Button>
         </Card>
 
+        {/* Add Bonus Expense */}
+        <Card className="p-8 mt-8">
+          <h3 className="text-2xl font-bold mb-6">Ajouter une Dépense Surprise</h3>
+          <AddBonusExpenseForm classId={actualClassId} students={students} />
+        </Card>
+
         {/* Students List */}
         {students.length > 0 && (
           <Card className="p-6 mt-8">
-            <h3 className="font-semibold mb-4">Élèves de la classe</h3>
+            <h3 className="font-semibold mb-4">Élèves de la classe ({students.length})</h3>
             <div className="space-y-2">
               {students.map((student) => (
                 <div key={student.id} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">

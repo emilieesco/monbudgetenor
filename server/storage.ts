@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -33,6 +33,12 @@ export interface IStorage {
   getDefaultExpenseAmounts(): Promise<Map<string, number>>;
   setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void>;
   updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void>;
+
+  // Bonus expenses
+  createBonusExpense(input: CreateBonusExpense, classId: string): Promise<BonusExpense>;
+  getStudentBonusExpenses(studentId: string): Promise<BonusExpense[]>;
+  payBonusExpense(id: string): Promise<BonusExpense | undefined>;
+  deleteClassBonusExpenses(classId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -41,6 +47,7 @@ export class MemStorage implements IStorage {
   private catalogItems: Map<string, CatalogItem>;
   private expenses: Map<string, Expense>;
   private fixedExpenses: Map<string, FixedExpense>;
+  private bonusExpenses: Map<string, BonusExpense> = new Map();
   private expenseSequence: Expense[] = [];
   private defaultExpenseAmounts: Map<string, number> = new Map();
 
@@ -329,6 +336,46 @@ export class MemStorage implements IStorage {
       if (newAmount !== undefined) {
         const updated = { ...expense, amount: newAmount };
         this.fixedExpenses.set(expenseId, updated);
+      }
+    }
+  }
+
+  async createBonusExpense(input: CreateBonusExpense, classId: string): Promise<BonusExpense> {
+    const id = randomUUID();
+    const bonus: BonusExpense = {
+      id,
+      ...input,
+      classId,
+      createdAt: new Date(),
+      isPaid: false,
+    };
+    this.bonusExpenses.set(id, bonus);
+
+    // Deduct from student budget
+    const student = await this.getStudent(input.studentId);
+    if (student) {
+      await this.updateStudentBudget(input.studentId, student.budget - input.amount);
+    }
+
+    return bonus;
+  }
+
+  async getStudentBonusExpenses(studentId: string): Promise<BonusExpense[]> {
+    return Array.from(this.bonusExpenses.values()).filter(b => b.studentId === studentId);
+  }
+
+  async payBonusExpense(id: string): Promise<BonusExpense | undefined> {
+    const bonus = this.bonusExpenses.get(id);
+    if (!bonus) return undefined;
+    const updated = { ...bonus, isPaid: true };
+    this.bonusExpenses.set(id, updated);
+    return updated;
+  }
+
+  async deleteClassBonusExpenses(classId: string): Promise<void> {
+    for (const [id, bonus] of this.bonusExpenses.entries()) {
+      if (bonus.classId === classId) {
+        this.bonusExpenses.delete(id);
       }
     }
   }

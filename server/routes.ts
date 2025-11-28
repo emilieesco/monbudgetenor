@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -185,6 +185,42 @@ export async function registerRoutes(
       res.json(expenses);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch fixed expenses" });
+    }
+  });
+
+  // Bonus expenses endpoints
+  app.post("/api/bonus-expenses", async (req, res) => {
+    try {
+      const data = createBonusExpenseSchema.parse(req.body);
+      const classId = req.body.classId;
+      if (!classId) {
+        return res.status(400).json({ error: "classId required" });
+      }
+      const bonus = await storage.createBonusExpense(data, classId);
+      res.json(bonus);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid bonus expense data" });
+    }
+  });
+
+  app.get("/api/bonus-expenses/:studentId", async (req, res) => {
+    try {
+      const expenses = await storage.getStudentBonusExpenses(req.params.studentId);
+      res.json(expenses);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch bonus expenses" });
+    }
+  });
+
+  app.patch("/api/bonus-expenses/:id/pay", async (req, res) => {
+    try {
+      const bonus = await storage.payBonusExpense(req.params.id);
+      if (!bonus) {
+        return res.status(404).json({ error: "Bonus not found" });
+      }
+      res.json(bonus);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to pay bonus" });
     }
   });
 

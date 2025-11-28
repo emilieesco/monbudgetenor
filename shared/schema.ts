@@ -49,6 +49,17 @@ export interface FixedExpense {
   dueDate: Date;
 }
 
+export interface BonusExpense {
+  id: string;
+  studentId: string;
+  classId: string;
+  title: string;
+  description: string;
+  amount: number;
+  createdAt: Date;
+  isPaid: boolean;
+}
+
 // Zod schemas for validation
 export const studentSchema = z.object({
   id: z.string(),
@@ -72,6 +83,13 @@ export const createClassSchema = z.object({
 export const joinClassSchema = z.object({
   name: z.string().min(1),
   classCode: z.string().min(1),
+});
+
+export const createBonusExpenseSchema = z.object({
+  studentId: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  amount: z.number().positive(),
 });
 
 export const catalogItemSchema = z.object({
@@ -120,3 +138,4 @@ export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type CreateClass = z.infer<typeof createClassSchema>;
 export type JoinClass = z.infer<typeof joinClassSchema>;
+export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;

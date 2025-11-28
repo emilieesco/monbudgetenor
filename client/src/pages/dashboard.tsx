@@ -7,7 +7,7 @@ import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
 import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home } from "lucide-react";
-import type { Student, Expense } from "@shared/schema";
+import type { Student, Expense, BonusExpense } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
@@ -25,6 +25,10 @@ export default function Dashboard() {
     queryKey: ["/api/fixed-expenses", studentId],
   });
 
+  const bonusExpensesQuery = useQuery({
+    queryKey: ["/api/bonus-expenses", studentId],
+  });
+
   const payRentMutation = useMutation({
     mutationFn: async (expenseId: string) => {
       const res = await apiRequest("PATCH", `/api/fixed-expenses/${expenseId}/pay`);
@@ -39,6 +43,7 @@ export default function Dashboard() {
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
+  const bonusExpenses = bonusExpensesQuery.data || [];
 
   if (!student) {
     return <div className="p-8">Chargement...</div>;
@@ -116,6 +121,27 @@ export default function Dashboard() {
           <Progress value={Math.min(spentPercentage, 100)} className="h-3" />
           <p className="text-xs text-muted-foreground mt-2">{Math.round(spentPercentage)}% utilisé</p>
         </Card>
+
+        {/* Bonus Expenses Alert */}
+        {bonusExpenses.length > 0 && (
+          <Card className="p-6 mb-8 border-destructive/50 bg-destructive/5">
+            <div className="flex gap-4">
+              <AlertCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-1" />
+              <div className="flex-1">
+                <h3 className="font-semibold text-destructive mb-2">Dépenses Surprises!</h3>
+                <div className="space-y-2">
+                  {bonusExpenses.map((bonus) => (
+                    <div key={bonus.id} className="text-sm">
+                      <p className="font-medium">{bonus.title}</p>
+                      <p className="text-muted-foreground text-xs">{bonus.description}</p>
+                      <p className="font-bold text-destructive">-${bonus.amount}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </Card>
+        )}
 
         {/* Main Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-8">

@@ -249,7 +249,8 @@ export async function registerRoutes(
       const student = await storage.getStudent(expense.studentId);
       if (student) {
         const newSpent = student.spent + expense.amount;
-        await storage.updateStudentBudget(expense.studentId, student.budget - expense.amount);
+        const newBudget = student.budget - expense.amount;
+        await storage.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
       }
       
       res.json(expense);

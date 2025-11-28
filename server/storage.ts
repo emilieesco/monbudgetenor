@@ -224,6 +224,14 @@ export class MemStorage implements IStorage {
     return updated;
   }
 
+  async updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, budget, spent };
+    this.students.set(id, updated);
+    return updated;
+  }
+
   private getDefaultAmounts(): Record<string, number> {
     return {
       "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,

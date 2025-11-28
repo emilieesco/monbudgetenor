@@ -6,13 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft } from "lucide-react";
+import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, TrendingUp } from "lucide-react";
 import type { CatalogItem, Student } from "@shared/schema";
 
 const CATEGORIES = [
-  { id: "food", name: "Nourriture", icon: "🍎" },
-  { id: "clothing", name: "Vêtements", icon: "👕" },
-  { id: "leisure", name: "Loisirs", icon: "🎮" },
+  { id: "food", name: "Nourriture", icon: "🍎", color: "from-green-400 to-green-600" },
+  { id: "clothing", name: "Vêtements", icon: "👕", color: "from-blue-400 to-blue-600" },
+  { id: "leisure", name: "Loisirs", icon: "🎮", color: "from-purple-400 to-purple-600" },
 ];
 
 export default function Catalog() {
@@ -22,7 +22,6 @@ export default function Catalog() {
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
-  // Get category from URL if provided
   useEffect(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
     const cat = params.get("category");
@@ -61,6 +60,7 @@ export default function Catalog() {
   const student = studentQuery.data as Student | undefined;
   const allItems = catalogQuery.data as CatalogItem[] || [];
   const items = allItems.filter(item => item.category === selectedCategory);
+  const currentCategory = CATEGORIES.find(c => c.id === selectedCategory);
 
   if (!student) {
     return <div className="p-8">Chargement...</div>;
@@ -70,168 +70,222 @@ export default function Catalog() {
   const canAfford = selectedItem ? remaining >= selectedItem.price : true;
 
   return (
-    <div className="min-h-screen bg-background p-4 md:p-8">
-      <div className="max-w-6xl mx-auto">
-        {/* Header */}
-        <div className="mb-8 flex items-center justify-between gap-4">
-          <div>
-            <h1 className="text-3xl font-bold text-primary">Catalogue</h1>
-            <p className="text-muted-foreground mt-1">Budget restant: <strong className={remaining < 0 ? "text-destructive" : "text-green-600"}>${remaining}</strong></p>
+    <div className="min-h-screen bg-gradient-to-b from-muted/50 to-background">
+      {/* Hero Header */}
+      <div className={`bg-gradient-to-r ${currentCategory?.color} text-white p-8 mb-8`}>
+        <div className="max-w-7xl mx-auto">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h1 className="text-5xl font-black mb-2">Circulaire Mon Budget en Or</h1>
+              <p className="text-white/90 text-lg">Découvrez nos meilleures offres</p>
+            </div>
+            <Button
+              onClick={() => navigate(`/student/${studentId}`)}
+              variant="secondary"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="w-5 h-5" />
+              Retour
+            </Button>
           </div>
-          <Button
-            onClick={() => navigate(`/student/${studentId}`)}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <ArrowLeft className="w-5 h-5" />
-            Retour
-          </Button>
+          <div className="flex items-center gap-4 text-sm">
+            <div className="bg-white/20 px-4 py-2 rounded-full">
+              Budget restant: <strong className={`ml-1 ${remaining < 0 ? "text-red-300" : "text-green-100"}`}>${remaining}</strong>
+            </div>
+          </div>
         </div>
+      </div>
 
-        {/* Category Tabs */}
-        <div className="flex gap-2 mb-8 flex-wrap">
+      <div className="max-w-7xl mx-auto px-4 pb-12">
+        {/* Category Navigation */}
+        <div className="flex gap-3 mb-12 justify-center flex-wrap">
           {CATEGORIES.map(cat => (
             <Button
               key={cat.id}
               variant={selectedCategory === cat.id ? "default" : "outline"}
               onClick={() => setSelectedCategory(cat.id)}
-              className="flex items-center gap-2"
+              className="px-8 py-6 text-lg flex items-center gap-3 font-semibold"
+              size="lg"
             >
-              <span>{cat.icon}</span>
+              <span className="text-2xl">{cat.icon}</span>
               {cat.name}
             </Button>
           ))}
         </div>
 
-        {/* Catalog Grid */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {items.map(item => (
-            <Card
-              key={item.id}
-              className="overflow-hidden hover-elevate transition-all cursor-pointer"
-              onClick={() => {
-                setSelectedItem(item);
-                setShowConfirm(true);
-              }}
-            >
-              {/* Item Icon/Placeholder */}
-              <div className="h-32 bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center">
-                <div className="text-4xl opacity-50">
-                  {item.category === "food" ? "🍕" : item.category === "clothing" ? "👔" : "🎮"}
-                </div>
+        {/* Products Grid - Flyer Style */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          {items.map(item => {
+            const isEssential = item.isEssential;
+            const isExpensive = item.price > 20;
+            
+            return (
+              <div
+                key={item.id}
+                className="hover-elevate transition-all cursor-pointer group"
+                onClick={() => {
+                  setSelectedItem(item);
+                  setShowConfirm(true);
+                }}
+              >
+                <Card className="overflow-hidden border-2 border-muted hover:border-primary">
+                  {/* Top Banner with Badge */}
+                  <div className={`bg-gradient-to-r ${currentCategory?.color} p-3 text-white relative overflow-hidden`}>
+                    <div className="flex items-start justify-between">
+                      <div>
+                        <p className="text-xs font-bold opacity-90">SPÉCIAL</p>
+                        <p className="text-2xl font-black">${item.price}</p>
+                      </div>
+                      <Badge 
+                        className={`${isEssential ? "bg-white text-green-600 hover:bg-white" : "bg-yellow-300 text-yellow-900 hover:bg-yellow-300"}`}
+                      >
+                        {isEssential ? "Essentiel" : "Plaisir"}
+                      </Badge>
+                    </div>
+                  </div>
+
+                  {/* Product Image/Icon Area */}
+                  <div className="h-40 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center border-b-2 border-muted">
+                    <div className="text-6xl group-hover:scale-110 transition-transform">
+                      {item.category === "food" ? "🍕" : item.category === "clothing" ? "👔" : "🎮"}
+                    </div>
+                  </div>
+
+                  {/* Product Details */}
+                  <div className="p-4">
+                    <h3 className="font-black text-lg mb-1 line-clamp-2 text-foreground">{item.name}</h3>
+                    <p className="text-xs text-muted-foreground mb-4 line-clamp-2">{item.description}</p>
+
+                    {/* Price Highlight */}
+                    <div className="mb-4 p-3 bg-muted rounded-lg border-2 border-dashed border-primary/30">
+                      <div className="flex items-baseline gap-1">
+                        <span className="text-3xl font-black text-primary">${item.price}</span>
+                        <span className="text-xs text-muted-foreground">seulement</span>
+                      </div>
+                    </div>
+
+                    {/* Info Badge */}
+                    {isExpensive && (
+                      <div className="mb-3 flex items-center gap-2 text-xs p-2 bg-orange-50 dark:bg-orange-900/20 rounded border border-orange-200 dark:border-orange-800">
+                        <TrendingUp className="w-3 h-3 text-orange-600 dark:text-orange-400" />
+                        <span className="text-orange-700 dark:text-orange-300 font-semibold">Prix élevé</span>
+                      </div>
+                    )}
+
+                    {/* Buy Button */}
+                    <Button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setSelectedItem(item);
+                        setShowConfirm(true);
+                      }}
+                      className="w-full font-bold py-2 bg-primary hover:bg-primary/90 text-base"
+                    >
+                      <ShoppingCart className="w-4 h-4 mr-2" />
+                      Ajouter
+                    </Button>
+                  </div>
+                </Card>
               </div>
-
-              {/* Item Details */}
-              <div className="p-4">
-                <div className="flex items-start justify-between mb-2">
-                  <h3 className="font-semibold text-lg">{item.name}</h3>
-                  <Badge variant={item.isEssential ? "outline" : "secondary"}>
-                    {item.isEssential ? "Essentiel" : "Plaisir"}
-                  </Badge>
-                </div>
-
-                <p className="text-sm text-muted-foreground mb-3">{item.description}</p>
-
-                <div className="flex items-center justify-between">
-                  <p className="text-2xl font-bold text-primary">${item.price}</p>
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      setSelectedItem(item);
-                      setShowConfirm(true);
-                    }}
-                  >
-                    Acheter
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
+            );
+          })}
         </div>
 
         {items.length === 0 && (
-          <Card className="p-8 text-center">
-            <p className="text-muted-foreground">Aucun article disponible dans cette catégorie</p>
+          <Card className="p-12 text-center border-2 border-dashed">
+            <p className="text-lg text-muted-foreground">Aucun article dans cette catégorie</p>
           </Card>
         )}
       </div>
 
       {/* Purchase Confirmation Dialog */}
       <Dialog open={showConfirm} onOpenChange={setShowConfirm}>
-        <DialogContent>
+        <DialogContent className="max-w-md">
           <DialogHeader>
-            <DialogTitle>Confirmer l'achat</DialogTitle>
+            <DialogTitle className="text-2xl">Confirmation d'achat</DialogTitle>
             <DialogDescription>
-              Êtes-vous sûr de vouloir acheter cet article?
+              Vérifiez les détails avant d'acheter
             </DialogDescription>
           </DialogHeader>
 
           {selectedItem && (
             <div className="space-y-4">
-              <div className="bg-muted p-4 rounded-lg">
-                <h3 className="font-semibold text-lg mb-2">{selectedItem.name}</h3>
-                <p className="text-sm text-muted-foreground mb-3">{selectedItem.description}</p>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex justify-between">
-                    <span>Prix:</span>
-                    <span className="font-semibold">${selectedItem.price}</span>
+              {/* Product Summary */}
+              <div className="bg-gradient-to-r from-primary/10 to-primary/5 p-6 rounded-lg border-2 border-primary/20">
+                <div className="text-center mb-4">
+                  <div className="text-5xl mb-2">
+                    {selectedItem.category === "food" ? "🍕" : selectedItem.category === "clothing" ? "👔" : "🎮"}
                   </div>
-                  <div className="flex justify-between">
+                  <h3 className="font-black text-xl">{selectedItem.name}</h3>
+                  <p className="text-sm text-muted-foreground mt-1">{selectedItem.description}</p>
+                </div>
+
+                <div className="space-y-3 border-t-2 border-primary/20 pt-4">
+                  <div className="flex justify-between text-sm">
+                    <span>Prix:</span>
+                    <span className="font-black text-lg text-primary">${selectedItem.price}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
                     <span>Budget restant:</span>
-                    <span className={`font-semibold ${remaining < 0 ? "text-destructive" : "text-green-600"}`}>
+                    <span className={`font-bold ${remaining < 0 ? "text-destructive" : "text-green-600"}`}>
                       ${remaining}
                     </span>
                   </div>
-                  <div className="border-t pt-2 flex justify-between">
-                    <span>Il te restera:</span>
-                    <span className={`font-semibold text-lg ${remaining - selectedItem.price < 0 ? "text-destructive" : "text-green-600"}`}>
+                  <div className="border-t pt-3 flex justify-between">
+                    <span className="font-semibold">Après achat:</span>
+                    <span className={`font-black text-lg ${remaining - selectedItem.price < 0 ? "text-destructive" : "text-green-600"}`}>
                       ${remaining - selectedItem.price}
                     </span>
                   </div>
                 </div>
+              </div>
 
-                {/* Feedback Indicator */}
-                <div className="mt-4 flex items-start gap-2 p-2 rounded-lg bg-background">
+              {/* Feedback Message */}
+              <div className={`flex items-start gap-3 p-4 rounded-lg ${
+                selectedItem.isEssential 
+                  ? "bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800" 
+                  : selectedItem.price > 20
+                  ? "bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800"
+                  : "bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800"
+              }`}>
+                <div className="mt-1">
                   {selectedItem.isEssential ? (
                     <>
-                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold text-sm">💸 Bravo ! Tu économises !</p>
-                        <p className="text-xs text-muted-foreground">C'est une bonne décision</p>
-                      </div>
+                      <CheckCircle2 className="w-5 h-5 text-green-600 dark:text-green-400" />
                     </>
                   ) : selectedItem.price > 20 ? (
-                    <>
-                      <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold text-sm">⚠ Dépassement</p>
-                        <p className="text-xs text-muted-foreground">C'est un achat coûteux</p>
-                      </div>
-                    </>
+                    <AlertCircle className="w-5 h-5 text-orange-600 dark:text-orange-400" />
                   ) : (
-                    <>
-                      <CheckCircle2 className="w-5 h-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <div>
-                        <p className="font-semibold text-sm">💸 Bravo ! Tu économises !</p>
-                        <p className="text-xs text-muted-foreground">Bon choix d'achat</p>
-                      </div>
-                    </>
+                    <CheckCircle2 className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                   )}
+                </div>
+                <div>
+                  <p className={`font-bold text-sm ${
+                    selectedItem.isEssential
+                      ? "text-green-700 dark:text-green-300"
+                      : selectedItem.price > 20
+                      ? "text-orange-700 dark:text-orange-300"
+                      : "text-blue-700 dark:text-blue-300"
+                  }`}>
+                    {selectedItem.isEssential 
+                      ? "💸 Bravo! Tu économises!" 
+                      : selectedItem.price > 20
+                      ? "⚠ Achat coûteux"
+                      : "💸 Bon choix!"}
+                  </p>
                 </div>
               </div>
 
               {!canAfford && (
-                <div className="flex items-start gap-2 p-3 bg-destructive/10 rounded-lg">
-                  <AlertCircle className="w-5 h-5 text-destructive mt-0.5 flex-shrink-0" />
-                  <p className="text-sm text-destructive">Tu n'as pas assez de budget pour cet achat!</p>
+                <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/30">
+                  <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+                  <p className="text-sm text-destructive font-semibold">Pas assez de budget!</p>
                 </div>
               )}
             </div>
           )}
 
-          <DialogFooter>
+          <DialogFooter className="gap-2">
             <Button variant="outline" onClick={() => setShowConfirm(false)}>
               Annuler
             </Button>
@@ -240,7 +294,7 @@ export default function Catalog() {
               disabled={!canAfford || addExpenseMutation.isPending}
               className="bg-primary hover:bg-primary/90"
             >
-              {addExpenseMutation.isPending ? "Traitement..." : "Acheter"}
+              {addExpenseMutation.isPending ? "Traitement..." : "Acheter maintenant"}
             </Button>
           </DialogFooter>
         </DialogContent>

@@ -137,7 +137,7 @@ export default function StudentWelcome() {
         {/* CTA Button */}
         <div className="flex justify-center">
           <Button
-            onClick={() => navigate(`/student/setup?classCode=${classCode}`)}
+            onClick={() => navigate(`/student/setup?classCode=${classCode}&name=${encodeURIComponent(studentName || "")}`)}
             className="bg-primary hover:bg-primary/90 text-lg px-8 py-6"
             data-testid="button-start-game"
           >

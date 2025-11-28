@@ -2,30 +2,21 @@ import { type Student, type CatalogItem, type Expense, type FixedExpense, type I
 import { randomUUID } from "crypto";
 
 export interface IStorage {
-  // Class operations
   createClass(input: CreateClass): Promise<Class>;
   getClassByCode(code: string): Promise<Class | undefined>;
   getClass(id: string): Promise<Class | undefined>;
   getClassStudents(classId: string): Promise<Student[]>;
   updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined>;
-
-  // Student operations
   getStudent(id: string): Promise<Student | undefined>;
   getAllStudents(): Promise<Student[]>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudentBudget(id: string, budget: number): Promise<Student | undefined>;
-
-  // Catalog operations
   getCatalogItems(category?: string): Promise<CatalogItem[]>;
   getCatalogItem(id: string): Promise<CatalogItem | undefined>;
   createCatalogItem(item: InsertCatalogItem): Promise<CatalogItem>;
-
-  // Expense operations
   addExpense(expense: InsertExpense): Promise<Expense>;
   getStudentExpenses(studentId: string): Promise<Expense[]>;
   getAllExpenses(): Promise<Expense[]>;
-
-  // Fixed expenses
   getFixedExpenses(studentId: string): Promise<FixedExpense[]>;
   createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense>;
   payFixedExpense(id: string): Promise<FixedExpense | undefined>;
@@ -33,8 +24,6 @@ export interface IStorage {
   getDefaultExpenseAmounts(): Promise<Map<string, number>>;
   setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void>;
   updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void>;
-
-  // Bonus expenses
   createBonusExpense(input: CreateBonusExpense, classId: string): Promise<BonusExpense>;
   getStudentBonusExpenses(studentId: string): Promise<BonusExpense[]>;
   payBonusExpense(id: string): Promise<BonusExpense | undefined>;
@@ -73,9 +62,7 @@ export class MemStorage implements IStorage {
   }
 
   private initializeCatalog() {
-    // Default catalog items with icons
     const defaultItems: CatalogItem[] = [
-      // Food - Essentials
       { id: randomUUID(), name: "Lait 1L", price: 3, category: "food", description: "Lait frais - 1 litre", isEssential: true },
       { id: randomUUID(), name: "Pain complet", price: 2, category: "food", description: "Baguette pain complet", isEssential: true },
       { id: randomUUID(), name: "Œufs fermiers", price: 4, category: "food", description: "Douzaine d'œufs frais", isEssential: true },
@@ -83,8 +70,6 @@ export class MemStorage implements IStorage {
       { id: randomUUID(), name: "Fromage blanc", price: 3.5, category: "food", description: "Fromage blanc 500g", isEssential: true },
       { id: randomUUID(), name: "Riz blanc", price: 2.5, category: "food", description: "Riz blanc 1kg", isEssential: true },
       { id: randomUUID(), name: "Pâtes", price: 1.5, category: "food", description: "Pâtes 500g", isEssential: true },
-      
-      // Food - Vegetables & Fruits
       { id: randomUUID(), name: "Bananes", price: 2, category: "food", description: "Régime de bananes", isEssential: false },
       { id: randomUUID(), name: "Pommes rouges", price: 3, category: "food", description: "2kg pommes rouges", isEssential: false },
       { id: randomUUID(), name: "Oranges", price: 3.5, category: "food", description: "1kg oranges juteuses", isEssential: false },
@@ -92,8 +77,6 @@ export class MemStorage implements IStorage {
       { id: randomUUID(), name: "Brocoli", price: 2.5, category: "food", description: "Brocoli frais", isEssential: false },
       { id: randomUUID(), name: "Tomates", price: 2.5, category: "food", description: "Tomates rouges 1kg", isEssential: false },
       { id: randomUUID(), name: "Salade verte", price: 1.5, category: "food", description: "Laitue verte", isEssential: false },
-      
-      // Food - Snacks & Treats
       { id: randomUUID(), name: "Pizza surgelée", price: 5, category: "food", description: "Pizza pepperoni", isEssential: false },
       { id: randomUUID(), name: "Chips nature", price: 3, category: "food", description: "Sac de chips nature", isEssential: false },
       { id: randomUUID(), name: "Chocolat", price: 2.5, category: "food", description: "Tablette chocolat", isEssential: false },
@@ -103,8 +86,6 @@ export class MemStorage implements IStorage {
       { id: randomUUID(), name: "Miel", price: 5, category: "food", description: "Miel 500g", isEssential: false },
       { id: randomUUID(), name: "Jus d'orange", price: 2.5, category: "food", description: "Jus 1L", isEssential: false },
       { id: randomUUID(), name: "Soda", price: 2, category: "food", description: "Soda 1.5L", isEssential: false },
-
-      // Clothing
       { id: randomUUID(), name: "T-shirt", price: 15, category: "clothing", description: "T-shirt coton classique", isEssential: false },
       { id: randomUUID(), name: "Jeans bleu", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false },
       { id: randomUUID(), name: "Chaussures sport", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false },
@@ -112,8 +93,6 @@ export class MemStorage implements IStorage {
       { id: randomUUID(), name: "Veste d'hiver", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false },
       { id: randomUUID(), name: "Pull", price: 35, category: "clothing", description: "Pull chaud", isEssential: false },
       { id: randomUUID(), name: "Bermuda", price: 25, category: "clothing", description: "Bermuda coton", isEssential: false },
-
-      // Leisure
       { id: randomUUID(), name: "Cinéma", price: 10, category: "leisure", description: "Billet de cinéma", isEssential: false },
       { id: randomUUID(), name: "Jeu vidéo", price: 20, category: "leisure", description: "Jeu vidéo populaire", isEssential: false },
       { id: randomUUID(), name: "Entrée piscine", price: 12, category: "leisure", description: "Entrée piscine/sport", isEssential: false },
@@ -121,7 +100,6 @@ export class MemStorage implements IStorage {
       { id: randomUUID(), name: "Livre", price: 15, category: "leisure", description: "Roman populaire", isEssential: false },
       { id: randomUUID(), name: "Ticket concert", price: 25, category: "leisure", description: "Entrée concert", isEssential: false },
     ];
-
     defaultItems.forEach(item => this.catalogItems.set(item.id, item));
   }
 
@@ -141,15 +119,9 @@ export class MemStorage implements IStorage {
       teacherName: input.teacherName,
       createdAt: new Date(),
       expenseAmounts: {
-        "Loyer": 15,
-        "Internet": 5,
-        "Téléphone": 3,
-        "Hydro": 8,
-        "Assurance Voiture": 10,
-        "Assurance Maison": 7,
-        "Essence": 12,
-        "Nourriture": 20,
-        "Sortie": 5,
+        "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,
+        "Assurance Voiture": 10, "Assurance Maison": 7, "Essence": 12,
+        "Nourriture": 20, "Sortie": 5,
       },
     };
     this.classes.set(id, classData);
@@ -179,7 +151,6 @@ export class MemStorage implements IStorage {
     };
     this.classes.set(classId, updated);
 
-    // Update all expenses for students in this class
     const classStudents = await this.getClassStudents(classId);
     for (const student of classStudents) {
       for (const [expenseId, expense] of this.fixedExpenses.entries()) {
@@ -206,11 +177,9 @@ export class MemStorage implements IStorage {
     };
     this.students.set(id, student);
 
-    // Get class expense amounts
     const classData = await this.getClass(input.classId);
     const amounts = classData?.expenseAmounts || this.getDefaultAmounts();
     
-    // Create all fixed expenses with class-specific amounts
     const fixedExpensesList = [
       { name: "Loyer", amount: amounts["Loyer"] || 15 },
       { name: "Internet", amount: amounts["Internet"] || 5 },
@@ -222,85 +191,75 @@ export class MemStorage implements IStorage {
       { name: "Nourriture", amount: amounts["Nourriture"] || 20 },
       { name: "Sortie", amount: amounts["Sortie"] || 5 },
     ];
-    
-    for (const expense of fixedExpensesList) {
-      await this.createFixedExpense(id, expense.name, expense.amount);
-    }
-    
-    return student;
-  }
 
-  private getDefaultAmounts(): { [key: string]: number } {
-    return {
-      "Loyer": 15,
-      "Internet": 5,
-      "Téléphone": 3,
-      "Hydro": 8,
-      "Assurance Voiture": 10,
-      "Assurance Maison": 7,
-      "Essence": 12,
-      "Nourriture": 20,
-      "Sortie": 5,
-    };
+    for (const expense of fixedExpensesList) {
+      const expenseId = randomUUID();
+      const fixedExpense: FixedExpense = {
+        id: expenseId,
+        studentId: id,
+        category: expense.name,
+        amount: expense.amount,
+        isPaid: false,
+        dueDate: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000),
+      };
+      this.fixedExpenses.set(expenseId, fixedExpense);
+    }
+
+    return student;
   }
 
   async updateStudentBudget(id: string, budget: number): Promise<Student | undefined> {
     const student = this.students.get(id);
     if (!student) return undefined;
-    
     const updated = { ...student, budget };
     this.students.set(id, updated);
     return updated;
   }
 
+  private getDefaultAmounts(): Record<string, number> {
+    return {
+      "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,
+      "Assurance Voiture": 10, "Assurance Maison": 7, "Essence": 12,
+      "Nourriture": 20, "Sortie": 5,
+    };
+  }
+
   async getCatalogItems(category?: string): Promise<CatalogItem[]> {
     const items = Array.from(this.catalogItems.values());
-    if (category) {
-      return items.filter(item => item.category === category);
-    }
-    return items;
+    return category ? items.filter(item => item.category === category) : items;
   }
 
   async getCatalogItem(id: string): Promise<CatalogItem | undefined> {
     return this.catalogItems.get(id);
   }
 
-  async createCatalogItem(input: InsertCatalogItem): Promise<CatalogItem> {
+  async createCatalogItem(item: InsertCatalogItem): Promise<CatalogItem> {
     const id = randomUUID();
-    const item: CatalogItem = { ...input, id };
-    this.catalogItems.set(id, item);
-    return item;
+    const catalogItem: CatalogItem = { ...item, id };
+    this.catalogItems.set(id, catalogItem);
+    return catalogItem;
   }
 
-  async addExpense(input: InsertExpense): Promise<Expense> {
+  async addExpense(expense: InsertExpense): Promise<Expense> {
     const id = randomUUID();
-    const expense: Expense = {
-      ...input,
+    const newExpense: Expense = {
+      ...expense,
       id,
       timestamp: new Date(),
-      feedback: input.isEssential ? "success" : input.amount > 20 ? "warning" : "success",
-      message: input.isEssential
-        ? `💸 Bravo ! Tu économises !`
-        : input.amount > 20
-        ? `⚠ Dépassement`
-        : `💸 Bravo ! Tu économises !`,
     };
-    
-    this.expenses.set(id, expense);
-    this.expenseSequence.push(expense);
-    
-    // Update student spent amount
-    const student = this.students.get(input.studentId);
+    this.expenses.set(id, newExpense);
+
+    const student = await this.getStudent(expense.studentId);
     if (student) {
-      const updated = { ...student, spent: student.spent + input.amount };
-      this.students.set(input.studentId, updated);
+      await this.updateStudentBudget(expense.studentId, student.budget - expense.amount);
     }
-    
-    return expense;
+
+    this.expenseSequence.push(newExpense);
+    return newExpense;
   }
 
   async getStudentExpenses(studentId: string): Promise<Expense[]> {
-    return this.expenseSequence.filter(e => e.studentId === studentId);
+    return Array.from(this.expenses.values()).filter(e => e.studentId === studentId);
   }
 
   async getAllExpenses(): Promise<Expense[]> {
@@ -308,7 +267,7 @@ export class MemStorage implements IStorage {
   }
 
   async getFixedExpenses(studentId: string): Promise<FixedExpense[]> {
-    return Array.from(this.fixedExpenses.values()).filter(fe => fe.studentId === studentId);
+    return Array.from(this.fixedExpenses.values()).filter(e => e.studentId === studentId);
   }
 
   async createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense> {
@@ -319,7 +278,7 @@ export class MemStorage implements IStorage {
       category,
       amount,
       isPaid: false,
-      dueDate: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+      dueDate: new Date(),
     };
     this.fixedExpenses.set(id, expense);
     return expense;
@@ -328,7 +287,6 @@ export class MemStorage implements IStorage {
   async payFixedExpense(id: string): Promise<FixedExpense | undefined> {
     const expense = this.fixedExpenses.get(id);
     if (!expense) return undefined;
-    
     const updated = { ...expense, isPaid: true };
     this.fixedExpenses.set(id, updated);
     return updated;
@@ -337,24 +295,20 @@ export class MemStorage implements IStorage {
   async updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined> {
     const expense = this.fixedExpenses.get(expenseId);
     if (!expense) return undefined;
-
     const updated = { ...expense, amount };
     this.fixedExpenses.set(expenseId, updated);
     return updated;
   }
 
   async getDefaultExpenseAmounts(): Promise<Map<string, number>> {
-    return new Map(this.defaultExpenseAmounts);
+    return this.defaultExpenseAmounts;
   }
 
   async setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void> {
-    this.defaultExpenseAmounts = new Map(amounts);
-    // Update all existing students' expenses
-    await this.updateAllStudentExpenseAmounts(amounts);
+    this.defaultExpenseAmounts = amounts;
   }
 
   async updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void> {
-    // Update all fixed expenses with the new amounts
     for (const [expenseId, expense] of this.fixedExpenses.entries()) {
       const newAmount = amounts.get(expense.category);
       if (newAmount !== undefined) {
@@ -375,7 +329,6 @@ export class MemStorage implements IStorage {
     };
     this.bonusExpenses.set(id, bonus);
 
-    // Deduct from student budget
     const student = await this.getStudent(input.studentId);
     if (student) {
       await this.updateStudentBudget(input.studentId, student.budget - input.amount);
@@ -406,3 +359,4 @@ export class MemStorage implements IStorage {
 }
 
 export const storage = new MemStorage();
+export const getStorage = async () => storage;

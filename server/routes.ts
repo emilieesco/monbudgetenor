@@ -7,6 +7,7 @@ export async function registerRoutes(
   httpServer: Server,
   app: Express
 ): Promise<Server> {
+  
   // Class endpoints
   app.post("/api/classes", async (req, res) => {
     try {

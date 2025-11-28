@@ -17,6 +17,7 @@ export interface Student {
   classId: string;
   budget: number;
   spent: number;
+  savings: number;
   createdAt: Date;
   customExpenses?: { [key: string]: number };
   scenario?: string;

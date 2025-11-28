@@ -11,6 +11,8 @@ export interface IStorage {
   getAllStudents(): Promise<Student[]>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudentBudget(id: string, budget: number): Promise<Student | undefined>;
+  updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined>;
+  updateStudentSavings(id: string, savings: number): Promise<Student | undefined>;
   getCatalogItems(category?: string): Promise<CatalogItem[]>;
   getCatalogItem(id: string): Promise<CatalogItem | undefined>;
   createCatalogItem(item: InsertCatalogItem): Promise<CatalogItem>;
@@ -189,6 +191,7 @@ export class MemStorage implements IStorage {
       ...input,
       id,
       spent: 0,
+      savings: 0,
       createdAt: new Date(),
     };
     this.students.set(id, student);
@@ -236,6 +239,14 @@ export class MemStorage implements IStorage {
     const student = this.students.get(id);
     if (!student) return undefined;
     const updated = { ...student, budget, spent };
+    this.students.set(id, updated);
+    return updated;
+  }
+
+  async updateStudentSavings(id: string, savings: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, savings: Math.max(0, savings) };
     this.students.set(id, updated);
     return updated;
   }

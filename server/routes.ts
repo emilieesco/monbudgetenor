@@ -353,5 +353,45 @@ export async function registerRoutes(
     }
   });
 
+  // Savings endpoints
+  app.patch("/api/students/:id/savings", async (req, res) => {
+    try {
+      const { amount } = req.body;
+      if (amount === undefined || amount < 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      const newSavings = student.savings + amount;
+      const updated = await storage.updateStudentSavings(req.params.id, newSavings);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update savings" });
+    }
+  });
+
+  app.patch("/api/students/:id/withdraw", async (req, res) => {
+    try {
+      const { amount } = req.body;
+      if (amount === undefined || amount < 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      if (student.savings < amount) {
+        return res.status(400).json({ error: "Insufficient savings" });
+      }
+      const newSavings = student.savings - amount;
+      const updated = await storage.updateStudentSavings(req.params.id, newSavings);
+      res.json(updated);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to withdraw savings" });
+    }
+  });
+
   return httpServer;
 }

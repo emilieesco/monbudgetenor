@@ -6,12 +6,17 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { useState } from "react";
 import type { Student, Expense, BonusExpense, Challenge } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
   const [_location, navigate] = useLocation();
+  const [savingsAmount, setSavingsAmount] = useState("");
+  const [withdrawAmount, setWithdrawAmount] = useState("");
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -40,6 +45,28 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/challenges", studentId] });
+    },
+  });
+
+  const savingsMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      const res = await apiRequest("PATCH", `/api/students/${studentId}/savings`, { amount });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      setSavingsAmount("");
+    },
+  });
+
+  const withdrawMutation = useMutation({
+    mutationFn: async (amount: number) => {
+      const res = await apiRequest("PATCH", `/api/students/${studentId}/withdraw`, { amount });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      setWithdrawAmount("");
     },
   });
 
@@ -99,7 +126,7 @@ export default function Dashboard() {
         </div>
 
         {/* Budget Overview Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -128,6 +155,16 @@ export default function Dashboard() {
               </p>
             </div>
           </Card>
+
+          <Card className="p-6 bg-purple-50 dark:bg-purple-950">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-sm text-muted-foreground mb-2">Épargne</p>
+                <p className="text-3xl font-bold text-purple-600 dark:text-purple-300">${student.savings}</p>
+              </div>
+              <PiggyBank className="w-12 h-12 text-purple-600 opacity-20 dark:text-purple-300" />
+            </div>
+          </Card>
         </div>
 
         {/* Progress Bar */}
@@ -135,6 +172,77 @@ export default function Dashboard() {
           <p className="text-sm font-semibold mb-3">Utilisation du Budget</p>
           <Progress value={Math.min(spentPercentage, 100)} className="h-3" />
           <p className="text-xs text-muted-foreground mt-2">{Math.round(spentPercentage)}% utilisé</p>
+        </Card>
+
+        {/* Savings Manager */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <PiggyBank className="w-6 h-6 text-purple-600" />
+            <h2 className="text-xl font-semibold">Gérer tes Épargnes</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Save Money */}
+            <div className="space-y-3 p-4 bg-muted rounded-lg">
+              <Label htmlFor="save-amount" className="font-semibold">Mettre de l'argent de côté</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="save-amount"
+                  type="number"
+                  placeholder="Montant"
+                  value={savingsAmount}
+                  onChange={(e) => setSavingsAmount(e.target.value)}
+                  min="0"
+                  data-testid="input-savings-amount"
+                />
+                <Button
+                  onClick={() => {
+                    const amount = parseFloat(savingsAmount);
+                    if (amount > 0 && amount <= remaining) {
+                      savingsMutation.mutate(amount);
+                    }
+                  }}
+                  disabled={savingsMutation.isPending || !savingsAmount}
+                  className="bg-purple-600 hover:bg-purple-700"
+                >
+                  Épargner
+                </Button>
+              </div>
+              {savingsAmount && parseFloat(savingsAmount) > remaining && (
+                <p className="text-xs text-destructive">Tu n'as pas assez d'argent disponible</p>
+              )}
+            </div>
+
+            {/* Withdraw */}
+            <div className="space-y-3 p-4 bg-muted rounded-lg">
+              <Label htmlFor="withdraw-amount" className="font-semibold">Retirer de tes épargnes</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="withdraw-amount"
+                  type="number"
+                  placeholder="Montant"
+                  value={withdrawAmount}
+                  onChange={(e) => setWithdrawAmount(e.target.value)}
+                  min="0"
+                  data-testid="input-withdraw-amount"
+                />
+                <Button
+                  onClick={() => {
+                    const amount = parseFloat(withdrawAmount);
+                    if (amount > 0 && amount <= student.savings) {
+                      withdrawMutation.mutate(amount);
+                    }
+                  }}
+                  disabled={withdrawMutation.isPending || !withdrawAmount}
+                  variant="outline"
+                >
+                  Retirer
+                </Button>
+              </div>
+              {withdrawAmount && parseFloat(withdrawAmount) > student.savings && (
+                <p className="text-xs text-destructive">Tu n'as pas assez d'épargnes</p>
+              )}
+            </div>
+          </div>
         </Card>
 
         {/* Bonus Expenses Alert */}

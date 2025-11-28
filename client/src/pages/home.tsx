@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Users, Plus, Edit2 } from "lucide-react";
+import { Users, Plus, Edit2, Settings } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import type { Student } from "@shared/schema";
 
@@ -61,19 +61,30 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-6xl mx-auto">
-        {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-5xl font-bold text-primary mb-4">Mon Budget en Or</h1>
-          <p className="text-xl text-muted-foreground mb-6">
-            Apprenez à gérer votre argent avec sagesse. Gagnez 50$, payez vos dépenses fixes, achetez intelligemment!
-          </p>
+        {/* Header with Admin Link */}
+        <div className="mb-8 flex items-center justify-between">
+          <div className="text-center flex-1">
+            <h1 className="text-5xl font-bold text-primary mb-4">Mon Budget en Or</h1>
+            <p className="text-xl text-muted-foreground mb-6">
+              Apprenez à gérer votre argent avec sagesse. Gagnez 50$, payez vos dépenses fixes, achetez intelligemment!
+            </p>
+            <Button
+              size="lg"
+              onClick={() => setShowCreateDialog(true)}
+              className="bg-primary hover:bg-primary/90"
+            >
+              <Plus className="w-5 h-5 mr-2" />
+              Créer un Élève
+            </Button>
+          </div>
           <Button
-            size="lg"
-            onClick={() => setShowCreateDialog(true)}
-            className="bg-primary hover:bg-primary/90"
+            onClick={() => navigate("/admin")}
+            variant="outline"
+            className="absolute top-4 right-4 flex items-center gap-2"
+            data-testid="button-admin-panel"
           >
-            <Plus className="w-5 h-5 mr-2" />
-            Créer un Élève
+            <Settings className="w-5 h-5" />
+            <span className="hidden sm:inline">Enseignant</span>
           </Button>
         </div>
 

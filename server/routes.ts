@@ -127,5 +127,41 @@ export async function registerRoutes(
     }
   });
 
+  // Admin endpoints
+  app.get("/api/admin/default-expenses", async (_req, res) => {
+    try {
+      const amounts = await storage.getDefaultExpenseAmounts();
+      res.json(Object.fromEntries(amounts));
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch default expenses" });
+    }
+  });
+
+  app.patch("/api/admin/default-expenses", async (req, res) => {
+    try {
+      const amounts = new Map(Object.entries(req.body));
+      await storage.setDefaultExpenseAmounts(amounts);
+      res.json(Object.fromEntries(amounts));
+    } catch (error) {
+      res.status(400).json({ error: "Invalid data" });
+    }
+  });
+
+  app.patch("/api/fixed-expenses/:id/amount", async (req, res) => {
+    try {
+      const { amount } = req.body;
+      if (!amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid amount" });
+      }
+      const expense = await storage.updateFixedExpenseAmount(req.params.id, amount);
+      if (!expense) {
+        return res.status(404).json({ error: "Expense not found" });
+      }
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to update expense" });
+    }
+  });
+
   return httpServer;
 }

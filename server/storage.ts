@@ -22,6 +22,9 @@ export interface IStorage {
   getFixedExpenses(studentId: string): Promise<FixedExpense[]>;
   createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense>;
   payFixedExpense(id: string): Promise<FixedExpense | undefined>;
+  updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined>;
+  getDefaultExpenseAmounts(): Promise<Map<string, number>>;
+  setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -30,6 +33,7 @@ export class MemStorage implements IStorage {
   private expenses: Map<string, Expense>;
   private fixedExpenses: Map<string, FixedExpense>;
   private expenseSequence: Expense[] = [];
+  private defaultExpenseAmounts: Map<string, number> = new Map();
 
   constructor() {
     this.students = new Map();
@@ -37,6 +41,19 @@ export class MemStorage implements IStorage {
     this.expenses = new Map();
     this.fixedExpenses = new Map();
     this.initializeCatalog();
+    this.initializeDefaultExpenses();
+  }
+
+  private initializeDefaultExpenses() {
+    this.defaultExpenseAmounts.set("Loyer", 15);
+    this.defaultExpenseAmounts.set("Internet", 5);
+    this.defaultExpenseAmounts.set("Téléphone", 3);
+    this.defaultExpenseAmounts.set("Hydro", 8);
+    this.defaultExpenseAmounts.set("Assurance Voiture", 10);
+    this.defaultExpenseAmounts.set("Assurance Maison", 7);
+    this.defaultExpenseAmounts.set("Essence", 12);
+    this.defaultExpenseAmounts.set("Nourriture", 20);
+    this.defaultExpenseAmounts.set("Sortie", 5);
   }
 
   private initializeCatalog() {
@@ -194,6 +211,23 @@ export class MemStorage implements IStorage {
     const updated = { ...expense, isPaid: true };
     this.fixedExpenses.set(id, updated);
     return updated;
+  }
+
+  async updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined> {
+    const expense = this.fixedExpenses.get(expenseId);
+    if (!expense) return undefined;
+
+    const updated = { ...expense, amount };
+    this.fixedExpenses.set(expenseId, updated);
+    return updated;
+  }
+
+  async getDefaultExpenseAmounts(): Promise<Map<string, number>> {
+    return new Map(this.defaultExpenseAmounts);
+  }
+
+  async setDefaultExpenseAmounts(amounts: Map<string, number>): Promise<void> {
+    this.defaultExpenseAmounts = new Map(amounts);
   }
 }
 

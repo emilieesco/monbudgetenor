@@ -79,6 +79,27 @@ export async function registerRoutes(
       if (existingStudent) {
         // Update the student's budget and add to history
         const updatedStudent = await storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget);
+        
+        // Recreate challenges for the new budget
+        const newChallenges = [
+          { title: "Économe", description: "Dépense moins de 30% de ton budget", type: "spending" as const, target: Math.round(data.budget * 0.3) },
+          { title: "Essentiel d'abord", description: "Achète 3 articles essentiels", type: "essential" as const, target: 3 },
+          { title: "Responsable", description: "Paye toutes tes dépenses fixes", type: "fixed" as const, target: 100 },
+          { title: "Sage", description: "Économise 50% de ton budget", type: "savings" as const, target: Math.round(data.budget * 0.5) },
+        ];
+        
+        // Delete old challenges and create new ones
+        await storage.deleteStudentChallenges(existingStudent.id);
+        for (const ch of newChallenges) {
+          await storage.createChallenge({
+            studentId: existingStudent.id,
+            title: ch.title,
+            description: ch.description,
+            type: ch.type,
+            targetValue: ch.target,
+          });
+        }
+        
         return res.json(updatedStudent || existingStudent);
       }
       

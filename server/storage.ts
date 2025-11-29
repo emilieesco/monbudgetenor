@@ -34,6 +34,7 @@ export interface IStorage {
   deleteClassBonusExpenses(classId: string): Promise<void>;
   createChallenge(input: CreateChallenge): Promise<Challenge>;
   getStudentChallenges(studentId: string): Promise<Challenge[]>;
+  deleteStudentChallenges(studentId: string): Promise<void>;
   completeChallenge(id: string): Promise<Challenge | undefined>;
   createCustomChallenge(input: CreateCustomChallenge): Promise<CustomChallenge>;
   getClassCustomChallenges(classId: string): Promise<CustomChallenge[]>;
@@ -431,6 +432,14 @@ export class MemStorage implements IStorage {
 
   async getStudentChallenges(studentId: string): Promise<Challenge[]> {
     return Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
+  }
+
+  async deleteStudentChallenges(studentId: string): Promise<void> {
+    for (const [id, challenge] of this.challenges.entries()) {
+      if (challenge.studentId === studentId) {
+        this.challenges.delete(id);
+      }
+    }
   }
 
   async completeChallenge(id: string): Promise<Challenge | undefined> {

@@ -457,6 +457,15 @@ export class FileStorage implements IStorage {
     return Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
   }
 
+  async deleteStudentChallenges(studentId: string): Promise<void> {
+    for (const [id, challenge] of this.challenges.entries()) {
+      if (challenge.studentId === studentId) {
+        this.challenges.delete(id);
+      }
+    }
+    this.save();
+  }
+
   async completeChallenge(id: string): Promise<Challenge | undefined> {
     const challenge = this.challenges.get(id);
     if (!challenge) return undefined;

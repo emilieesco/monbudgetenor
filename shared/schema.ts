@@ -75,6 +75,40 @@ export interface Challenge {
   createdAt: Date;
 }
 
+export interface CustomChallenge {
+  id: string;
+  classId: string;
+  teacherId: string;
+  title: string;
+  description: string;
+  type: "spending" | "savings" | "custom";
+  targetValue: number;
+  createdAt: Date;
+  completedBy: string[];
+}
+
+export interface TeacherMessage {
+  id: string;
+  classId: string;
+  studentId?: string;
+  teacherId: string;
+  content: string;
+  type: "congratulations" | "warning" | "info";
+  timestamp: Date;
+}
+
+export interface SurpriseEvent {
+  id: string;
+  classId: string;
+  studentId?: string;
+  type: "bonus_salary" | "promo" | "emergency_expense";
+  title: string;
+  description: string;
+  amount: number;
+  createdAt: Date;
+  appliedAt?: Date;
+}
+
 // Zod schemas for validation
 export const studentSchema = z.object({
   id: z.string(),
@@ -152,9 +186,36 @@ export const updateBudgetSchema = z.object({
   budget: z.number().positive(),
 });
 
+export const createCustomChallengeSchema = z.object({
+  classId: z.string().min(1),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  type: z.enum(["spending", "savings", "custom"]),
+  targetValue: z.number().positive(),
+});
+
+export const createTeacherMessageSchema = z.object({
+  classId: z.string().min(1),
+  studentId: z.string().optional(),
+  content: z.string().min(1),
+  type: z.enum(["congratulations", "warning", "info"]),
+});
+
+export const createSurpriseEventSchema = z.object({
+  classId: z.string().min(1),
+  studentId: z.string().optional(),
+  type: z.enum(["bonus_salary", "promo", "emergency_expense"]),
+  title: z.string().min(1),
+  description: z.string().min(1),
+  amount: z.number().positive(),
+});
+
 export type InsertStudent = z.infer<typeof insertStudentSchema>;
 export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type CreateClass = z.infer<typeof createClassSchema>;
 export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;
 export type CreateChallenge = z.infer<typeof createChallengeSchema>;
+export type CreateCustomChallenge = z.infer<typeof createCustomChallengeSchema>;
+export type CreateTeacherMessage = z.infer<typeof createTeacherMessageSchema>;
+export type CreateSurpriseEvent = z.infer<typeof createSurpriseEventSchema>;

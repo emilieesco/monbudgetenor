@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -33,6 +33,15 @@ export interface IStorage {
   createChallenge(input: CreateChallenge): Promise<Challenge>;
   getStudentChallenges(studentId: string): Promise<Challenge[]>;
   completeChallenge(id: string): Promise<Challenge | undefined>;
+  createCustomChallenge(input: CreateCustomChallenge): Promise<CustomChallenge>;
+  getClassCustomChallenges(classId: string): Promise<CustomChallenge[]>;
+  completeCustomChallenge(id: string, studentId: string): Promise<CustomChallenge | undefined>;
+  createTeacherMessage(input: CreateTeacherMessage): Promise<TeacherMessage>;
+  getClassMessages(classId: string): Promise<TeacherMessage[]>;
+  getStudentMessages(studentId: string): Promise<TeacherMessage[]>;
+  createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent>;
+  getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]>;
+  applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined>;
 }
 
 export class MemStorage implements IStorage {
@@ -43,6 +52,9 @@ export class MemStorage implements IStorage {
   private fixedExpenses: Map<string, FixedExpense>;
   private bonusExpenses: Map<string, BonusExpense> = new Map();
   private challenges: Map<string, Challenge> = new Map();
+  private customChallenges: Map<string, CustomChallenge> = new Map();
+  private teacherMessages: Map<string, TeacherMessage> = new Map();
+  private surpriseEvents: Map<string, SurpriseEvent> = new Map();
   private expenseSequence: Expense[] = [];
   private defaultExpenseAmounts: Map<string, number> = new Map();
 
@@ -413,6 +425,74 @@ export class MemStorage implements IStorage {
     if (!challenge) return undefined;
     const updated = { ...challenge, completed: true };
     this.challenges.set(id, updated);
+    return updated;
+  }
+
+  async createCustomChallenge(input: CreateCustomChallenge): Promise<CustomChallenge> {
+    const id = randomUUID();
+    const challenge: CustomChallenge = {
+      ...input,
+      id,
+      createdAt: new Date(),
+      completedBy: [],
+    };
+    this.customChallenges.set(id, challenge);
+    return challenge;
+  }
+
+  async getClassCustomChallenges(classId: string): Promise<CustomChallenge[]> {
+    return Array.from(this.customChallenges.values()).filter(c => c.classId === classId);
+  }
+
+  async completeCustomChallenge(id: string, studentId: string): Promise<CustomChallenge | undefined> {
+    const challenge = this.customChallenges.get(id);
+    if (!challenge) return undefined;
+    if (!challenge.completedBy.includes(studentId)) {
+      challenge.completedBy.push(studentId);
+    }
+    this.customChallenges.set(id, challenge);
+    return challenge;
+  }
+
+  async createTeacherMessage(input: CreateTeacherMessage): Promise<TeacherMessage> {
+    const id = randomUUID();
+    const message: TeacherMessage = {
+      ...input,
+      id,
+      timestamp: new Date(),
+    };
+    this.teacherMessages.set(id, message);
+    return message;
+  }
+
+  async getClassMessages(classId: string): Promise<TeacherMessage[]> {
+    return Array.from(this.teacherMessages.values()).filter(m => m.classId === classId);
+  }
+
+  async getStudentMessages(studentId: string): Promise<TeacherMessage[]> {
+    return Array.from(this.teacherMessages.values()).filter(m => !m.studentId || m.studentId === studentId);
+  }
+
+  async createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent> {
+    const id = randomUUID();
+    const event: SurpriseEvent = {
+      ...input,
+      id,
+      createdAt: new Date(),
+    };
+    this.surpriseEvents.set(id, event);
+    return event;
+  }
+
+  async getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]> {
+    return Array.from(this.surpriseEvents.values()).filter(e => e.classId === classId && !e.appliedAt);
+  }
+
+  async applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined> {
+    const event = this.surpriseEvents.get(eventId);
+    if (!event) return undefined;
+    const updated = { ...event, appliedAt: new Date(), studentId };
+    this.surpriseEvents.set(eventId, updated);
     return updated;
   }
 }

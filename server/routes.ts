@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -390,6 +390,120 @@ export async function registerRoutes(
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to withdraw savings" });
+    }
+  });
+
+  // Custom Challenge endpoints
+  app.post("/api/custom-challenges", async (req, res) => {
+    try {
+      const data = createCustomChallengeSchema.parse(req.body);
+      const challenge = await storage.createCustomChallenge(data);
+      res.json(challenge);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid challenge data" });
+    }
+  });
+
+  app.get("/api/custom-challenges/:classId", async (req, res) => {
+    try {
+      const challenges = await storage.getClassCustomChallenges(req.params.classId);
+      res.json(challenges);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch challenges" });
+    }
+  });
+
+  app.patch("/api/custom-challenges/:id/complete", async (req, res) => {
+    try {
+      const { studentId } = req.body;
+      if (!studentId) {
+        return res.status(400).json({ error: "studentId required" });
+      }
+      const challenge = await storage.completeCustomChallenge(req.params.id, studentId);
+      if (!challenge) {
+        return res.status(404).json({ error: "Challenge not found" });
+      }
+      res.json(challenge);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to complete challenge" });
+    }
+  });
+
+  // Teacher Message endpoints
+  app.post("/api/messages", async (req, res) => {
+    try {
+      const data = createTeacherMessageSchema.parse(req.body);
+      const message = await storage.createTeacherMessage(data);
+      res.json(message);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid message data" });
+    }
+  });
+
+  app.get("/api/messages/class/:classId", async (req, res) => {
+    try {
+      const messages = await storage.getClassMessages(req.params.classId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  app.get("/api/messages/student/:studentId", async (req, res) => {
+    try {
+      const messages = await storage.getStudentMessages(req.params.studentId);
+      res.json(messages);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch messages" });
+    }
+  });
+
+  // Surprise Event endpoints
+  app.post("/api/surprise-events", async (req, res) => {
+    try {
+      const data = createSurpriseEventSchema.parse(req.body);
+      const event = await storage.createSurpriseEvent(data);
+      res.json(event);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid event data" });
+    }
+  });
+
+  app.get("/api/surprise-events/:classId", async (req, res) => {
+    try {
+      const events = await storage.getClassSurpriseEvents(req.params.classId);
+      res.json(events);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  app.patch("/api/surprise-events/:id/apply", async (req, res) => {
+    try {
+      const { studentId } = req.body;
+      if (!studentId) {
+        return res.status(400).json({ error: "studentId required" });
+      }
+      const student = await storage.getStudent(studentId);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      const event = await storage.applyStudentSurpriseEvent(req.params.id, studentId);
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+      // Apply event to student budget
+      let newBudget = student.budget;
+      if (event.type === "bonus_salary") {
+        newBudget += event.amount;
+      } else if (event.type === "emergency_expense") {
+        newBudget -= event.amount;
+      }
+      // For promo, reduce price in catalog later
+      await storage.updateStudentBudget(studentId, newBudget);
+      res.json(event);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to apply event" });
     }
   });
 

@@ -15,6 +15,18 @@ const CATEGORIES = [
   { id: "leisure", name: "Loisirs", icon: "🎮", color: "from-purple-400 to-purple-600" },
 ];
 
+const FOOD_SUBCATEGORIES = [
+  "Produits Laitiers",
+  "Viandes",
+  "Fruits & Légumes",
+  "Conserves",
+  "Boulangerie",
+  "Bonbons & Sucreries",
+  "Boissons",
+];
+
+const ITEMS_PER_PAGE = 12;
+
 // Function to get emoji based on product name
 function getProductEmoji(name: string, category: string): string {
   const lower = name.toLowerCase();
@@ -77,6 +89,8 @@ export default function Catalog() {
   const { studentId } = useParams();
   const [location, navigate] = useLocation();
   const [selectedCategory, setSelectedCategory] = useState("food");
+  const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
   const [selectedItem, setSelectedItem] = useState<CatalogItem | null>(null);
   const [showConfirm, setShowConfirm] = useState(false);
 
@@ -117,8 +131,28 @@ export default function Catalog() {
 
   const student = studentQuery.data as Student | undefined;
   const allItems = catalogQuery.data as CatalogItem[] || [];
-  const items = allItems.filter(item => item.category === selectedCategory);
+  let filteredItems = allItems.filter(item => item.category === selectedCategory);
+  
+  if (selectedCategory === "food" && selectedSubcategory) {
+    filteredItems = filteredItems.filter(item => item.subcategory === selectedSubcategory);
+  }
+  
+  const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
+  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
+  const items = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory);
+  
+  const handleCategoryChange = (catId: string) => {
+    setSelectedCategory(catId);
+    setSelectedSubcategory(null);
+    setCurrentPage(1);
+  };
+  
+  const handleSubcategoryChange = (subcat: string | null) => {
+    setSelectedSubcategory(subcat);
+    setCurrentPage(1);
+  };
 
   if (!student) {
     return <div className="p-8">Chargement...</div>;
@@ -156,12 +190,12 @@ export default function Catalog() {
 
       <div className="max-w-7xl mx-auto px-4 pb-12">
         {/* Category Navigation */}
-        <div className="flex gap-3 mb-12 justify-center flex-wrap">
+        <div className="flex gap-3 mb-8 justify-center flex-wrap">
           {CATEGORIES.map(cat => (
             <Button
               key={cat.id}
               variant={selectedCategory === cat.id ? "default" : "outline"}
-              onClick={() => setSelectedCategory(cat.id)}
+              onClick={() => handleCategoryChange(cat.id)}
               className="px-8 py-6 text-lg flex items-center gap-3 font-semibold"
               size="lg"
             >
@@ -170,6 +204,29 @@ export default function Catalog() {
             </Button>
           ))}
         </div>
+
+        {/* Subcategory Navigation for Food */}
+        {selectedCategory === "food" && (
+          <div className="mb-8 flex gap-2 justify-center flex-wrap">
+            <Button
+              variant={selectedSubcategory === null ? "default" : "outline"}
+              onClick={() => handleSubcategoryChange(null)}
+              size="sm"
+            >
+              Tous les produits
+            </Button>
+            {FOOD_SUBCATEGORIES.map(subcat => (
+              <Button
+                key={subcat}
+                variant={selectedSubcategory === subcat ? "default" : "outline"}
+                onClick={() => handleSubcategoryChange(subcat)}
+                size="sm"
+              >
+                {subcat}
+              </Button>
+            ))}
+          </div>
+        )}
 
         {/* Products Grid - Flyer Style */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -253,6 +310,41 @@ export default function Catalog() {
           <Card className="p-12 text-center border-2 border-dashed">
             <p className="text-lg text-muted-foreground">Aucun article dans cette catégorie</p>
           </Card>
+        )}
+
+        {/* Pagination Controls */}
+        {totalPages > 1 && (
+          <div className="mt-12 flex items-center justify-center gap-4 flex-wrap">
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+              disabled={currentPage === 1}
+            >
+              Précédent
+            </Button>
+            <div className="flex gap-2">
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <Button
+                  key={page}
+                  variant={currentPage === page ? "default" : "outline"}
+                  onClick={() => setCurrentPage(page)}
+                  size="sm"
+                >
+                  {page}
+                </Button>
+              ))}
+            </div>
+            <Button
+              variant="outline"
+              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+              disabled={currentPage === totalPages}
+            >
+              Suivant
+            </Button>
+            <span className="text-muted-foreground text-sm">
+              Page {currentPage} sur {totalPages}
+            </span>
+          </div>
         )}
       </div>
 

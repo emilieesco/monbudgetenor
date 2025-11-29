@@ -30,6 +30,7 @@ export interface CatalogItem {
   name: string;
   price: number;
   category: "food" | "clothing" | "leisure";
+  subcategory?: string;
   description: string;
   isEssential: boolean;
 }

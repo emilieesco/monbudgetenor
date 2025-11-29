@@ -8,11 +8,13 @@ import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { Home, Plus, Send, Gift, Target, Users } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent } from "@shared/schema";
 
 export default function TeacherDashboard() {
   const { classId } = useParams();
   const [_location, navigate] = useLocation();
+  const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events">("students");
 
   // Form states
@@ -96,6 +98,18 @@ export default function TeacherDashboard() {
       setEventTitle("");
       setEventDesc("");
       setEventAmount("");
+      toast({
+        title: "Événement créé!",
+        description: "L'événement surprise a été créé avec succès.",
+      });
+    },
+    onError: (error) => {
+      console.error("Event creation error:", error);
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer l'événement.",
+        variant: "destructive",
+      });
     },
   });
 

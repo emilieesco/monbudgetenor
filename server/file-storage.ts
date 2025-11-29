@@ -379,6 +379,15 @@ export class FileStorage implements IStorage {
     return expense;
   }
 
+  async deleteStudentFixedExpenses(studentId: string): Promise<void> {
+    for (const [id, expense] of this.fixedExpenses) {
+      if (expense.studentId === studentId) {
+        this.fixedExpenses.delete(id);
+      }
+    }
+    this.save();
+  }
+
   async payFixedExpense(id: string): Promise<FixedExpense | undefined> {
     const expense = this.fixedExpenses.get(id);
     if (!expense) return undefined;

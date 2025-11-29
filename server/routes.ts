@@ -116,6 +116,13 @@ export async function registerRoutes(
           });
         }
         
+        // Delete old fixed expenses and create new ones
+        await storage.deleteStudentFixedExpenses(existingStudent.id);
+        const amounts = classData.expenseAmounts || {};
+        for (const [category, amount] of Object.entries(amounts)) {
+          await storage.createFixedExpense(existingStudent.id, category, amount as number);
+        }
+        
         return res.json(updatedStudent || existingStudent);
       }
       

@@ -24,6 +24,7 @@ export interface IStorage {
   getAllExpenses(): Promise<Expense[]>;
   getFixedExpenses(studentId: string): Promise<FixedExpense[]>;
   createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense>;
+  deleteStudentFixedExpenses(studentId: string): Promise<void>;
   payFixedExpense(id: string): Promise<FixedExpense | undefined>;
   updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined>;
   getDefaultExpenseAmounts(): Promise<Map<string, number>>;
@@ -352,6 +353,14 @@ export class MemStorage implements IStorage {
     };
     this.fixedExpenses.set(id, expense);
     return expense;
+  }
+
+  async deleteStudentFixedExpenses(studentId: string): Promise<void> {
+    for (const [id, expense] of this.fixedExpenses) {
+      if (expense.studentId === studentId) {
+        this.fixedExpenses.delete(id);
+      }
+    }
   }
 
   async payFixedExpense(id: string): Promise<FixedExpense | undefined> {

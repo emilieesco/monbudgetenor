@@ -6,17 +6,24 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useToast } from "@/hooks/use-toast";
+import jsPDF from "jspdf";
 import type { Student, Expense, BonusExpense, Challenge } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
   const [_location, navigate] = useLocation();
+  const { toast } = useToast();
   const [savingsAmount, setSavingsAmount] = useState("");
   const [withdrawAmount, setWithdrawAmount] = useState("");
+  const [searchExpense, setSearchExpense] = useState("");
+  const [filterCategory, setFilterCategory] = useState<"all" | "food" | "clothing" | "leisure" | "rent">("all");
+  const [prevBudgetSpent, setPrevBudgetSpent] = useState<number | null>(null);
+  const [notifiedChallenges, setNotifiedChallenges] = useState<Set<string>>(new Set());
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -87,13 +94,66 @@ export default function Dashboard() {
   const bonusExpenses = bonusExpensesQuery.data || [];
   const challenges = challengesQuery.data as Challenge[] || [];
 
+  // Offline support - cache data
+  useEffect(() => {
+    if (student) {
+      localStorage.setItem(`student_${studentId}`, JSON.stringify(student));
+    }
+    if (expenses.length > 0) {
+      localStorage.setItem(`expenses_${studentId}`, JSON.stringify(expenses));
+    }
+    if (challenges.length > 0) {
+      localStorage.setItem(`challenges_${studentId}`, JSON.stringify(challenges));
+    }
+  }, [student, expenses, challenges, studentId]);
+
+  // Budget exceeded notification
+  useEffect(() => {
+    if (student && prevBudgetSpent !== null && student.spent > prevBudgetSpent && student.spent > student.budget) {
+      toast({
+        title: "Attention! 🚨",
+        description: `Tu as dépassé ton budget de $${(student.spent - student.budget).toFixed(2)}`,
+        variant: "destructive",
+      });
+    }
+    if (student) {
+      setPrevBudgetSpent(student.spent);
+    }
+  }, [student?.spent, student?.budget, toast]);
+
+  // Challenge completion notification
+  useEffect(() => {
+    challenges.forEach(ch => {
+      if (ch.completed && !notifiedChallenges.has(ch.id)) {
+        toast({
+          title: "Défi Complété! 🎉",
+          description: `Tu as réussi: ${ch.title}`,
+        });
+        setNotifiedChallenges(prev => new Set(prev).add(ch.id));
+      }
+    });
+  }, [challenges, notifiedChallenges, toast]);
+
   if (!student) {
+    const cachedStudent = localStorage.getItem(`student_${studentId}`);
+    if (cachedStudent) {
+      return <div className="p-8 text-center">
+        <p className="text-muted-foreground mb-4">Mode hors-ligne - Dernières données disponibles</p>
+      </div>;
+    }
     return <div className="p-8">Chargement...</div>;
   }
 
   const remaining = student.budget - student.spent;
   const spentPercentage = (student.spent / student.budget) * 100;
   const totalFixedDue = fixedExpenses.filter(fe => !fe.isPaid).reduce((sum, fe) => sum + fe.amount, 0);
+
+  // Filter expenses
+  const filteredExpenses = expenses.filter(e => {
+    const matchesSearch = e.message.toLowerCase().includes(searchExpense.toLowerCase());
+    const matchesCategory = filterCategory === "all" || e.category === filterCategory;
+    return matchesSearch && matchesCategory;
+  });
 
   // Expense breakdown by category
   const categoryBreakdown = ["food", "clothing", "leisure", "rent"].map(category => ({
@@ -448,14 +508,83 @@ export default function Dashboard() {
           </Card>
         )}
 
-        {/* Decision History */}
+        {/* Decision History with Filters */}
         <Card className="p-6">
-          <h2 className="text-xl font-semibold mb-4">Historique des Décisions</h2>
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-xl font-semibold">Historique Détaillé</h2>
+            <Button
+              onClick={() => {
+                const doc = new jsPDF();
+                doc.setFontSize(16);
+                doc.text("Rapport Budgétaire", 10, 10);
+                doc.setFontSize(10);
+                doc.text(`Étudiant: ${student.name}`, 10, 20);
+                doc.text(`Budget: $${student.budget} | Dépensé: $${student.spent} | Épargne: $${student.savings}`, 10, 30);
+                doc.text(`Restant: $${remaining} (${Math.round(spentPercentage)}% utilisé)`, 10, 40);
+                doc.text("", 10, 50);
+                doc.text("Dépenses:", 10, 60);
+                let y = 70;
+                filteredExpenses.forEach(exp => {
+                  if (y > 280) {
+                    doc.addPage();
+                    y = 10;
+                  }
+                  doc.text(`${exp.message} - $${exp.amount}`, 15, y);
+                  y += 5;
+                });
+                doc.save(`rapport_${student.name}.pdf`);
+              }}
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-2"
+              data-testid="button-export-pdf"
+            >
+              <Download className="w-4 h-4" />
+              Télécharger
+            </Button>
+          </div>
+
+          {/* Search and Filter */}
+          <div className="space-y-4 mb-4">
+            <div>
+              <Label htmlFor="search-expense" className="text-sm">Rechercher</Label>
+              <div className="flex gap-2 items-center">
+                <Search className="w-4 h-4 text-muted-foreground" />
+                <Input
+                  id="search-expense"
+                  placeholder="Cherche une dépense..."
+                  value={searchExpense}
+                  onChange={(e) => setSearchExpense(e.target.value)}
+                  data-testid="input-search-expense"
+                />
+              </div>
+            </div>
+
+            <div>
+              <Label htmlFor="filter-category" className="text-sm">Catégorie</Label>
+              <select
+                id="filter-category"
+                value={filterCategory}
+                onChange={(e) => setFilterCategory(e.target.value as any)}
+                className="w-full px-3 py-2 border border-border rounded-md bg-background text-sm"
+                data-testid="select-filter-category"
+              >
+                <option value="all">Toutes les catégories</option>
+                <option value="food">Nourriture</option>
+                <option value="clothing">Vêtements</option>
+                <option value="leisure">Loisirs</option>
+                <option value="rent">Loyer</option>
+              </select>
+            </div>
+          </div>
+
           <div className="space-y-2 max-h-96 overflow-y-auto">
-            {expenses.length === 0 ? (
-              <p className="text-muted-foreground text-center py-8">Aucune dépense encore</p>
+            {filteredExpenses.length === 0 ? (
+              <p className="text-muted-foreground text-center py-8">
+                {expenses.length === 0 ? "Aucune dépense encore" : "Aucune dépense ne correspond à ta recherche"}
+              </p>
             ) : (
-              expenses.map(expense => (
+              filteredExpenses.map(expense => (
                 <div key={expense.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex-1">
                     <p className="font-medium">{expense.message}</p>

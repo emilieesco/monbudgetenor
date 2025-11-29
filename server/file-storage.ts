@@ -224,6 +224,15 @@ export class FileStorage implements IStorage {
     return updated;
   }
 
+  async updateClassPredefinedBudget(classId: string, predefinedBudget: number): Promise<Class | undefined> {
+    const classData = this.classes.get(classId);
+    if (!classData) return undefined;
+    const updated = { ...classData, predefinedBudget };
+    this.classes.set(classId, updated);
+    this.save();
+    return updated;
+  }
+
   async getStudent(id: string): Promise<Student | undefined> {
     return this.students.get(id);
   }

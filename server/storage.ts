@@ -7,6 +7,7 @@ export interface IStorage {
   getClass(id: string): Promise<Class | undefined>;
   getClassStudents(classId: string): Promise<Student[]>;
   updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined>;
+  updateClassPredefinedBudget(classId: string, predefinedBudget: number): Promise<Class | undefined>;
   getStudent(id: string): Promise<Student | undefined>;
   getAllStudents(): Promise<Student[]>;
   getStudentByNameAndClass(name: string, classId: string): Promise<Student | undefined>;
@@ -198,6 +199,14 @@ export class MemStorage implements IStorage {
       }
     }
 
+    return updated;
+  }
+
+  async updateClassPredefinedBudget(classId: string, predefinedBudget: number): Promise<Class | undefined> {
+    const classData = this.classes.get(classId);
+    if (!classData) return undefined;
+    const updated = { ...classData, predefinedBudget };
+    this.classes.set(classId, updated);
     return updated;
   }
 

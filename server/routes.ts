@@ -65,6 +65,22 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/classes/:id/predefined-budget", async (req, res) => {
+    try {
+      const { predefinedBudget } = req.body;
+      if (typeof predefinedBudget !== "number" || predefinedBudget <= 0) {
+        return res.status(400).json({ error: "Invalid budget amount" });
+      }
+      const classData = await storage.updateClassPredefinedBudget(req.params.id, predefinedBudget);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      res.json(classData);
+    } catch (error) {
+      res.status(400).json({ error: "Invalid data" });
+    }
+  });
+
   // Student endpoints
   app.post("/api/students/join", async (req, res) => {
     try {

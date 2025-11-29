@@ -8,6 +8,7 @@ export interface Class {
   createdAt: Date;
   expenseAmounts: { [key: string]: number };
   mode: "predefined" | "custom" | "scenario";
+  predefinedBudget?: number;
 }
 
 // Student with budget

@@ -47,7 +47,8 @@ export default function StudentSetup() {
       return;
     }
 
-    const defaultBudget = Math.round(Object.values(classData?.expenseAmounts || {}).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+    const calculatedBudget = Math.round(Object.values(classData?.expenseAmounts || {}).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+    const defaultBudget = classData?.predefinedBudget || calculatedBudget;
     let budget = defaultBudget;
     let scenario = undefined;
 
@@ -70,7 +71,8 @@ export default function StudentSetup() {
     return <div className="p-8 text-center">Chargement de la classe...</div>;
   }
 
-  const defaultBudget = Math.round(Object.values(classData.expenseAmounts).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+  const calculatedBudget = Math.round(Object.values(classData.expenseAmounts).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+  const defaultBudget = classData.predefinedBudget || calculatedBudget;
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">

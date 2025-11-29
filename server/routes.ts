@@ -77,7 +77,9 @@ export async function registerRoutes(
       // Check if student with same name already exists in this class
       const existingStudent = await storage.getStudentByNameAndClass(data.name, classData.id);
       if (existingStudent) {
-        return res.json(existingStudent);
+        // Update the student's budget and add to history
+        const updatedStudent = await storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget);
+        return res.json(updatedStudent || existingStudent);
       }
       
       const student = await storage.createStudent({

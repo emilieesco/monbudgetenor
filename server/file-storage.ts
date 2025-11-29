@@ -282,6 +282,17 @@ export class FileStorage implements IStorage {
     return updated;
   }
 
+  async updateStudentBudgetWithHistory(id: string, budget: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const budgetHistory = student.budgetHistory || [];
+    budgetHistory.push({ budget, date: new Date() });
+    const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory };
+    this.students.set(id, updated);
+    this.save();
+    return updated;
+  }
+
   async updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined> {
     const student = this.students.get(id);
     if (!student) return undefined;

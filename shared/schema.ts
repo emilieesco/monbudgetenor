@@ -215,7 +215,6 @@ export type InsertCatalogItem = z.infer<typeof insertCatalogItemSchema>;
 export type InsertExpense = z.infer<typeof insertExpenseSchema>;
 export type CreateClass = z.infer<typeof createClassSchema>;
 export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;
-export type CreateChallenge = z.infer<typeof createChallengeSchema>;
 export type CreateCustomChallenge = z.infer<typeof createCustomChallengeSchema>;
 export type CreateTeacherMessage = z.infer<typeof createTeacherMessageSchema>;
 export type CreateSurpriseEvent = z.infer<typeof createSurpriseEventSchema>;

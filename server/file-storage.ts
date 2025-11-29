@@ -234,7 +234,7 @@ export class FileStorage implements IStorage {
 
   async createStudent(input: InsertStudent): Promise<Student> {
     const id = randomUUID();
-    const student: Student = { ...input, id, spent: 0, createdAt: new Date(), scenario: input.scenario, customExpenses: input.customExpenses };
+    const student: Student = { ...input, id, spent: 0, savings: 0, createdAt: new Date(), scenario: input.scenario, customExpenses: input.customExpenses };
     this.students.set(id, student);
 
     const classData = await this.getClass(input.classId);

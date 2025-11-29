@@ -11,6 +11,7 @@ import StudentJoin from "@/pages/student-join";
 import StudentWelcome from "@/pages/student-welcome";
 import StudentSetup from "@/pages/student-setup";
 import TeacherSetup from "@/pages/teacher-setup";
+import TeacherDashboard from "@/pages/teacher-dashboard";
 import Dashboard from "@/pages/dashboard";
 import Catalog from "@/pages/catalog";
 import Admin from "@/pages/admin";
@@ -24,7 +25,7 @@ function Router() {
       <Route path="/student/welcome" component={StudentWelcome} />
       <Route path="/student/setup" component={StudentSetup} />
       <Route path="/teacher-setup" component={TeacherSetup} />
-      <Route path="/teacher/:classId" component={Home} />
+      <Route path="/teacher/:classId" component={TeacherDashboard} />
       <Route path="/admin/:classId" component={Admin} />
       <Route path="/student/:studentId" component={Dashboard} />
       <Route path="/student/:studentId/catalog" component={Catalog} />

@@ -25,7 +25,7 @@ export default function TeacherSetup() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/classes", data.id] });
-      navigate(`/admin/${data.id}`);
+      navigate(`/teacher/${data.id}`);
     },
     onError: () => {
       setError("Erreur: le code existe peut-être déjà. Essaie un autre.");
@@ -39,7 +39,7 @@ export default function TeacherSetup() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/classes", data.id] });
-      navigate(`/admin/${data.id}`);
+      navigate(`/teacher/${data.id}`);
     },
     onError: () => {
       setError("Code de classe introuvable. Vérifie le code.");

@@ -169,12 +169,12 @@ export default function TeacherDashboard() {
               <div className="grid gap-4">
                 {students.map(student => (
                   <Card key={student.id} className="p-6">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between mb-4">
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold mb-2">{student.name}</h3>
                         <div className="grid grid-cols-3 gap-4 text-sm">
                           <div>
-                            <p className="text-muted-foreground">Budget</p>
+                            <p className="text-muted-foreground">Budget Actuel</p>
                             <p className="font-bold">${student.budget}</p>
                           </div>
                           <div>
@@ -191,6 +191,22 @@ export default function TeacherDashboard() {
                         <Badge variant="default">{Math.round(100 - (student.spent / student.budget * 100))}% restant</Badge>
                       </div>
                     </div>
+                    {student.budgetHistory && student.budgetHistory.length > 1 && (
+                      <div className="border-t pt-4">
+                        <p className="text-xs font-semibold text-muted-foreground mb-2">Historique des Budgets ({student.budgetHistory.length})</p>
+                        <div className="space-y-1">
+                          {student.budgetHistory.map((h, i) => {
+                            const date = typeof h.date === 'string' ? new Date(h.date) : h.date;
+                            return (
+                              <div key={i} className="text-xs flex justify-between p-1.5 bg-muted rounded">
+                                <span>Essai {student.budgetHistory!.length - i}</span>
+                                <span className="font-semibold">${h.budget}</span>
+                              </div>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    )}
                   </Card>
                 ))}
               </div>

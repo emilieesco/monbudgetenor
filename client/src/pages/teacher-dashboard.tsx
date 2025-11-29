@@ -17,6 +17,7 @@ export default function TeacherDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "config">("students");
   const [expenseAmounts, setExpenseAmounts] = useState<{ [key: string]: number }>({});
+  const [predefinedBudget, setPredefinedBudget] = useState<number | "">("");
 
   // Form states
   const [challengeTitle, setChallengeTitle] = useState("");
@@ -134,7 +135,7 @@ export default function TeacherDashboard() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/classes", classId] });
       toast({
-        title: "Budget mis à jour!",
+        title: "Dépenses mises à jour!",
         description: "Les montants des dépenses ont été sauvegardés.",
       });
     },
@@ -142,6 +143,27 @@ export default function TeacherDashboard() {
       toast({
         title: "Erreur",
         description: "Impossible de sauvegarder les modifications.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const updatePredefinedBudgetMutation = useMutation({
+    mutationFn: async (budget: number) => {
+      const res = await apiRequest("PATCH", `/api/classes/${classId}/predefined-budget`, { predefinedBudget: budget });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId] });
+      toast({
+        title: "Budget prédéfini sauvegardé!",
+        description: "Le budget prédéfini pour les élèves a été mis à jour.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder le budget prédéfini.",
         variant: "destructive",
       });
     },
@@ -182,6 +204,7 @@ export default function TeacherDashboard() {
                 setActiveTab(tab as any);
                 if (tab === "config" && classData) {
                   setExpenseAmounts({ ...classData.expenseAmounts });
+                  setPredefinedBudget(classData.predefinedBudget || "");
                 }
               }}
               className="flex items-center gap-2"
@@ -515,10 +538,57 @@ export default function TeacherDashboard() {
         {/* Config Tab */}
         {activeTab === "config" && (
           <div className="space-y-8">
+            {/* Budget Prédéfini */}
             <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Configuration du Budget Prédéfini</h2>
+              <h2 className="text-2xl font-bold mb-4">Budget Prédéfini</h2>
+              <p className="text-muted-foreground mb-4">
+                Définissez le montant que les élèves recevront s'ils choisissent le "Budget Prédéfini".
+              </p>
+              
+              <div className="flex items-end gap-4 mb-4">
+                <div className="flex-1 max-w-xs space-y-2">
+                  <Label htmlFor="predefined-budget">Montant du budget prédéfini ($)</Label>
+                  <Input
+                    id="predefined-budget"
+                    type="number"
+                    placeholder={`Suggéré: ${Math.round(Object.values(expenseAmounts).reduce((a, b) => a + b, 0) * 1.5)}`}
+                    value={predefinedBudget}
+                    onChange={(e) => setPredefinedBudget(e.target.value ? parseFloat(e.target.value) : "")}
+                    data-testid="input-predefined-budget"
+                  />
+                </div>
+                <Button
+                  onClick={() => {
+                    if (typeof predefinedBudget === "number" && predefinedBudget > 0) {
+                      updatePredefinedBudgetMutation.mutate(predefinedBudget);
+                    }
+                  }}
+                  disabled={updatePredefinedBudgetMutation.isPending || !predefinedBudget}
+                  data-testid="button-save-predefined-budget"
+                >
+                  Sauvegarder
+                </Button>
+              </div>
+
+              {classData?.predefinedBudget && (
+                <div className="p-4 bg-primary/10 rounded-lg">
+                  <p className="text-sm text-muted-foreground">Budget prédéfini actuel:</p>
+                  <p className="text-3xl font-bold text-primary">${classData.predefinedBudget}</p>
+                </div>
+              )}
+              {!classData?.predefinedBudget && (
+                <div className="p-4 bg-muted rounded-lg">
+                  <p className="text-sm text-muted-foreground">Aucun budget prédéfini défini.</p>
+                  <p className="text-sm">Si non défini, le budget sera calculé automatiquement: <strong>${Math.round(Object.values(expenseAmounts).reduce((a, b) => a + b, 0) * 1.5)}</strong> (total dépenses × 1.5)</p>
+                </div>
+              )}
+            </Card>
+
+            {/* Dépenses Fixes */}
+            <Card className="p-6">
+              <h2 className="text-2xl font-bold mb-4">Dépenses Fixes Mensuelles</h2>
               <p className="text-muted-foreground mb-6">
-                Modifiez les montants des dépenses fixes. Le budget prédéfini pour les élèves sera calculé automatiquement (total × 1.5).
+                Modifiez les montants des dépenses fixes que les élèves devront payer.
               </p>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
@@ -542,10 +612,6 @@ export default function TeacherDashboard() {
               <div className="p-4 bg-muted rounded-lg mb-6">
                 <p className="text-sm text-muted-foreground">Total dépenses fixes:</p>
                 <p className="text-2xl font-bold">${Object.values(expenseAmounts).reduce((a, b) => a + b, 0)}</p>
-                <p className="text-sm text-muted-foreground mt-2">Budget prédéfini (×1.5):</p>
-                <p className="text-3xl font-bold text-primary">
-                  ${Math.round(Object.values(expenseAmounts).reduce((a, b) => a + b, 0) * 1.5)}
-                </p>
               </div>
 
               <Button
@@ -554,7 +620,7 @@ export default function TeacherDashboard() {
                 className="flex items-center gap-2"
               >
                 <Settings className="w-4 h-4" />
-                Sauvegarder les Modifications
+                Sauvegarder les Dépenses
               </Button>
             </Card>
           </div>

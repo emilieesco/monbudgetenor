@@ -47,7 +47,8 @@ export default function StudentSetup() {
       return;
     }
 
-    let budget = 50;
+    const defaultBudget = Math.round(Object.values(classData?.expenseAmounts || {}).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
+    let budget = defaultBudget;
     let scenario = undefined;
 
     if (mode === "custom") {

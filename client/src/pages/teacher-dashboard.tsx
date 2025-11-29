@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent } from "@shared/schema";
 
@@ -15,7 +15,8 @@ export default function TeacherDashboard() {
   const { classId } = useParams();
   const [_location, navigate] = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events">("students");
+  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "config">("students");
+  const [expenseAmounts, setExpenseAmounts] = useState<{ [key: string]: number }>({});
 
   // Form states
   const [challengeTitle, setChallengeTitle] = useState("");
@@ -125,6 +126,27 @@ export default function TeacherDashboard() {
     },
   });
 
+  const updateExpensesMutation = useMutation({
+    mutationFn: async (amounts: { [key: string]: number }) => {
+      const res = await apiRequest("PATCH", `/api/classes/${classId}/expenses`, amounts);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId] });
+      toast({
+        title: "Budget mis à jour!",
+        description: "Les montants des dépenses ont été sauvegardés.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de sauvegarder les modifications.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const classData = classQuery.data as Class | undefined;
   const students = studentsQuery.data as Student[] || [];
   const challenges = customChallengesQuery.data as CustomChallenge[] || [];
@@ -152,21 +174,28 @@ export default function TeacherDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
-          {["students", "challenges", "messages", "events"].map(tab => (
+          {["students", "challenges", "messages", "events", "config"].map(tab => (
             <Button
               key={tab}
               variant={activeTab === tab ? "default" : "outline"}
-              onClick={() => setActiveTab(tab as any)}
+              onClick={() => {
+                setActiveTab(tab as any);
+                if (tab === "config" && classData) {
+                  setExpenseAmounts({ ...classData.expenseAmounts });
+                }
+              }}
               className="flex items-center gap-2"
             >
               {tab === "students" && <Users className="w-4 h-4" />}
               {tab === "challenges" && <Target className="w-4 h-4" />}
               {tab === "messages" && <Send className="w-4 h-4" />}
               {tab === "events" && <Gift className="w-4 h-4" />}
+              {tab === "config" && <Settings className="w-4 h-4" />}
               {tab === "students" && "Étudiants"}
               {tab === "challenges" && "Défis"}
               {tab === "messages" && "Messages"}
               {tab === "events" && "Événements"}
+              {tab === "config" && "Configuration"}
             </Button>
           ))}
         </div>
@@ -480,6 +509,54 @@ export default function TeacherDashboard() {
                 </div>
               </Card>
             )}
+          </div>
+        )}
+
+        {/* Config Tab */}
+        {activeTab === "config" && (
+          <div className="space-y-8">
+            <Card className="p-6">
+              <h2 className="text-2xl font-bold mb-6">Configuration du Budget Prédéfini</h2>
+              <p className="text-muted-foreground mb-6">
+                Modifiez les montants des dépenses fixes. Le budget prédéfini pour les élèves sera calculé automatiquement (total × 1.5).
+              </p>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
+                {Object.entries(expenseAmounts).map(([name, amount]) => (
+                  <div key={name} className="space-y-2">
+                    <Label htmlFor={`expense-${name}`}>{name}</Label>
+                    <Input
+                      id={`expense-${name}`}
+                      type="number"
+                      value={amount}
+                      onChange={(e) => setExpenseAmounts(prev => ({
+                        ...prev,
+                        [name]: parseFloat(e.target.value) || 0
+                      }))}
+                      data-testid={`input-expense-${name}`}
+                    />
+                  </div>
+                ))}
+              </div>
+
+              <div className="p-4 bg-muted rounded-lg mb-6">
+                <p className="text-sm text-muted-foreground">Total dépenses fixes:</p>
+                <p className="text-2xl font-bold">${Object.values(expenseAmounts).reduce((a, b) => a + b, 0)}</p>
+                <p className="text-sm text-muted-foreground mt-2">Budget prédéfini (×1.5):</p>
+                <p className="text-3xl font-bold text-primary">
+                  ${Math.round(Object.values(expenseAmounts).reduce((a, b) => a + b, 0) * 1.5)}
+                </p>
+              </div>
+
+              <Button
+                onClick={() => updateExpensesMutation.mutate(expenseAmounts)}
+                disabled={updateExpensesMutation.isPending}
+                className="flex items-center gap-2"
+              >
+                <Settings className="w-4 h-4" />
+                Sauvegarder les Modifications
+              </Button>
+            </Card>
           </div>
         )}
       </div>

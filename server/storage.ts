@@ -9,6 +9,7 @@ export interface IStorage {
   updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined>;
   getStudent(id: string): Promise<Student | undefined>;
   getAllStudents(): Promise<Student[]>;
+  getStudentByNameAndClass(name: string, classId: string): Promise<Student | undefined>;
   createStudent(student: InsertStudent): Promise<Student>;
   updateStudentBudget(id: string, budget: number): Promise<Student | undefined>;
   updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined>;

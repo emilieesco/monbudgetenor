@@ -144,6 +144,7 @@ export class MemStorage implements IStorage {
       id,
       code: upperCode,
       teacherName: input.teacherName,
+      mode: "predefined",
       createdAt: new Date(),
       expenseAmounts: {
         "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,
@@ -434,6 +435,7 @@ export class MemStorage implements IStorage {
     const challenge: CustomChallenge = {
       ...input,
       id,
+      teacherId: "system",
       createdAt: new Date(),
       completedBy: [],
     };
@@ -460,6 +462,7 @@ export class MemStorage implements IStorage {
     const message: TeacherMessage = {
       ...input,
       id,
+      teacherId: "system",
       timestamp: new Date(),
     };
     this.teacherMessages.set(id, message);

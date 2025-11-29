@@ -713,5 +713,21 @@
       "dueDate": "2025-12-28T23:24:38.907Z"
     }
   },
-  "bonusExpenses": {}
+  "bonusExpenses": {},
+  "challenges": {},
+  "customChallenges": {
+    "cb952a3e-6252-4dc7-9d60-f03544bc86e9": {
+      "classId": "9b15a65f-8f9e-479b-b34d-7a1ac64032e1",
+      "title": "économise",
+      "description": "eefef",
+      "type": "custom",
+      "targetValue": 20,
+      "id": "cb952a3e-6252-4dc7-9d60-f03544bc86e9",
+      "teacherId": "system",
+      "createdAt": "2025-11-29T00:30:56.129Z",
+      "completedBy": []
+    }
+  },
+  "teacherMessages": {},
+  "surpriseEvents": {}
 }

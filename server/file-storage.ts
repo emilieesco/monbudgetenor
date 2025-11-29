@@ -183,7 +183,7 @@ export class FileStorage implements IStorage {
   }
 
   async getStudentByNameAndClass(name: string, classId: string): Promise<Student | undefined> {
-    return Array.from(this.students.values()).find(s => s.name === name && s.classId === classId);
+    return Array.from(this.students.values()).find(s => s.name.toLowerCase() === name.toLowerCase() && s.classId === classId);
   }
 
   async getClassByCode(code: string): Promise<Class | undefined> {

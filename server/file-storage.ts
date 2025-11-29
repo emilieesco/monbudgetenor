@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -11,6 +11,10 @@ interface StorageData {
   expenses: Record<string, Expense>;
   fixedExpenses: Record<string, FixedExpense>;
   bonusExpenses: Record<string, BonusExpense>;
+  challenges: Record<string, Challenge>;
+  customChallenges: Record<string, CustomChallenge>;
+  teacherMessages: Record<string, TeacherMessage>;
+  surpriseEvents: Record<string, SurpriseEvent>;
 }
 
 export class FileStorage implements IStorage {
@@ -21,6 +25,10 @@ export class FileStorage implements IStorage {
   private expenses: Map<string, Expense> = new Map();
   private fixedExpenses: Map<string, FixedExpense> = new Map();
   private bonusExpenses: Map<string, BonusExpense> = new Map();
+  private challenges: Map<string, Challenge> = new Map();
+  private customChallenges: Map<string, CustomChallenge> = new Map();
+  private teacherMessages: Map<string, TeacherMessage> = new Map();
+  private surpriseEvents: Map<string, SurpriseEvent> = new Map();
 
   constructor() {
     this.dataFile = join(process.cwd(), "data.json");
@@ -63,6 +71,26 @@ export class FileStorage implements IStorage {
             this.bonusExpenses.set(key, { ...value, createdAt: new Date(value.createdAt) });
           }
         }
+        if (data.challenges) {
+          for (const [key, value] of Object.entries(data.challenges)) {
+            this.challenges.set(key, { ...value, createdAt: new Date(value.createdAt) });
+          }
+        }
+        if (data.customChallenges) {
+          for (const [key, value] of Object.entries(data.customChallenges)) {
+            this.customChallenges.set(key, { ...value, createdAt: new Date(value.createdAt) });
+          }
+        }
+        if (data.teacherMessages) {
+          for (const [key, value] of Object.entries(data.teacherMessages)) {
+            this.teacherMessages.set(key, { ...value, timestamp: new Date(value.timestamp) });
+          }
+        }
+        if (data.surpriseEvents) {
+          for (const [key, value] of Object.entries(data.surpriseEvents)) {
+            this.surpriseEvents.set(key, { ...value, createdAt: new Date(value.createdAt), appliedAt: value.appliedAt ? new Date(value.appliedAt) : undefined });
+          }
+        }
         console.log("Data loaded from file");
       }
     } catch (error) {
@@ -79,6 +107,10 @@ export class FileStorage implements IStorage {
         expenses: Object.fromEntries(this.expenses),
         fixedExpenses: Object.fromEntries(this.fixedExpenses),
         bonusExpenses: Object.fromEntries(this.bonusExpenses),
+        challenges: Object.fromEntries(this.challenges),
+        customChallenges: Object.fromEntries(this.customChallenges),
+        teacherMessages: Object.fromEntries(this.teacherMessages),
+        surpriseEvents: Object.fromEntries(this.surpriseEvents),
       };
       writeFileSync(this.dataFile, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -137,6 +169,7 @@ export class FileStorage implements IStorage {
       id,
       code: input.code.toUpperCase(),
       teacherName: input.teacherName,
+      mode: "predefined",
       createdAt: new Date(),
       expenseAmounts: {
         "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,
@@ -147,6 +180,10 @@ export class FileStorage implements IStorage {
     this.classes.set(id, classData);
     this.save();
     return classData;
+  }
+
+  async getStudentByNameAndClass(name: string, classId: string): Promise<Student | undefined> {
+    return Array.from(this.students.values()).find(s => s.name === name && s.classId === classId);
   }
 
   async getClassByCode(code: string): Promise<Class | undefined> {
@@ -240,6 +277,24 @@ export class FileStorage implements IStorage {
     const student = this.students.get(id);
     if (!student) return undefined;
     const updated = { ...student, budget };
+    this.students.set(id, updated);
+    this.save();
+    return updated;
+  }
+
+  async updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, budget, spent };
+    this.students.set(id, updated);
+    this.save();
+    return updated;
+  }
+
+  async updateStudentSavings(id: string, savings: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, savings };
     this.students.set(id, updated);
     this.save();
     return updated;
@@ -372,5 +427,106 @@ export class FileStorage implements IStorage {
       }
     }
     this.save();
+  }
+
+  async createChallenge(input: CreateChallenge): Promise<Challenge> {
+    const id = randomUUID();
+    const challenge: Challenge = {
+      id,
+      ...input,
+      completed: false,
+      createdAt: new Date(),
+    };
+    this.challenges.set(id, challenge);
+    this.save();
+    return challenge;
+  }
+
+  async getStudentChallenges(studentId: string): Promise<Challenge[]> {
+    return Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
+  }
+
+  async completeChallenge(id: string): Promise<Challenge | undefined> {
+    const challenge = this.challenges.get(id);
+    if (!challenge) return undefined;
+    const updated = { ...challenge, completed: true };
+    this.challenges.set(id, updated);
+    this.save();
+    return updated;
+  }
+
+  async createCustomChallenge(input: CreateCustomChallenge): Promise<CustomChallenge> {
+    const id = randomUUID();
+    const challenge: CustomChallenge = {
+      ...input,
+      id,
+      teacherId: "system",
+      createdAt: new Date(),
+      completedBy: [],
+    };
+    this.customChallenges.set(id, challenge);
+    this.save();
+    return challenge;
+  }
+
+  async getClassCustomChallenges(classId: string): Promise<CustomChallenge[]> {
+    return Array.from(this.customChallenges.values()).filter(c => c.classId === classId);
+  }
+
+  async completeCustomChallenge(id: string, studentId: string): Promise<CustomChallenge | undefined> {
+    const challenge = this.customChallenges.get(id);
+    if (!challenge) return undefined;
+    if (!challenge.completedBy.includes(studentId)) {
+      challenge.completedBy.push(studentId);
+    }
+    this.customChallenges.set(id, challenge);
+    this.save();
+    return challenge;
+  }
+
+  async createTeacherMessage(input: CreateTeacherMessage): Promise<TeacherMessage> {
+    const id = randomUUID();
+    const message: TeacherMessage = {
+      ...input,
+      id,
+      teacherId: "system",
+      timestamp: new Date(),
+    };
+    this.teacherMessages.set(id, message);
+    this.save();
+    return message;
+  }
+
+  async getClassMessages(classId: string): Promise<TeacherMessage[]> {
+    return Array.from(this.teacherMessages.values()).filter(m => m.classId === classId);
+  }
+
+  async getStudentMessages(studentId: string): Promise<TeacherMessage[]> {
+    return Array.from(this.teacherMessages.values()).filter(m => !m.studentId || m.studentId === studentId);
+  }
+
+  async createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent> {
+    const id = randomUUID();
+    const event: SurpriseEvent = {
+      ...input,
+      id,
+      createdAt: new Date(),
+    };
+    this.surpriseEvents.set(id, event);
+    this.save();
+    return event;
+  }
+
+  async getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]> {
+    return Array.from(this.surpriseEvents.values()).filter(e => e.classId === classId && !e.appliedAt);
+  }
+
+  async applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined> {
+    const event = this.surpriseEvents.get(eventId);
+    if (!event) return undefined;
+    const updated = { ...event, appliedAt: new Date(), studentId };
+    this.surpriseEvents.set(eventId, updated);
+    this.save();
+    return updated;
   }
 }

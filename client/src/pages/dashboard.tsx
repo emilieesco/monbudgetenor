@@ -190,8 +190,11 @@ export default function Dashboard() {
           <Card className="p-6">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-muted-foreground mb-2">Budget Initial</p>
+                <p className="text-sm text-muted-foreground mb-2">Budget Actuel</p>
                 <p className="text-3xl font-bold text-primary">${student.budget}</p>
+                {student.budgetHistory && student.budgetHistory.length > 1 && (
+                  <p className="text-xs text-muted-foreground mt-2">{student.budgetHistory.length} essais</p>
+                )}
               </div>
               <DollarSign className="w-12 h-12 text-primary opacity-20" />
             </div>
@@ -233,6 +236,25 @@ export default function Dashboard() {
           <Progress value={Math.min(spentPercentage, 100)} className="h-3" />
           <p className="text-xs text-muted-foreground mt-2">{Math.round(spentPercentage)}% utilisé</p>
         </Card>
+
+        {/* Budget History */}
+        {student.budgetHistory && student.budgetHistory.length > 1 && (
+          <Card className="p-6 mb-8">
+            <h2 className="text-xl font-semibold mb-4">Historique de tes Budgets</h2>
+            <div className="space-y-2">
+              {student.budgetHistory.map((h, i) => {
+                const date = typeof h.date === 'string' ? new Date(h.date) : h.date;
+                return (
+                  <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">
+                    <span className="text-sm">Essai {student.budgetHistory!.length - i}</span>
+                    <span className="font-bold">${h.budget}</span>
+                    <span className="text-xs text-muted-foreground">{date.toLocaleDateString()}</span>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
 
         {/* Savings Manager */}
         <Card className="p-6 mb-8">

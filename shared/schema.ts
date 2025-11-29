@@ -21,6 +21,7 @@ export interface Student {
   createdAt: Date;
   customExpenses?: { [key: string]: number };
   scenario?: string;
+  budgetHistory?: Array<{ budget: number; date: Date }>;
 }
 
 export interface CatalogItem {

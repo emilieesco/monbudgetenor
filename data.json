@@ -703,6 +703,941 @@
       "description": "Entrée concert",
       "isEssential": false,
       "isTaxable": true
+    },
+    "71769557-60d8-41a9-af69-d983a09c5d59": {
+      "name": "Yogourt aux fruits 650g",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Yogourt aux fraises",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "71769557-60d8-41a9-af69-d983a09c5d59"
+    },
+    "07232c87-81e4-46e6-8147-6f1c6f23bcd6": {
+      "name": "Fromage cottage 500g",
+      "price": 4.79,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage cottage 2%",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "07232c87-81e4-46e6-8147-6f1c6f23bcd6"
+    },
+    "5b8152ae-cd85-4c8c-84cd-9fb21ac081e2": {
+      "name": "Lait au chocolat 1L",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Lait au chocolat",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "5b8152ae-cd85-4c8c-84cd-9fb21ac081e2"
+    },
+    "c2bbadd9-8a28-4829-8018-94def9aa68c9": {
+      "name": "Fromage en grains 200g",
+      "price": 6.99,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage squik-squik",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "c2bbadd9-8a28-4829-8018-94def9aa68c9"
+    },
+    "d11c315b-37c6-468d-acae-c9b544406714": {
+      "name": "Brie 200g",
+      "price": 7.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage brie crémeux",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "d11c315b-37c6-468d-acae-c9b544406714"
+    },
+    "c0a9e435-f95a-419a-aae7-96e768fdd4bf": {
+      "name": "Parmesan râpé 250g",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Parmesan râpé",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "c0a9e435-f95a-419a-aae7-96e768fdd4bf"
+    },
+    "2234988a-21c8-49a0-876c-5dec38674e97": {
+      "name": "Saucisses italiennes 450g",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Saucisses douces",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "2234988a-21c8-49a0-876c-5dec38674e97"
+    },
+    "10d38ecd-c722-487c-be03-8e12654ff618": {
+      "name": "Jambon tranché 300g",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Jambon Forêt-Noire",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "10d38ecd-c722-487c-be03-8e12654ff618"
+    },
+    "a7bdd1d5-bbee-418e-8a85-fbdb367b66c2": {
+      "name": "Dinde hachée 450g",
+      "price": 6.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Dinde hachée maigre",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "a7bdd1d5-bbee-418e-8a85-fbdb367b66c2"
+    },
+    "381f32b1-29f7-425e-9062-608cce220c66": {
+      "name": "Steak de bœuf 400g",
+      "price": 18.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Steak AAA",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "381f32b1-29f7-425e-9062-608cce220c66"
+    },
+    "b0f0d83f-3e09-4e43-9cd9-46542b348d15": {
+      "name": "Pepperoni 175g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Pepperoni tranché",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "b0f0d83f-3e09-4e43-9cd9-46542b348d15"
+    },
+    "d016f9d5-a8ab-4e75-b113-f82c4a9659cc": {
+      "name": "Tofu ferme 454g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Tofu biologique",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "d016f9d5-a8ab-4e75-b113-f82c4a9659cc"
+    },
+    "c11cb804-5d1e-4474-b306-a937f10f3742": {
+      "name": "Tilapia 400g",
+      "price": 9.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Filets de tilapia",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "c11cb804-5d1e-4474-b306-a937f10f3742"
+    },
+    "9e543856-a7ca-40ba-ae34-73e8b291fcb5": {
+      "name": "Porc haché 450g",
+      "price": 6.49,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Porc haché maigre",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "9e543856-a7ca-40ba-ae34-73e8b291fcb5"
+    },
+    "10e7464c-7628-4017-b6fb-2939964f3127": {
+      "name": "Fraises 454g",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Fraises fraîches",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "10e7464c-7628-4017-b6fb-2939964f3127"
+    },
+    "6eefbae3-8082-4e79-ae3c-7a1857502d93": {
+      "name": "Bleuets 170g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Bleuets du Québec",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "6eefbae3-8082-4e79-ae3c-7a1857502d93"
+    },
+    "2b365fc2-92e1-4c75-84dc-8790fbc843ff": {
+      "name": "Raisins verts 1.5lb",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Raisins sans pépins",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "2b365fc2-92e1-4c75-84dc-8790fbc843ff"
+    },
+    "eaa11247-f4e5-423e-ab83-95d1a8c2022d": {
+      "name": "Concombres 3",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Mini concombres",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "eaa11247-f4e5-423e-ab83-95d1a8c2022d"
+    },
+    "f54f86fc-6fc1-480c-830e-cb02a768cc57": {
+      "name": "Poivrons 3",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Poivrons colorés",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "f54f86fc-6fc1-480c-830e-cb02a768cc57"
+    },
+    "65fbecfc-b1db-4883-b0c0-82b225556e57": {
+      "name": "Champignons 227g",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Champignons blancs",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "65fbecfc-b1db-4883-b0c0-82b225556e57"
+    },
+    "9467ba3c-4d80-463a-838f-a9f69074f038": {
+      "name": "Céleri",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Céleri frais",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "9467ba3c-4d80-463a-838f-a9f69074f038"
+    },
+    "17a84092-1668-43ce-abfc-db78933f7261": {
+      "name": "Ail 3 têtes",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Ail frais",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "17a84092-1668-43ce-abfc-db78933f7261"
+    },
+    "29221270-b103-45e9-8908-ca641722649c": {
+      "name": "Citrons 5",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Citrons frais",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "29221270-b103-45e9-8908-ca641722649c"
+    },
+    "aafc2e9a-bfd2-485c-8456-4fa944c74212": {
+      "name": "Avocat 3",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Avocats mûrs",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "aafc2e9a-bfd2-485c-8456-4fa944c74212"
+    },
+    "7e99fbb0-e82d-4c3e-9556-3c7e9c66b168": {
+      "name": "Épinards 312g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Épinards bébé",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "7e99fbb0-e82d-4c3e-9556-3c7e9c66b168"
+    },
+    "e9b67326-c2af-4a55-80f8-b63516e020b3": {
+      "name": "Chou-fleur",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Chou-fleur frais",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "e9b67326-c2af-4a55-80f8-b63516e020b3"
+    },
+    "3e0788d9-7ccb-4d7e-a437-150c45e23b66": {
+      "name": "Courgettes 2",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Courgettes vertes",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "3e0788d9-7ccb-4d7e-a437-150c45e23b66"
+    },
+    "1878830f-15e3-474b-974f-3c7ff0f8912c": {
+      "name": "Pêches 4",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Pêches juteuses",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "1878830f-15e3-474b-974f-3c7ff0f8912c"
+    },
+    "b3a0bf61-4a93-43b4-8f2c-86e2f4e653a2": {
+      "name": "Mangues 2",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Mangues mûres",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "b3a0bf61-4a93-43b4-8f2c-86e2f4e653a2"
+    },
+    "13884459-6285-4d59-97e6-edbb84d3473a": {
+      "name": "Pois chiches 540ml",
+      "price": 1.79,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Pois chiches en conserve",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "13884459-6285-4d59-97e6-edbb84d3473a"
+    },
+    "5c81faa1-23f2-4020-9a59-c2954dadabff": {
+      "name": "Lentilles 540ml",
+      "price": 1.69,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Lentilles vertes",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "5c81faa1-23f2-4020-9a59-c2954dadabff"
+    },
+    "9b127691-65b9-46b0-8c44-113ef3bd1961": {
+      "name": "Macaroni 900g",
+      "price": 2.29,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Pâtes macaroni",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "9b127691-65b9-46b0-8c44-113ef3bd1961"
+    },
+    "cf4fbe34-debd-47c5-a861-c57e959450b8": {
+      "name": "Céréales Cheerios 430g",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Céréales Cheerios",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "cf4fbe34-debd-47c5-a861-c57e959450b8"
+    },
+    "0da0262f-98fb-48e6-b742-d6839d920bfc": {
+      "name": "Flocons d'avoine 1kg",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Gruau Quaker",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "0da0262f-98fb-48e6-b742-d6839d920bfc"
+    },
+    "f9694fb6-99b7-4fc1-a7a0-c1aa5ae3a8f2": {
+      "name": "Beurre d'arachide 500g",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Beurre d'arachide",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "f9694fb6-99b7-4fc1-a7a0-c1aa5ae3a8f2"
+    },
+    "62af4625-11e3-41a3-a1f3-43826a275f3c": {
+      "name": "Confiture fraises 500ml",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Confiture maison",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "62af4625-11e3-41a3-a1f3-43826a275f3c"
+    },
+    "061cb240-12e4-4d7c-b5e6-fb8b70ff1e08": {
+      "name": "Miel 500g",
+      "price": 7.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Miel pur",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "061cb240-12e4-4d7c-b5e6-fb8b70ff1e08"
+    },
+    "092fbfcf-b164-4c69-a3e8-6e05db784326": {
+      "name": "Sirop d'érable 250ml",
+      "price": 9.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Sirop d'érable pur",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "092fbfcf-b164-4c69-a3e8-6e05db784326"
+    },
+    "59483d3d-2c38-4543-a112-5cfc8a745175": {
+      "name": "Huile d'olive 500ml",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Huile extra vierge",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "59483d3d-2c38-4543-a112-5cfc8a745175"
+    },
+    "5ac0fc23-2e98-4424-bbac-d7a879702443": {
+      "name": "Ketchup 1L",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Ketchup Heinz",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "5ac0fc23-2e98-4424-bbac-d7a879702443"
+    },
+    "b17fb96e-8a05-4913-a090-9e7e70b44d26": {
+      "name": "Moutarde 400ml",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Moutarde jaune",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "b17fb96e-8a05-4913-a090-9e7e70b44d26"
+    },
+    "f59a3fa2-badd-4e91-a13d-3f2840668654": {
+      "name": "Mayonnaise 890ml",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Mayonnaise Hellmann's",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "f59a3fa2-badd-4e91-a13d-3f2840668654"
+    },
+    "13c63d31-cbfb-4131-8a06-5d7a6a9105ed": {
+      "name": "Pains hot-dog 8",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pains à hot-dog",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "13c63d31-cbfb-4131-8a06-5d7a6a9105ed"
+    },
+    "a577adf7-f19b-4a02-bc52-c1231ee91132": {
+      "name": "Pains hamburger 8",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pains à hamburger",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "a577adf7-f19b-4a02-bc52-c1231ee91132"
+    },
+    "b32c127b-0ad6-4683-8c36-562a68711e49": {
+      "name": "Pain naan 4",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pains naan nature",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "b32c127b-0ad6-4683-8c36-562a68711e49"
+    },
+    "b2b51adc-168f-48ec-9b5f-e4c0fb9ebf06": {
+      "name": "Baguette",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Baguette française",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "b2b51adc-168f-48ec-9b5f-e4c0fb9ebf06"
+    },
+    "aff8ea37-0c9a-4b79-9349-6ea0a55909cb": {
+      "name": "Pain à l'ail",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pain à l'ail congelé",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "aff8ea37-0c9a-4b79-9349-6ea0a55909cb"
+    },
+    "bcd5ea5d-a268-4912-9a5c-226df4d70300": {
+      "name": "Kit Kat 4 barres",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres Kit Kat",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "bcd5ea5d-a268-4912-9a5c-226df4d70300"
+    },
+    "b6dba9dc-ea20-40d2-9686-56f8d9b7d88f": {
+      "name": "M&M's 230g",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Bonbons M&M's",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "b6dba9dc-ea20-40d2-9686-56f8d9b7d88f"
+    },
+    "5bce5c33-608e-46fe-b02f-bd98bc02a48e": {
+      "name": "Réglisses rouges 250g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Réglisses Twizzlers",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "5bce5c33-608e-46fe-b02f-bd98bc02a48e"
+    },
+    "45015d87-989e-4d72-8084-89c87f649682": {
+      "name": "Pringles 156g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chips Pringles",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "45015d87-989e-4d72-8084-89c87f649682"
+    },
+    "2270eea1-8dc0-44d5-9431-97a4e7148720": {
+      "name": "Ruffles 235g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chips ondulées",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "2270eea1-8dc0-44d5-9431-97a4e7148720"
+    },
+    "0ee57b3a-6070-40a2-9a3d-d3bca3500ac4": {
+      "name": "Cheetos 285g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Cheetos croquants",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "0ee57b3a-6070-40a2-9a3d-d3bca3500ac4"
+    },
+    "3601216b-8bb9-46a8-8ba8-db81619f2039": {
+      "name": "Skittles 191g",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Bonbons Skittles",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "3601216b-8bb9-46a8-8ba8-db81619f2039"
+    },
+    "32a5580d-28c3-4429-93b6-aed4a8cd1d23": {
+      "name": "Aero 97g",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chocolat Aero",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "32a5580d-28c3-4429-93b6-aed4a8cd1d23"
+    },
+    "b8879f1e-5270-437d-9411-bb72a7f7e5cb": {
+      "name": "Smarties 120g",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Bonbons Smarties",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "b8879f1e-5270-437d-9411-bb72a7f7e5cb"
+    },
+    "016360a4-640e-4c75-99be-b4963b7e5365": {
+      "name": "Caramilk 100g",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chocolat Caramilk",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "016360a4-640e-4c75-99be-b4963b7e5365"
+    },
+    "1fbb5548-358e-4074-a964-89b2ac7b3ae8": {
+      "name": "Coffee Crisp 4 barres",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres Coffee Crisp",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1fbb5548-358e-4074-a964-89b2ac7b3ae8"
+    },
+    "35fa3e21-b43f-453b-b5cd-934f7cff5bdb": {
+      "name": "Biscuits Chips Ahoy 300g",
+      "price": 4.29,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Biscuits aux pépites",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "35fa3e21-b43f-453b-b5cd-934f7cff5bdb"
+    },
+    "3d0b0902-e59f-46dd-ad1d-3773d5f866ac": {
+      "name": "Brownies 6",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Brownies au chocolat",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "3d0b0902-e59f-46dd-ad1d-3773d5f866ac"
+    },
+    "948cb769-8e53-416c-b65d-39b7d20be0fa": {
+      "name": "Gâteau au chocolat",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Gâteau glacé",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "948cb769-8e53-416c-b65d-39b7d20be0fa"
+    },
+    "1c1c4a9a-e34c-4659-889d-f23550d19a66": {
+      "name": "Craquelins Ritz 200g",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Craquelins Ritz",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1c1c4a9a-e34c-4659-889d-f23550d19a66"
+    },
+    "1d311770-145a-4709-9e5f-20617a3d09f4": {
+      "name": "Barres granola 5",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres Nature Valley",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1d311770-145a-4709-9e5f-20617a3d09f4"
+    },
+    "42fa75bb-4656-4ccd-b345-bf237e78b0ec": {
+      "name": "Sprite 2L",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson gazeuse",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "42fa75bb-4656-4ccd-b345-bf237e78b0ec"
+    },
+    "fc8eaf8c-cc9e-47ba-96b6-7a0dff7c7950": {
+      "name": "7-Up 2L",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson gazeuse",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "fc8eaf8c-cc9e-47ba-96b6-7a0dff7c7950"
+    },
+    "49665ef7-5b09-4c72-b98f-2d370135d99e": {
+      "name": "Red Bull 250ml",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson énergisante",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "49665ef7-5b09-4c72-b98f-2d370135d99e"
+    },
+    "ff623938-3b1e-41a8-a535-3cc75e8d708b": {
+      "name": "Monster 473ml",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson énergisante",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "ff623938-3b1e-41a8-a535-3cc75e8d708b"
+    },
+    "3fb2166a-a27d-4d87-a17b-02c14481a444": {
+      "name": "Limonade 1.89L",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Limonade naturelle",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "3fb2166a-a27d-4d87-a17b-02c14481a444"
+    },
+    "a71cad9c-b810-4769-bf9b-5c7597916a3d": {
+      "name": "Thé glacé Nestea 2L",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Thé glacé au citron",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "a71cad9c-b810-4769-bf9b-5c7597916a3d"
+    },
+    "40dd6812-794e-4a8d-8f2d-53ca484bf873": {
+      "name": "Chocolat chaud 500g",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Mélange chocolat chaud",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "40dd6812-794e-4a8d-8f2d-53ca484bf873"
+    },
+    "563cb335-d87d-4228-a05d-6df4e3530d59": {
+      "name": "V8 légumes 1.89L",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Cocktail de légumes",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "563cb335-d87d-4228-a05d-6df4e3530d59"
+    },
+    "30dae2b6-bf77-484e-b042-8269034cfc4b": {
+      "name": "Casquette",
+      "price": 20,
+      "category": "clothing",
+      "description": "Casquette ajustable",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "30dae2b6-bf77-484e-b042-8269034cfc4b"
+    },
+    "4f59b538-4685-4651-ba50-62bb8d56aa3c": {
+      "name": "Tuque d'hiver",
+      "price": 15,
+      "category": "clothing",
+      "description": "Tuque chaude",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "4f59b538-4685-4651-ba50-62bb8d56aa3c"
+    },
+    "a3a6f5f0-afb8-4d5f-8f98-6b18ba709c3f": {
+      "name": "Gants d'hiver",
+      "price": 18,
+      "category": "clothing",
+      "description": "Gants isolés",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "a3a6f5f0-afb8-4d5f-8f98-6b18ba709c3f"
+    },
+    "fda0d9f0-6be7-4163-8be9-eb7e82feca66": {
+      "name": "Écharpe",
+      "price": 22,
+      "category": "clothing",
+      "description": "Écharpe en laine",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "fda0d9f0-6be7-4163-8be9-eb7e82feca66"
+    },
+    "05f4d7e1-e1df-40ed-9050-8e655cc8646c": {
+      "name": "Pantalon sport",
+      "price": 35,
+      "category": "clothing",
+      "description": "Pantalon jogging",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "05f4d7e1-e1df-40ed-9050-8e655cc8646c"
+    },
+    "045c93bc-8e6a-43fc-a6d6-a760511a45d3": {
+      "name": "Robe d'été",
+      "price": 45,
+      "category": "clothing",
+      "description": "Robe légère",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "045c93bc-8e6a-43fc-a6d6-a760511a45d3"
+    },
+    "362b298f-583e-4341-898e-efe253d015a5": {
+      "name": "Sandales",
+      "price": 30,
+      "category": "clothing",
+      "description": "Sandales d'été",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "362b298f-583e-4341-898e-efe253d015a5"
+    },
+    "27ce1e21-4f9f-4dcb-aa08-fb0832d53214": {
+      "name": "Bottes d'hiver",
+      "price": 90,
+      "category": "clothing",
+      "description": "Bottes imperméables",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "27ce1e21-4f9f-4dcb-aa08-fb0832d53214"
+    },
+    "43c3ca27-0e97-48a5-b7ad-2ca0c2c7cdc5": {
+      "name": "Manteau de pluie",
+      "price": 55,
+      "category": "clothing",
+      "description": "Imperméable léger",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "43c3ca27-0e97-48a5-b7ad-2ca0c2c7cdc5"
+    },
+    "9b778429-25a3-454e-9431-8885e42b4941": {
+      "name": "Sous-vêtements 3",
+      "price": 15,
+      "category": "clothing",
+      "description": "Pack sous-vêtements",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "9b778429-25a3-454e-9431-8885e42b4941"
+    },
+    "504a8c02-0c6b-48f2-a814-6d7bcd1565d5": {
+      "name": "Abonnement Netflix",
+      "price": 16.99,
+      "category": "leisure",
+      "description": "Abonnement mensuel",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "504a8c02-0c6b-48f2-a814-6d7bcd1565d5"
+    },
+    "837dd220-cc10-4ad4-8090-1ed3c06428a8": {
+      "name": "Abonnement Spotify",
+      "price": 9.99,
+      "category": "leisure",
+      "description": "Musique illimitée",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "837dd220-cc10-4ad4-8090-1ed3c06428a8"
+    },
+    "77dde8d4-d3b2-4a11-9564-af580f683789": {
+      "name": "Pizza restaurant",
+      "price": 18.99,
+      "category": "leisure",
+      "description": "Pizza large",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "77dde8d4-d3b2-4a11-9564-af580f683789"
+    },
+    "5e348d3a-8157-49e9-afd4-d00d5738a1e9": {
+      "name": "Repas McDonald's",
+      "price": 12.99,
+      "category": "leisure",
+      "description": "Trio Big Mac",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "5e348d3a-8157-49e9-afd4-d00d5738a1e9"
+    },
+    "0015bd59-9817-4520-9a5e-1978e33b60aa": {
+      "name": "Bowling",
+      "price": 12,
+      "category": "leisure",
+      "description": "Partie de bowling",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "0015bd59-9817-4520-9a5e-1978e33b60aa"
+    },
+    "5d0cd317-92cd-40fd-a848-112fe51f0d94": {
+      "name": "Karaoké",
+      "price": 20,
+      "category": "leisure",
+      "description": "Soirée karaoké",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "5d0cd317-92cd-40fd-a848-112fe51f0d94"
+    },
+    "b2ec6bd2-850f-4451-abc0-d06f703e95ed": {
+      "name": "Escape room",
+      "price": 25,
+      "category": "leisure",
+      "description": "Jeu d'évasion",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "b2ec6bd2-850f-4451-abc0-d06f703e95ed"
+    },
+    "23dda09b-a5d1-4807-8581-ea16a725e469": {
+      "name": "Manucure",
+      "price": 35,
+      "category": "leisure",
+      "description": "Soins des ongles",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "23dda09b-a5d1-4807-8581-ea16a725e469"
+    },
+    "6acc4858-d1c5-4181-9ff9-4ea8299fc992": {
+      "name": "Coupe de cheveux",
+      "price": 25,
+      "category": "leisure",
+      "description": "Coiffure",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "6acc4858-d1c5-4181-9ff9-4ea8299fc992"
+    },
+    "141c0f85-16ca-429f-8a5c-db810ad96856": {
+      "name": "Gym mensuel",
+      "price": 40,
+      "category": "leisure",
+      "description": "Abonnement gym",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "141c0f85-16ca-429f-8a5c-db810ad96856"
+    },
+    "fb7c22f5-76ad-4143-8a0d-5059cd542c5b": {
+      "name": "Uber",
+      "price": 15,
+      "category": "leisure",
+      "description": "Course Uber",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "fb7c22f5-76ad-4143-8a0d-5059cd542c5b"
+    },
+    "9b8b9de6-6f9c-4e5a-921a-d7c8a837f64c": {
+      "name": "Billet d'autobus",
+      "price": 3.5,
+      "category": "leisure",
+      "description": "Transport en commun",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "9b8b9de6-6f9c-4e5a-921a-d7c8a837f64c"
+    },
+    "9c82fb78-7a27-4ed7-8f3f-bc96377cec86": {
+      "name": "Location vélo",
+      "price": 8,
+      "category": "leisure",
+      "description": "Vélo Bixi",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "9c82fb78-7a27-4ed7-8f3f-bc96377cec86"
+    },
+    "c5246f10-0771-4be0-b208-965cb4bca0fc": {
+      "name": "Tatouage",
+      "price": 100,
+      "category": "leisure",
+      "description": "Petit tatouage",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "c5246f10-0771-4be0-b208-965cb4bca0fc"
+    },
+    "1a3261b6-bcb9-49d4-96e9-9fa64db29124": {
+      "name": "Piercing",
+      "price": 50,
+      "category": "leisure",
+      "description": "Piercing oreille",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1a3261b6-bcb9-49d4-96e9-9fa64db29124"
     }
   },
   "expenses": {},

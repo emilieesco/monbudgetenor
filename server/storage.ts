@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type CreateSnapshot } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -47,6 +47,10 @@ export interface IStorage {
   createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent>;
   getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]>;
   applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined>;
+  createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot>;
+  getStudentSnapshots(studentId: string): Promise<BudgetSnapshot[]>;
+  restoreSnapshot(snapshotId: string): Promise<Student | undefined>;
+  deleteSnapshot(snapshotId: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -60,6 +64,7 @@ export class MemStorage implements IStorage {
   private customChallenges: Map<string, CustomChallenge> = new Map();
   private teacherMessages: Map<string, TeacherMessage> = new Map();
   private surpriseEvents: Map<string, SurpriseEvent> = new Map();
+  private snapshots: Map<string, BudgetSnapshot> = new Map();
   private expenseSequence: Expense[] = [];
   private defaultExpenseAmounts: Map<string, number> = new Map();
 
@@ -588,6 +593,107 @@ export class MemStorage implements IStorage {
     const updated = { ...event, appliedAt: new Date(), studentId };
     this.surpriseEvents.set(eventId, updated);
     return updated;
+  }
+
+  async createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot> {
+    const student = await this.getStudent(studentId);
+    if (!student) throw new Error("Étudiant non trouvé");
+
+    const existingSnapshots = await this.getStudentSnapshots(studentId);
+    if (existingSnapshots.length >= 3) {
+      const oldest = existingSnapshots.sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      )[0];
+      this.snapshots.delete(oldest.id);
+    }
+
+    const expenses = Array.from(this.expenses.values()).filter(e => e.studentId === studentId);
+    const fixedExpenses = Array.from(this.fixedExpenses.values()).filter(e => e.studentId === studentId);
+    const bonusExpenses = Array.from(this.bonusExpenses.values()).filter(e => e.studentId === studentId);
+    const challenges = Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
+
+    const id = randomUUID();
+    const snapshot: BudgetSnapshot = {
+      id,
+      studentId,
+      label,
+      createdAt: new Date(),
+      studentState: {
+        budget: student.budget,
+        spent: student.spent,
+        savings: student.savings,
+      },
+      expenses: JSON.parse(JSON.stringify(expenses)),
+      fixedExpenses: JSON.parse(JSON.stringify(fixedExpenses)),
+      bonusExpenses: JSON.parse(JSON.stringify(bonusExpenses)),
+      challenges: JSON.parse(JSON.stringify(challenges)),
+    };
+    this.snapshots.set(id, snapshot);
+    return snapshot;
+  }
+
+  async getStudentSnapshots(studentId: string): Promise<BudgetSnapshot[]> {
+    return Array.from(this.snapshots.values())
+      .filter(s => s.studentId === studentId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async restoreSnapshot(snapshotId: string): Promise<Student | undefined> {
+    const snapshot = this.snapshots.get(snapshotId);
+    if (!snapshot) return undefined;
+
+    const student = await this.getStudent(snapshot.studentId);
+    if (!student) return undefined;
+
+    const updatedStudent = {
+      ...student,
+      budget: snapshot.studentState.budget,
+      spent: snapshot.studentState.spent,
+      savings: snapshot.studentState.savings,
+    };
+    this.students.set(student.id, updatedStudent);
+
+    for (const [id, exp] of this.expenses.entries()) {
+      if (exp.studentId === snapshot.studentId) {
+        this.expenses.delete(id);
+      }
+    }
+    for (const exp of snapshot.expenses) {
+      this.expenses.set(exp.id, { ...exp, timestamp: new Date(exp.timestamp) });
+    }
+
+    for (const [id, fe] of this.fixedExpenses.entries()) {
+      if (fe.studentId === snapshot.studentId) {
+        this.fixedExpenses.delete(id);
+      }
+    }
+    for (const fe of snapshot.fixedExpenses) {
+      this.fixedExpenses.set(fe.id, { ...fe, dueDate: new Date(fe.dueDate) });
+    }
+
+    for (const [id, be] of this.bonusExpenses.entries()) {
+      if (be.studentId === snapshot.studentId) {
+        this.bonusExpenses.delete(id);
+      }
+    }
+    for (const be of snapshot.bonusExpenses) {
+      this.bonusExpenses.set(be.id, { ...be, createdAt: new Date(be.createdAt) });
+    }
+
+    for (const [id, ch] of this.challenges.entries()) {
+      if (ch.studentId === snapshot.studentId) {
+        this.challenges.delete(id);
+      }
+    }
+    for (const ch of snapshot.challenges) {
+      this.challenges.set(ch.id, { ...ch, createdAt: new Date(ch.createdAt) });
+    }
+
+    return updatedStudent;
+  }
+
+  async deleteSnapshot(snapshotId: string): Promise<boolean> {
+    return this.snapshots.delete(snapshotId);
   }
 }
 

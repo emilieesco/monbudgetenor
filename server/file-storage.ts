@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -15,6 +15,7 @@ interface StorageData {
   customChallenges: Record<string, CustomChallenge>;
   teacherMessages: Record<string, TeacherMessage>;
   surpriseEvents: Record<string, SurpriseEvent>;
+  snapshots: Record<string, BudgetSnapshot>;
 }
 
 export class FileStorage implements IStorage {
@@ -29,6 +30,7 @@ export class FileStorage implements IStorage {
   private customChallenges: Map<string, CustomChallenge> = new Map();
   private teacherMessages: Map<string, TeacherMessage> = new Map();
   private surpriseEvents: Map<string, SurpriseEvent> = new Map();
+  private snapshots: Map<string, BudgetSnapshot> = new Map();
 
   constructor() {
     this.dataFile = join(process.cwd(), "data.json");
@@ -91,6 +93,11 @@ export class FileStorage implements IStorage {
             this.surpriseEvents.set(key, { ...value, createdAt: new Date(value.createdAt), appliedAt: value.appliedAt ? new Date(value.appliedAt) : undefined });
           }
         }
+        if (data.snapshots) {
+          for (const [key, value] of Object.entries(data.snapshots)) {
+            this.snapshots.set(key, { ...value, createdAt: new Date(value.createdAt) });
+          }
+        }
         console.log("Data loaded from file");
       }
     } catch (error) {
@@ -111,6 +118,7 @@ export class FileStorage implements IStorage {
         customChallenges: Object.fromEntries(this.customChallenges),
         teacherMessages: Object.fromEntries(this.teacherMessages),
         surpriseEvents: Object.fromEntries(this.surpriseEvents),
+        snapshots: Object.fromEntries(this.snapshots),
       };
       writeFileSync(this.dataFile, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -618,5 +626,110 @@ export class FileStorage implements IStorage {
     this.surpriseEvents.set(eventId, updated);
     this.save();
     return updated;
+  }
+
+  async createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot> {
+    const student = await this.getStudent(studentId);
+    if (!student) throw new Error("Étudiant non trouvé");
+
+    const existingSnapshots = await this.getStudentSnapshots(studentId);
+    if (existingSnapshots.length >= 3) {
+      const oldest = existingSnapshots.sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+      )[0];
+      this.snapshots.delete(oldest.id);
+    }
+
+    const expenses = Array.from(this.expenses.values()).filter(e => e.studentId === studentId);
+    const fixedExpenses = Array.from(this.fixedExpenses.values()).filter(e => e.studentId === studentId);
+    const bonusExpenses = Array.from(this.bonusExpenses.values()).filter(e => e.studentId === studentId);
+    const challenges = Array.from(this.challenges.values()).filter(c => c.studentId === studentId);
+
+    const id = randomUUID();
+    const snapshot: BudgetSnapshot = {
+      id,
+      studentId,
+      label,
+      createdAt: new Date(),
+      studentState: {
+        budget: student.budget,
+        spent: student.spent,
+        savings: student.savings,
+      },
+      expenses: JSON.parse(JSON.stringify(expenses)),
+      fixedExpenses: JSON.parse(JSON.stringify(fixedExpenses)),
+      bonusExpenses: JSON.parse(JSON.stringify(bonusExpenses)),
+      challenges: JSON.parse(JSON.stringify(challenges)),
+    };
+    this.snapshots.set(id, snapshot);
+    this.save();
+    return snapshot;
+  }
+
+  async getStudentSnapshots(studentId: string): Promise<BudgetSnapshot[]> {
+    return Array.from(this.snapshots.values())
+      .filter(s => s.studentId === studentId)
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+  }
+
+  async restoreSnapshot(snapshotId: string): Promise<Student | undefined> {
+    const snapshot = this.snapshots.get(snapshotId);
+    if (!snapshot) return undefined;
+
+    const student = await this.getStudent(snapshot.studentId);
+    if (!student) return undefined;
+
+    const updatedStudent = {
+      ...student,
+      budget: snapshot.studentState.budget,
+      spent: snapshot.studentState.spent,
+      savings: snapshot.studentState.savings,
+    };
+    this.students.set(student.id, updatedStudent);
+
+    for (const [id, exp] of this.expenses.entries()) {
+      if (exp.studentId === snapshot.studentId) {
+        this.expenses.delete(id);
+      }
+    }
+    for (const exp of snapshot.expenses) {
+      this.expenses.set(exp.id, { ...exp, timestamp: new Date(exp.timestamp) });
+    }
+
+    for (const [id, fe] of this.fixedExpenses.entries()) {
+      if (fe.studentId === snapshot.studentId) {
+        this.fixedExpenses.delete(id);
+      }
+    }
+    for (const fe of snapshot.fixedExpenses) {
+      this.fixedExpenses.set(fe.id, { ...fe, dueDate: new Date(fe.dueDate) });
+    }
+
+    for (const [id, be] of this.bonusExpenses.entries()) {
+      if (be.studentId === snapshot.studentId) {
+        this.bonusExpenses.delete(id);
+      }
+    }
+    for (const be of snapshot.bonusExpenses) {
+      this.bonusExpenses.set(be.id, { ...be, createdAt: new Date(be.createdAt) });
+    }
+
+    for (const [id, ch] of this.challenges.entries()) {
+      if (ch.studentId === snapshot.studentId) {
+        this.challenges.delete(id);
+      }
+    }
+    for (const ch of snapshot.challenges) {
+      this.challenges.set(ch.id, { ...ch, createdAt: new Date(ch.createdAt) });
+    }
+
+    this.save();
+    return updatedStudent;
+  }
+
+  async deleteSnapshot(snapshotId: string): Promise<boolean> {
+    const result = this.snapshots.delete(snapshotId);
+    if (result) this.save();
+    return result;
   }
 }

@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema, createSnapshotSchema } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -558,6 +558,50 @@ export async function registerRoutes(
       res.json(event);
     } catch (error) {
       res.status(500).json({ error: "Failed to apply event" });
+    }
+  });
+
+  // Budget Snapshot endpoints
+  app.post("/api/students/:id/snapshots", async (req, res) => {
+    try {
+      const data = createSnapshotSchema.parse(req.body);
+      const snapshot = await storage.createSnapshot(req.params.id, data.label);
+      res.json(snapshot);
+    } catch (error) {
+      res.status(400).json({ error: error instanceof Error ? error.message : "Erreur lors de la sauvegarde" });
+    }
+  });
+
+  app.get("/api/students/:id/snapshots", async (req, res) => {
+    try {
+      const snapshots = await storage.getStudentSnapshots(req.params.id);
+      res.json(snapshots);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des sauvegardes" });
+    }
+  });
+
+  app.post("/api/snapshots/:id/restore", async (req, res) => {
+    try {
+      const student = await storage.restoreSnapshot(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Sauvegarde introuvable" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la restauration" });
+    }
+  });
+
+  app.delete("/api/snapshots/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteSnapshot(req.params.id);
+      if (!result) {
+        return res.status(404).json({ error: "Sauvegarde introuvable" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression" });
     }
   });
 

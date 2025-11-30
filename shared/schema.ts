@@ -33,6 +33,7 @@ export interface CatalogItem {
   subcategory?: string;
   description: string;
   isEssential: boolean;
+  isTaxable: boolean;
 }
 
 export interface Expense {

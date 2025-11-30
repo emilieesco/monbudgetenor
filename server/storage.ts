@@ -85,77 +85,95 @@ export class MemStorage implements IStorage {
   }
 
   private initializeCatalog() {
+    // Au Québec: TPS 5% + TVQ 9.975% = 14.975% (~15%)
+    // Produits alimentaires de base = NON TAXÉS
+    // Bonbons, chips, sodas, chocolat = TAXÉS
     const defaultItems: CatalogItem[] = [
-      // Produits laitiers
-      { id: randomUUID(), name: "Lait 1L", price: 3, category: "food", subcategory: "Produits Laitiers", description: "Lait frais - 1 litre", isEssential: true },
-      { id: randomUUID(), name: "Yaourt nature", price: 3, category: "food", subcategory: "Produits Laitiers", description: "Pack yaourt 4x125g", isEssential: true },
-      { id: randomUUID(), name: "Fromage blanc", price: 3.5, category: "food", subcategory: "Produits Laitiers", description: "Fromage blanc 500g", isEssential: true },
-      { id: randomUUID(), name: "Beurre salé", price: 3.5, category: "food", subcategory: "Produits Laitiers", description: "Beurre 250g", isEssential: true },
-      { id: randomUUID(), name: "Crème fraîche", price: 2, category: "food", subcategory: "Produits Laitiers", description: "Crème fraîche 200ml", isEssential: false },
-      { id: randomUUID(), name: "Mozzarella", price: 4, category: "food", subcategory: "Produits Laitiers", description: "Mozzarella 200g", isEssential: false },
-      { id: randomUUID(), name: "Cheddar", price: 5, category: "food", subcategory: "Produits Laitiers", description: "Fromage cheddar 200g", isEssential: false },
+      // Produits laitiers - NON TAXÉS (aliments de base)
+      { id: randomUUID(), name: "Lait 2% 2L", price: 4.99, category: "food", subcategory: "Produits Laitiers", description: "Lait partiellement écrémé", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Lait 3.25% 2L", price: 5.29, category: "food", subcategory: "Produits Laitiers", description: "Lait entier homogénéisé", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Yogourt nature 650g", price: 4.49, category: "food", subcategory: "Produits Laitiers", description: "Yogourt nature sans sucre", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Fromage cheddar 400g", price: 7.99, category: "food", subcategory: "Produits Laitiers", description: "Cheddar fort vieilli", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Beurre salé 454g", price: 5.99, category: "food", subcategory: "Produits Laitiers", description: "Beurre de laiterie", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Crème 35% 473ml", price: 4.29, category: "food", subcategory: "Produits Laitiers", description: "Crème à fouetter", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Mozzarella 340g", price: 6.49, category: "food", subcategory: "Produits Laitiers", description: "Fromage mozzarella", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Crème sure 500ml", price: 3.49, category: "food", subcategory: "Produits Laitiers", description: "Crème sure 14%", isEssential: false, isTaxable: false },
       
-      // Viandes et poissons
-      { id: randomUUID(), name: "Poulet fermier", price: 8, category: "food", subcategory: "Viandes", description: "Poulet entier 1.5kg", isEssential: true },
-      { id: randomUUID(), name: "Œufs fermiers", price: 4, category: "food", subcategory: "Viandes", description: "Douzaine d'œufs frais", isEssential: true },
-      { id: randomUUID(), name: "Steak haché", price: 6, category: "food", subcategory: "Viandes", description: "Steak haché 500g", isEssential: true },
-      { id: randomUUID(), name: "Porc côtelettes", price: 7, category: "food", subcategory: "Viandes", description: "Côtelettes de porc 600g", isEssential: false },
-      { id: randomUUID(), name: "Bacon", price: 5, category: "food", subcategory: "Viandes", description: "Bacon 200g", isEssential: false },
-      { id: randomUUID(), name: "Saumon frais", price: 12, category: "food", subcategory: "Viandes", description: "Filet de saumon 400g", isEssential: false },
-      { id: randomUUID(), name: "Truite", price: 10, category: "food", subcategory: "Viandes", description: "Filet de truite 300g", isEssential: false },
+      // Viandes et œufs - NON TAXÉS
+      { id: randomUUID(), name: "Poulet entier 1.5kg", price: 12.99, category: "food", subcategory: "Viandes", description: "Poulet frais entier", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Œufs gros calibre 12", price: 4.99, category: "food", subcategory: "Viandes", description: "Œufs frais grade A", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Bœuf haché mi-maigre 450g", price: 7.99, category: "food", subcategory: "Viandes", description: "Bœuf haché frais", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Poitrines de poulet 900g", price: 15.99, category: "food", subcategory: "Viandes", description: "Poitrines désossées", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Côtelettes de porc 600g", price: 9.99, category: "food", subcategory: "Viandes", description: "Côtelettes avec os", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Bacon 375g", price: 6.99, category: "food", subcategory: "Viandes", description: "Bacon tranché", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Saumon filet 400g", price: 14.99, category: "food", subcategory: "Viandes", description: "Filet de saumon atlantique", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Crevettes 340g", price: 12.99, category: "food", subcategory: "Viandes", description: "Crevettes décortiquées", isEssential: false, isTaxable: false },
       
-      // Fruits et légumes
-      { id: randomUUID(), name: "Bananes", price: 2, category: "food", subcategory: "Fruits & Légumes", description: "Régime de bananes", isEssential: false },
-      { id: randomUUID(), name: "Pommes rouges", price: 3, category: "food", subcategory: "Fruits & Légumes", description: "2kg pommes rouges", isEssential: false },
-      { id: randomUUID(), name: "Oranges", price: 3.5, category: "food", subcategory: "Fruits & Légumes", description: "1kg oranges juteuses", isEssential: false },
-      { id: randomUUID(), name: "Carottes", price: 1.5, category: "food", subcategory: "Fruits & Légumes", description: "Botte de carottes 1kg", isEssential: false },
-      { id: randomUUID(), name: "Brocoli", price: 2.5, category: "food", subcategory: "Fruits & Légumes", description: "Brocoli frais", isEssential: false },
-      { id: randomUUID(), name: "Tomates", price: 2.5, category: "food", subcategory: "Fruits & Légumes", description: "Tomates rouges 1kg", isEssential: false },
-      { id: randomUUID(), name: "Salade verte", price: 1.5, category: "food", subcategory: "Fruits & Légumes", description: "Laitue verte", isEssential: false },
-      { id: randomUUID(), name: "Courgettes", price: 2, category: "food", subcategory: "Fruits & Légumes", description: "Courgettes 800g", isEssential: false },
-      { id: randomUUID(), name: "Poivrons", price: 2.5, category: "food", subcategory: "Fruits & Légumes", description: "Poivrons rouges 500g", isEssential: false },
+      // Fruits et légumes - NON TAXÉS
+      { id: randomUUID(), name: "Bananes", price: 1.49, category: "food", subcategory: "Fruits & Légumes", description: "Bananes fraîches /lb", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Pommes Gala 3lb", price: 4.99, category: "food", subcategory: "Fruits & Légumes", description: "Pommes Gala en sac", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Oranges Navel 4lb", price: 6.99, category: "food", subcategory: "Fruits & Légumes", description: "Oranges juteuses", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Carottes 2lb", price: 2.49, category: "food", subcategory: "Fruits & Légumes", description: "Carottes fraîches", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Brocoli", price: 2.99, category: "food", subcategory: "Fruits & Légumes", description: "Brocoli frais", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Tomates grappe", price: 3.99, category: "food", subcategory: "Fruits & Légumes", description: "Tomates sur vigne /lb", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Laitue romaine", price: 2.99, category: "food", subcategory: "Fruits & Légumes", description: "Laitue fraîche", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Pommes de terre 10lb", price: 5.99, category: "food", subcategory: "Fruits & Légumes", description: "Pommes de terre russet", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Oignons 3lb", price: 3.49, category: "food", subcategory: "Fruits & Légumes", description: "Oignons jaunes", isEssential: true, isTaxable: false },
       
-      // Conserves et pâtes
-      { id: randomUUID(), name: "Pâtes", price: 1.5, category: "food", subcategory: "Conserves", description: "Pâtes 500g", isEssential: true },
-      { id: randomUUID(), name: "Riz blanc", price: 2.5, category: "food", subcategory: "Conserves", description: "Riz blanc 1kg", isEssential: true },
-      { id: randomUUID(), name: "Boîte tomates", price: 1.5, category: "food", subcategory: "Conserves", description: "Tomates en boîte 400g", isEssential: true },
-      { id: randomUUID(), name: "Boîte haricots", price: 1, category: "food", subcategory: "Conserves", description: "Haricots rouges 400g", isEssential: false },
-      { id: randomUUID(), name: "Conserve thon", price: 2, category: "food", subcategory: "Conserves", description: "Thon en boîte 185g", isEssential: false },
-      { id: randomUUID(), name: "Maïs en boîte", price: 1.5, category: "food", subcategory: "Conserves", description: "Maïs 280g", isEssential: false },
-      { id: randomUUID(), name: "Lentilles corail", price: 2.5, category: "food", subcategory: "Conserves", description: "Lentilles corail 500g", isEssential: false },
+      // Conserves et pâtes - NON TAXÉS (aliments de base)
+      { id: randomUUID(), name: "Pâtes spaghetti 900g", price: 2.49, category: "food", subcategory: "Conserves", description: "Spaghetti Catelli", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Riz blanc 2kg", price: 4.99, category: "food", subcategory: "Conserves", description: "Riz à grain long", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Sauce tomate 680ml", price: 2.99, category: "food", subcategory: "Conserves", description: "Sauce tomate Classico", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Tomates en dés 796ml", price: 1.99, category: "food", subcategory: "Conserves", description: "Tomates italiennes", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Haricots rouges 540ml", price: 1.49, category: "food", subcategory: "Conserves", description: "Haricots en conserve", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Thon pâle 170g", price: 2.49, category: "food", subcategory: "Conserves", description: "Thon en morceaux", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Maïs en crème 398ml", price: 1.79, category: "food", subcategory: "Conserves", description: "Maïs sucré", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Soupe poulet nouilles", price: 1.99, category: "food", subcategory: "Conserves", description: "Soupe Campbell's", isEssential: false, isTaxable: false },
       
-      // Produits sucrés et snacks
-      { id: randomUUID(), name: "Pain complet", price: 2, category: "food", subcategory: "Boulangerie", description: "Baguette pain complet", isEssential: true },
-      { id: randomUUID(), name: "Pain blanc", price: 1.5, category: "food", subcategory: "Boulangerie", description: "Pain de mie", isEssential: true },
-      { id: randomUUID(), name: "Croissants", price: 4, category: "food", subcategory: "Boulangerie", description: "Pack 4 croissants", isEssential: false },
-      { id: randomUUID(), name: "Chocolat noir", price: 2.5, category: "food", subcategory: "Bonbons & Sucreries", description: "Tablette chocolat 100g", isEssential: false },
-      { id: randomUUID(), name: "Bonbons", price: 2, category: "food", subcategory: "Bonbons & Sucreries", description: "Assortiment bonbons", isEssential: false },
-      { id: randomUUID(), name: "Chips nature", price: 3, category: "food", subcategory: "Bonbons & Sucreries", description: "Sac de chips nature", isEssential: false },
-      { id: randomUUID(), name: "Biscuits", price: 2.5, category: "food", subcategory: "Bonbons & Sucreries", description: "Biscuits 200g", isEssential: false },
+      // Boulangerie - NON TAXÉS (pain de base)
+      { id: randomUUID(), name: "Pain tranché blanc", price: 2.99, category: "food", subcategory: "Boulangerie", description: "Pain blanc 675g", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Pain blé entier", price: 3.49, category: "food", subcategory: "Boulangerie", description: "Pain 100% blé 675g", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Bagels nature 6", price: 3.99, category: "food", subcategory: "Boulangerie", description: "Bagels frais", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Tortillas 10po 8", price: 3.49, category: "food", subcategory: "Boulangerie", description: "Tortillas de blé", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Croissants 6", price: 4.99, category: "food", subcategory: "Boulangerie", description: "Croissants au beurre", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Muffins anglais 6", price: 3.29, category: "food", subcategory: "Boulangerie", description: "Muffins anglais", isEssential: false, isTaxable: false },
       
-      // Boissons
-      { id: randomUUID(), name: "Jus d'orange", price: 2.5, category: "food", subcategory: "Boissons", description: "Jus 100% 1L", isEssential: false },
-      { id: randomUUID(), name: "Soda", price: 2, category: "food", subcategory: "Boissons", description: "Soda 1.5L", isEssential: false },
-      { id: randomUUID(), name: "Eau minérale", price: 1.5, category: "food", subcategory: "Boissons", description: "Pack eau 6x1.5L", isEssential: false },
-      { id: randomUUID(), name: "Café instant", price: 5, category: "food", subcategory: "Boissons", description: "Café instantané 200g", isEssential: false },
-      { id: randomUUID(), name: "Thé", price: 3, category: "food", subcategory: "Boissons", description: "Boîte thé 25 sachets", isEssential: false },
+      // Bonbons & Sucreries - TAXÉS (produits non essentiels)
+      { id: randomUUID(), name: "Chocolat Lindt 100g", price: 4.99, category: "food", subcategory: "Bonbons & Sucreries", description: "Chocolat noir 70%", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Chips Lays 235g", price: 4.49, category: "food", subcategory: "Bonbons & Sucreries", description: "Chips nature", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bonbons gélifiés 175g", price: 2.99, category: "food", subcategory: "Bonbons & Sucreries", description: "Oursons gélifiés", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Biscuits Oreo 303g", price: 3.99, category: "food", subcategory: "Bonbons & Sucreries", description: "Biscuits Oreo", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Barres Oh Henry 4", price: 4.49, category: "food", subcategory: "Bonbons & Sucreries", description: "Barres chocolatées", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Crème glacée 1.5L", price: 5.99, category: "food", subcategory: "Bonbons & Sucreries", description: "Crème glacée vanille", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Popcorn micro-ondes 3", price: 3.49, category: "food", subcategory: "Bonbons & Sucreries", description: "Popcorn au beurre", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Doritos Nacho 255g", price: 4.49, category: "food", subcategory: "Bonbons & Sucreries", description: "Tortillas nacho", isEssential: false, isTaxable: true },
       
-      // Vêtements
-      { id: randomUUID(), name: "T-shirt", price: 15, category: "clothing", description: "T-shirt coton classique", isEssential: false },
-      { id: randomUUID(), name: "Jeans bleu", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false },
-      { id: randomUUID(), name: "Chaussures sport", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false },
-      { id: randomUUID(), name: "Chaussettes", price: 5, category: "clothing", description: "Paire de chaussettes", isEssential: true },
-      { id: randomUUID(), name: "Veste d'hiver", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false },
-      { id: randomUUID(), name: "Pull", price: 35, category: "clothing", description: "Pull chaud", isEssential: false },
-      { id: randomUUID(), name: "Bermuda", price: 25, category: "clothing", description: "Bermuda coton", isEssential: false },
+      // Boissons - Certaines TAXÉES
+      { id: randomUUID(), name: "Jus d'orange 1.89L", price: 4.99, category: "food", subcategory: "Boissons", description: "Jus 100% pur", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Pepsi 2L", price: 2.99, category: "food", subcategory: "Boissons", description: "Boisson gazeuse", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Coca-Cola 2L", price: 2.99, category: "food", subcategory: "Boissons", description: "Boisson gazeuse", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Eau Eska 12x500ml", price: 3.99, category: "food", subcategory: "Boissons", description: "Eau de source", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Café moulu 340g", price: 8.99, category: "food", subcategory: "Boissons", description: "Café Maxwell House", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Thé Red Rose 72", price: 5.99, category: "food", subcategory: "Boissons", description: "Sachets de thé", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Gatorade 950ml", price: 2.49, category: "food", subcategory: "Boissons", description: "Boisson sportive", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Jus de pomme 1.89L", price: 3.99, category: "food", subcategory: "Boissons", description: "Jus 100% pomme", isEssential: false, isTaxable: false },
       
-      // Loisirs
-      { id: randomUUID(), name: "Cinéma", price: 10, category: "leisure", description: "Billet de cinéma", isEssential: false },
-      { id: randomUUID(), name: "Jeu vidéo", price: 20, category: "leisure", description: "Jeu vidéo populaire", isEssential: false },
-      { id: randomUUID(), name: "Entrée piscine", price: 12, category: "leisure", description: "Entrée piscine/sport", isEssential: false },
-      { id: randomUUID(), name: "Café", price: 3, category: "leisure", description: "Boisson café", isEssential: false },
-      { id: randomUUID(), name: "Livre", price: 15, category: "leisure", description: "Roman populaire", isEssential: false },
-      { id: randomUUID(), name: "Ticket concert", price: 25, category: "leisure", description: "Entrée concert", isEssential: false },
+      // Vêtements - TAXÉS
+      { id: randomUUID(), name: "T-shirt", price: 15, category: "clothing", description: "T-shirt coton classique", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Jeans bleu", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Chaussures sport", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Chaussettes", price: 5, category: "clothing", description: "Paire de chaussettes", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Veste d'hiver", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Pull", price: 35, category: "clothing", description: "Pull chaud", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bermuda", price: 25, category: "clothing", description: "Bermuda coton", isEssential: false, isTaxable: true },
+      
+      // Loisirs - TAXÉS
+      { id: randomUUID(), name: "Cinéma", price: 14.99, category: "leisure", description: "Billet de cinéma", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Jeu vidéo", price: 79.99, category: "leisure", description: "Jeu vidéo populaire", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Entrée piscine", price: 8.00, category: "leisure", description: "Entrée piscine/sport", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Café Starbucks", price: 5.99, category: "leisure", description: "Grand latte", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Livre", price: 24.99, category: "leisure", description: "Roman populaire", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Ticket concert", price: 75.00, category: "leisure", description: "Entrée concert", isEssential: false, isTaxable: true },
     ];
     defaultItems.forEach(item => this.catalogItems.set(item.id, item));
   }

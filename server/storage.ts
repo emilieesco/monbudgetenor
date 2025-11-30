@@ -379,7 +379,9 @@ export class MemStorage implements IStorage {
 
     const student = await this.getStudent(expense.studentId);
     if (student) {
-      await this.updateStudentBudget(expense.studentId, student.budget - expense.amount);
+      const newBudget = student.budget - expense.amount;
+      const newSpent = (student.spent || 0) + expense.amount;
+      await this.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
     }
 
     this.expenseSequence.push(newExpense);

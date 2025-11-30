@@ -201,22 +201,114 @@ export class FileStorage implements IStorage {
         { id: randomUUID(), name: "Gatorade 950ml", price: 2.49, category: "food", subcategory: "Boissons", description: "Boisson sportive", isEssential: false, isTaxable: true },
         { id: randomUUID(), name: "Jus de pomme 1.89L", price: 3.99, category: "food", subcategory: "Boissons", description: "Jus 100% pomme", isEssential: false, isTaxable: false },
         
-        // Vêtements - TAXÉS
-        { id: randomUUID(), name: "T-shirt", price: 15, category: "clothing", description: "T-shirt coton classique", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Jeans bleu", price: 40, category: "clothing", description: "Jeans bleu slim", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Chaussures sport", price: 60, category: "clothing", description: "Sneakers décontractées", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Chaussettes", price: 5, category: "clothing", description: "Paire de chaussettes", isEssential: true, isTaxable: true },
-        { id: randomUUID(), name: "Veste d'hiver", price: 80, category: "clothing", description: "Veste d'hiver", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Pull", price: 35, category: "clothing", description: "Pull chaud", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Bermuda", price: 25, category: "clothing", description: "Bermuda coton", isEssential: false, isTaxable: true },
+        // Vêtements Hauts - TAXÉS
+        { id: randomUUID(), name: "T-shirt uni coton", price: 14.99, category: "clothing", subcategory: "Hauts", description: "T-shirt 100% coton basique", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "T-shirt graphique", price: 24.99, category: "clothing", subcategory: "Hauts", description: "T-shirt avec imprimé tendance", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Polo sport", price: 34.99, category: "clothing", subcategory: "Hauts", description: "Polo respirant polyester", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Chemise Oxford", price: 44.99, category: "clothing", subcategory: "Hauts", description: "Chemise classique bureau", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Chandail à capuche", price: 49.99, category: "clothing", subcategory: "Hauts", description: "Hoodie molleton chaud", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Pull en laine", price: 59.99, category: "clothing", subcategory: "Hauts", description: "Pull tricot laine mérinos", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Cardigan", price: 54.99, category: "clothing", subcategory: "Hauts", description: "Cardigan boutonné classique", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Débardeur sport", price: 19.99, category: "clothing", subcategory: "Hauts", description: "Camisole entraînement", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Blouse élégante", price: 39.99, category: "clothing", subcategory: "Hauts", description: "Blouse pour occasions", isEssential: false, isTaxable: true },
         
-        // Loisirs - TAXÉS
-        { id: randomUUID(), name: "Cinéma", price: 14.99, category: "leisure", description: "Billet de cinéma", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Jeu vidéo", price: 79.99, category: "leisure", description: "Jeu vidéo populaire", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Entrée piscine", price: 8.00, category: "leisure", description: "Entrée piscine/sport", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Café Starbucks", price: 5.99, category: "leisure", description: "Grand latte", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Livre", price: 24.99, category: "leisure", description: "Roman populaire", isEssential: false, isTaxable: true },
-        { id: randomUUID(), name: "Ticket concert", price: 75.00, category: "leisure", description: "Entrée concert", isEssential: false, isTaxable: true },
+        // Vêtements Bas - TAXÉS
+        { id: randomUUID(), name: "Jeans classique", price: 49.99, category: "clothing", subcategory: "Bas", description: "Jeans denim coupe droite", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Jeans slim", price: 59.99, category: "clothing", subcategory: "Bas", description: "Jeans coupe ajustée", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Pantalon chino", price: 44.99, category: "clothing", subcategory: "Bas", description: "Chino coton polyvalent", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Pantalon jogging", price: 34.99, category: "clothing", subcategory: "Bas", description: "Jogger confortable molleton", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Short sport", price: 24.99, category: "clothing", subcategory: "Bas", description: "Short basketball respirant", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Bermuda cargo", price: 34.99, category: "clothing", subcategory: "Bas", description: "Bermuda multi-poches été", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Legging sport", price: 29.99, category: "clothing", subcategory: "Bas", description: "Legging compression yoga", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Pantalon habillé", price: 64.99, category: "clothing", subcategory: "Bas", description: "Pantalon formel travail", isEssential: true, isTaxable: true },
+        
+        // Vêtements Extérieur - TAXÉS
+        { id: randomUUID(), name: "Manteau hiver Kanuk", price: 299.99, category: "clothing", subcategory: "Extérieur", description: "Manteau grand froid -30°C", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Parka mi-saison", price: 149.99, category: "clothing", subcategory: "Extérieur", description: "Parka automne/printemps", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Veste imperméable", price: 89.99, category: "clothing", subcategory: "Extérieur", description: "Coupe-vent imperméable", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Doudoune légère", price: 119.99, category: "clothing", subcategory: "Extérieur", description: "Veste matelassée compactable", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Manteau laine", price: 179.99, category: "clothing", subcategory: "Extérieur", description: "Manteau classique laine", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Veste denim", price: 69.99, category: "clothing", subcategory: "Extérieur", description: "Veste jeans classique", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Blouson cuir", price: 199.99, category: "clothing", subcategory: "Extérieur", description: "Blouson simili-cuir", isEssential: false, isTaxable: true },
+        
+        // Chaussures - TAXÉS
+        { id: randomUUID(), name: "Espadrilles Nike", price: 89.99, category: "clothing", subcategory: "Chaussures", description: "Sneakers sport tendance", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Bottes hiver Sorel", price: 149.99, category: "clothing", subcategory: "Chaussures", description: "Bottes imperméables -32°C", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Chaussures course", price: 119.99, category: "clothing", subcategory: "Chaussures", description: "Running Asics/Brooks", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Sandales été", price: 34.99, category: "clothing", subcategory: "Chaussures", description: "Sandales confortables", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Souliers habillés", price: 79.99, category: "clothing", subcategory: "Chaussures", description: "Chaussures formelles", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Bottes pluie", price: 49.99, category: "clothing", subcategory: "Chaussures", description: "Bottes caoutchouc Hunter", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Pantoufles maison", price: 24.99, category: "clothing", subcategory: "Chaussures", description: "Pantoufles doublées", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Crocs classiques", price: 44.99, category: "clothing", subcategory: "Chaussures", description: "Sabots confort", isEssential: false, isTaxable: true },
+        
+        // Accessoires vestimentaires - TAXÉS
+        { id: randomUUID(), name: "Chaussettes 6 paires", price: 14.99, category: "clothing", subcategory: "Accessoires", description: "Chaussettes coton sport", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Sous-vêtements 3 pack", price: 24.99, category: "clothing", subcategory: "Accessoires", description: "Boxers/culottes coton", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Ceinture cuir", price: 29.99, category: "clothing", subcategory: "Accessoires", description: "Ceinture classique", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Tuque laine", price: 19.99, category: "clothing", subcategory: "Accessoires", description: "Tuque chaude hiver", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Gants hiver", price: 24.99, category: "clothing", subcategory: "Accessoires", description: "Gants isolés tactiles", isEssential: true, isTaxable: true },
+        { id: randomUUID(), name: "Foulard laine", price: 29.99, category: "clothing", subcategory: "Accessoires", description: "Écharpe chaude tricot", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Casquette sport", price: 24.99, category: "clothing", subcategory: "Accessoires", description: "Casquette ajustable", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Lunettes soleil", price: 19.99, category: "clothing", subcategory: "Accessoires", description: "Lunettes UV protection", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Sac à dos", price: 49.99, category: "clothing", subcategory: "Accessoires", description: "Sac école/travail", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Parapluie compact", price: 14.99, category: "clothing", subcategory: "Accessoires", description: "Parapluie pliable", isEssential: false, isTaxable: true },
+        
+        // Loisirs Divertissement - TAXÉS
+        { id: randomUUID(), name: "Billet cinéma Cineplex", price: 15.99, category: "leisure", subcategory: "Divertissement", description: "Film régulier en salle", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Cinéma IMAX", price: 21.99, category: "leisure", subcategory: "Divertissement", description: "Expérience IMAX/3D", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Netflix mensuel", price: 16.49, category: "leisure", subcategory: "Divertissement", description: "Abonnement streaming", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Spotify Premium", price: 10.99, category: "leisure", subcategory: "Divertissement", description: "Musique illimitée mensuel", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Ticket concert local", price: 45.00, category: "leisure", subcategory: "Divertissement", description: "Concert salle moyenne", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Festival Osheaga", price: 149.00, category: "leisure", subcategory: "Divertissement", description: "Passe journée festival", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Spectacle Cirque Soleil", price: 89.00, category: "leisure", subcategory: "Divertissement", description: "Billet spectacle", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Musée beaux-arts", price: 12.00, category: "leisure", subcategory: "Divertissement", description: "Entrée musée", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Escape room", price: 28.00, category: "leisure", subcategory: "Divertissement", description: "Jeu évasion 1 personne", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Karaoké 2h", price: 15.00, category: "leisure", subcategory: "Divertissement", description: "Location salle karaoké", isEssential: false, isTaxable: true },
+        
+        // Loisirs Jeux - TAXÉS
+        { id: randomUUID(), name: "Jeu vidéo PS5/Xbox", price: 89.99, category: "leisure", subcategory: "Jeux", description: "Jeu AAA nouvelle sortie", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Jeu vidéo indie", price: 29.99, category: "leisure", subcategory: "Jeux", description: "Jeu indépendant Steam", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "PlayStation Plus an", price: 79.99, category: "leisure", subcategory: "Jeux", description: "Abonnement PS+ annuel", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Xbox Game Pass", price: 16.99, category: "leisure", subcategory: "Jeux", description: "Abonnement mensuel", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Jeu de société Catan", price: 54.99, category: "leisure", subcategory: "Jeux", description: "Jeu stratégie populaire", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Jeu cartes Uno", price: 9.99, category: "leisure", subcategory: "Jeux", description: "Jeu de cartes familial", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Casse-tête 1000 pièces", price: 19.99, category: "leisure", subcategory: "Jeux", description: "Puzzle adulte", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Bowling 2 parties", price: 18.00, category: "leisure", subcategory: "Jeux", description: "Session bowling", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Arcade 20 jetons", price: 15.00, category: "leisure", subcategory: "Jeux", description: "Jetons salle arcade", isEssential: false, isTaxable: true },
+        
+        // Loisirs Sport - TAXÉS
+        { id: randomUUID(), name: "Gym mensuel", price: 39.99, category: "leisure", subcategory: "Sport", description: "Abonnement centre fitness", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Piscine municipale", price: 6.50, category: "leisure", subcategory: "Sport", description: "Entrée baignade libre", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Patinoire entrée", price: 5.00, category: "leisure", subcategory: "Sport", description: "Patinage libre 2h", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Location patins", price: 8.00, category: "leisure", subcategory: "Sport", description: "Patins hockey/artistique", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Ski Tremblant jour", price: 119.00, category: "leisure", subcategory: "Sport", description: "Billet ski journée", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Location skis", price: 49.00, category: "leisure", subcategory: "Sport", description: "Équipement ski journée", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Yoga cours drop-in", price: 18.00, category: "leisure", subcategory: "Sport", description: "Un cours de yoga", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Tennis court 1h", price: 20.00, category: "leisure", subcategory: "Sport", description: "Location terrain tennis", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Golf 18 trous", price: 65.00, category: "leisure", subcategory: "Sport", description: "Partie golf complète", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Escalade session", price: 22.00, category: "leisure", subcategory: "Sport", description: "Mur escalade 3h", isEssential: false, isTaxable: true },
+        
+        // Loisirs Restauration - TAXÉS
+        { id: randomUUID(), name: "Café Starbucks", price: 5.99, category: "leisure", subcategory: "Restauration", description: "Grand latte signature", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Café Tim Hortons", price: 2.49, category: "leisure", subcategory: "Restauration", description: "Café moyen régulier", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Boba tea", price: 7.99, category: "leisure", subcategory: "Restauration", description: "Thé aux perles", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Smoothie Jugo Juice", price: 8.49, category: "leisure", subcategory: "Restauration", description: "Smoothie fruits frais", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "McDonald's combo", price: 12.99, category: "leisure", subcategory: "Restauration", description: "Repas Big Mac combo", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Subway 6 pouces", price: 8.99, category: "leisure", subcategory: "Restauration", description: "Sous-marin du jour", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Pizza slice", price: 4.50, category: "leisure", subcategory: "Restauration", description: "Pointe pizza fromage", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Poutine La Banquise", price: 11.99, category: "leisure", subcategory: "Restauration", description: "Poutine classique", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Sushi plateau", price: 18.99, category: "leisure", subcategory: "Restauration", description: "Assortiment 12 morceaux", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Restaurant brunch", price: 25.00, category: "leisure", subcategory: "Restauration", description: "Brunch week-end", isEssential: false, isTaxable: true },
+        
+        // Loisirs Culture - TAXÉS
+        { id: randomUUID(), name: "Roman poche", price: 12.99, category: "leisure", subcategory: "Culture", description: "Livre format poche", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "BD/Manga", price: 14.99, category: "leisure", subcategory: "Culture", description: "Bande dessinée/manga", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Livre grand format", price: 29.99, category: "leisure", subcategory: "Culture", description: "Nouveau roman couverture rigide", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Magazine mensuel", price: 8.99, category: "leisure", subcategory: "Culture", description: "Revue spécialisée", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Vinyle album", price: 34.99, category: "leisure", subcategory: "Culture", description: "Album vinyle collector", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Cours dessin", price: 35.00, category: "leisure", subcategory: "Culture", description: "Atelier art 2h", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Cours musique", price: 45.00, category: "leisure", subcategory: "Culture", description: "Leçon instrument 1h", isEssential: false, isTaxable: true },
+        { id: randomUUID(), name: "Théâtre billet", price: 55.00, category: "leisure", subcategory: "Culture", description: "Spectacle théâtre local", isEssential: false, isTaxable: true },
       ];
       defaultItems.forEach(item => this.catalogItems.set(item.id, item));
       this.save();

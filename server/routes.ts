@@ -247,7 +247,15 @@ export async function registerRoutes(
   // Expense endpoints
   app.post("/api/expenses", async (req, res) => {
     try {
-      const data = insertExpenseSchema.parse(req.body);
+      const parsed = insertExpenseSchema.parse(req.body);
+      
+      // Generate feedback and message if not provided
+      const feedback = parsed.feedback || (parsed.isEssential ? "success" : "warning");
+      const message = parsed.message || (parsed.isEssential 
+        ? "Bon choix! C'est un achat essentiel." 
+        : "Attention, ceci n'est pas un achat essentiel.");
+      
+      const data = { ...parsed, feedback, message };
       const expense = await storage.addExpense(data);
       res.json(expense);
     } catch (error) {

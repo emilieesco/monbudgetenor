@@ -186,8 +186,8 @@ export const insertExpenseSchema = z.object({
   amount: z.number().positive(),
   category: z.enum(["food", "clothing", "leisure", "rent"]),
   isEssential: z.boolean(),
-  feedback: z.enum(["success", "warning"]),
-  message: z.string(),
+  feedback: z.enum(["success", "warning"]).optional(),
+  message: z.string().optional(),
 });
 
 export const updateBudgetSchema = z.object({

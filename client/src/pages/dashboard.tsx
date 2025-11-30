@@ -191,7 +191,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Budget Actuel</p>
-                <p className="text-3xl font-bold text-primary">${student.budget}</p>
+                <p className="text-3xl font-bold text-primary">${student.budget.toFixed(2)}</p>
                 {student.budgetHistory && student.budgetHistory.length > 1 && (
                   <p className="text-xs text-muted-foreground mt-2">{student.budgetHistory.length} essais</p>
                 )}
@@ -204,7 +204,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Dépensé</p>
-                <p className="text-3xl font-bold text-destructive">${student.spent}</p>
+                <p className="text-3xl font-bold text-destructive">${student.spent.toFixed(2)}</p>
               </div>
               <ShoppingBag className="w-12 h-12 text-destructive opacity-20" />
             </div>
@@ -214,7 +214,7 @@ export default function Dashboard() {
             <div>
               <p className="text-sm text-muted-foreground mb-2">Restant</p>
               <p className={`text-3xl font-bold ${remaining >= 0 ? "text-green-600" : "text-destructive"}`}>
-                ${remaining}
+                ${remaining.toFixed(2)}
               </p>
             </div>
           </Card>
@@ -223,7 +223,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-muted-foreground mb-2">Épargne</p>
-                <p className="text-3xl font-bold text-purple-600 dark:text-purple-300">${student.savings}</p>
+                <p className="text-3xl font-bold text-purple-600 dark:text-purple-300">${student.savings.toFixed(2)}</p>
               </div>
               <PiggyBank className="w-12 h-12 text-purple-600 opacity-20 dark:text-purple-300" />
             </div>
@@ -247,7 +247,7 @@ export default function Dashboard() {
                 return (
                   <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                     <span className="text-sm">Essai {student.budgetHistory!.length - i}</span>
-                    <span className="font-bold">${h.budget}</span>
+                    <span className="font-bold">${h.budget.toFixed(2)}</span>
                     <span className="text-xs text-muted-foreground">{date.toLocaleDateString()}</span>
                   </div>
                 );
@@ -339,7 +339,7 @@ export default function Dashboard() {
                     <div key={bonus.id} className="text-sm">
                       <p className="font-medium">{bonus.title}</p>
                       <p className="text-muted-foreground text-xs">{bonus.description}</p>
-                      <p className="font-bold text-destructive">-${bonus.amount}</p>
+                      <p className="font-bold text-destructive">-${bonus.amount.toFixed(2)}</p>
                     </div>
                   ))}
                 </div>
@@ -370,7 +370,7 @@ export default function Dashboard() {
                       <div className="flex-1">
                         <p className="font-semibold">{expense.category}</p>
                         <p className={`text-sm font-bold ${expense.isPaid ? "text-green-700 dark:text-green-300" : "text-foreground"}`}>
-                          ${expense.amount}
+                          ${expense.amount.toFixed(2)}
                         </p>
                       </div>
                       {!expense.isPaid ? (
@@ -394,7 +394,7 @@ export default function Dashboard() {
             {totalFixedDue > 0 && (
               <div className="mt-4 p-4 bg-destructive/10 rounded-lg border border-destructive/30">
                 <p className="text-sm font-semibold text-destructive">
-                  Total à payer: ${totalFixedDue}
+                  Total à payer: ${totalFixedDue.toFixed(2)}
                 </p>
               </div>
             )}
@@ -541,8 +541,8 @@ export default function Dashboard() {
                 doc.text("Rapport Budgétaire", 10, 10);
                 doc.setFontSize(10);
                 doc.text(`Étudiant: ${student.name}`, 10, 20);
-                doc.text(`Budget: $${student.budget} | Dépensé: $${student.spent} | Épargne: $${student.savings}`, 10, 30);
-                doc.text(`Restant: $${remaining} (${Math.round(spentPercentage)}% utilisé)`, 10, 40);
+                doc.text(`Budget: $${student.budget.toFixed(2)} | Dépensé: $${student.spent.toFixed(2)} | Épargne: $${student.savings.toFixed(2)}`, 10, 30);
+                doc.text(`Restant: $${remaining.toFixed(2)} (${Math.round(spentPercentage)}% utilisé)`, 10, 40);
                 doc.text("", 10, 50);
                 doc.text("Dépenses:", 10, 60);
                 let y = 70;
@@ -551,7 +551,7 @@ export default function Dashboard() {
                     doc.addPage();
                     y = 10;
                   }
-                  doc.text(`${exp.message} - $${exp.amount}`, 15, y);
+                  doc.text(`${exp.message} - $${exp.amount.toFixed(2)}`, 15, y);
                   y += 5;
                 });
                 doc.save(`rapport_${student.name}.pdf`);
@@ -610,7 +610,7 @@ export default function Dashboard() {
                 <div key={expense.id} className="flex items-center justify-between p-3 bg-muted rounded-lg">
                   <div className="flex-1">
                     <p className="font-medium">{expense.message}</p>
-                    <p className="text-sm text-muted-foreground">${expense.amount} - {expense.category}</p>
+                    <p className="text-sm text-muted-foreground">${expense.amount.toFixed(2)} - {expense.category}</p>
                   </div>
                   <Badge variant={expense.feedback === "success" ? "default" : "destructive"}>
                     {expense.feedback === "success" ? "✓" : "!"}

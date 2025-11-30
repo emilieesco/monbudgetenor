@@ -6,13 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
-import type { Student, Expense, BonusExpense, Challenge } from "@shared/schema";
+import type { Student, Expense, BonusExpense, Challenge, BudgetSnapshot } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
@@ -24,6 +24,8 @@ export default function Dashboard() {
   const [filterCategory, setFilterCategory] = useState<"all" | "food" | "clothing" | "leisure" | "rent">("all");
   const [prevBudgetSpent, setPrevBudgetSpent] = useState<number | null>(null);
   const [notifiedChallenges, setNotifiedChallenges] = useState<Set<string>>(new Set());
+  const [snapshotLabel, setSnapshotLabel] = useState("");
+  const [showSnapshots, setShowSnapshots] = useState(false);
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -43,6 +45,15 @@ export default function Dashboard() {
 
   const challengesQuery = useQuery({
     queryKey: ["/api/challenges", studentId],
+  });
+
+  const snapshotsQuery = useQuery({
+    queryKey: ["/api/students", studentId, "snapshots"],
+    queryFn: async () => {
+      const res = await fetch(`/api/students/${studentId}/snapshots`);
+      if (!res.ok) throw new Error("Erreur");
+      return res.json();
+    },
   });
 
   const completeChallengeMutation = useMutation({
@@ -88,11 +99,73 @@ export default function Dashboard() {
     },
   });
 
+  const createSnapshotMutation = useMutation({
+    mutationFn: async (label: string) => {
+      const res = await apiRequest("POST", `/api/students/${studentId}/snapshots`, { label });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "snapshots"] });
+      setSnapshotLabel("");
+      toast({
+        title: "Sauvegarde créée",
+        description: "Ton point de sauvegarde a été enregistré",
+      });
+    },
+    onError: (error: Error) => {
+      toast({
+        title: "Erreur",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+
+  const restoreSnapshotMutation = useMutation({
+    mutationFn: async (snapshotId: string) => {
+      const res = await apiRequest("POST", `/api/snapshots/${snapshotId}/restore`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/fixed-expenses", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bonus-expenses", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/challenges", studentId] });
+      toast({
+        title: "Restauration réussie",
+        description: "Ton budget a été restauré au point de sauvegarde sélectionné",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de restaurer cette sauvegarde",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteSnapshotMutation = useMutation({
+    mutationFn: async (snapshotId: string) => {
+      const res = await apiRequest("DELETE", `/api/snapshots/${snapshotId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "snapshots"] });
+      toast({
+        title: "Sauvegarde supprimée",
+        description: "Le point de sauvegarde a été supprimé",
+      });
+    },
+  });
+
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
   const bonusExpenses = bonusExpensesQuery.data || [];
   const challenges = challengesQuery.data as Challenge[] || [];
+  const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
 
   // Offline support - cache data
   useEffect(() => {
@@ -170,20 +243,118 @@ export default function Dashboard() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between gap-4">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold text-primary mb-2">Mon Budget en Or</h1>
             <p className="text-lg text-muted-foreground">Bienvenue, {student.name}</p>
           </div>
-          <Button
-            onClick={() => navigate("/")}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <Home className="w-5 h-5" />
-            Retour
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              onClick={() => setShowSnapshots(!showSnapshots)}
+              variant={showSnapshots ? "default" : "outline"}
+              className="flex items-center gap-2"
+              data-testid="button-toggle-snapshots"
+            >
+              <History className="w-5 h-5" />
+              Sauvegardes
+              {snapshots.length > 0 && (
+                <Badge variant="secondary" className="ml-1">{snapshots.length}</Badge>
+              )}
+            </Button>
+            <Button
+              onClick={() => navigate("/")}
+              variant="outline"
+              className="flex items-center gap-2"
+            >
+              <Home className="w-5 h-5" />
+              Retour
+            </Button>
+          </div>
         </div>
+
+        {/* Snapshots Panel */}
+        {showSnapshots && (
+          <Card className="p-6 mb-8 border-2 border-primary/20">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-xl font-semibold flex items-center gap-2">
+                <History className="w-5 h-5" />
+                Points de Sauvegarde
+              </h2>
+              <p className="text-sm text-muted-foreground">Maximum 3 sauvegardes</p>
+            </div>
+            
+            {/* Create Snapshot */}
+            <div className="flex gap-2 mb-4">
+              <Input
+                placeholder="Nom du point de sauvegarde..."
+                value={snapshotLabel}
+                onChange={(e) => setSnapshotLabel(e.target.value)}
+                className="flex-1"
+                data-testid="input-snapshot-label"
+              />
+              <Button
+                onClick={() => {
+                  if (snapshotLabel.trim()) {
+                    createSnapshotMutation.mutate(snapshotLabel.trim());
+                  }
+                }}
+                disabled={!snapshotLabel.trim() || createSnapshotMutation.isPending}
+                className="flex items-center gap-2"
+                data-testid="button-create-snapshot"
+              >
+                <Save className="w-4 h-4" />
+                {createSnapshotMutation.isPending ? "Sauvegarde..." : "Sauvegarder"}
+              </Button>
+            </div>
+
+            {/* Snapshot List */}
+            {snapshots.length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">
+                Aucun point de sauvegarde. Crée-en un pour pouvoir revenir à cet état plus tard.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {snapshots.map((snapshot) => (
+                  <div key={snapshot.id} className="flex items-center justify-between p-4 bg-muted rounded-lg" data-testid={`snapshot-${snapshot.id}`}>
+                    <div>
+                      <p className="font-medium">{snapshot.label}</p>
+                      <p className="text-sm text-muted-foreground">
+                        {new Date(snapshot.createdAt).toLocaleDateString("fr-CA")} à{" "}
+                        {new Date(snapshot.createdAt).toLocaleTimeString("fr-CA", { hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                      <p className="text-xs text-muted-foreground mt-1">
+                        Budget: ${snapshot.studentState.budget.toFixed(2)} | Dépensé: ${snapshot.studentState.spent.toFixed(2)} | Épargne: ${snapshot.studentState.savings.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => restoreSnapshotMutation.mutate(snapshot.id)}
+                        disabled={restoreSnapshotMutation.isPending}
+                        className="flex items-center gap-1"
+                        data-testid={`button-restore-snapshot-${snapshot.id}`}
+                      >
+                        <RotateCcw className="w-4 h-4" />
+                        Restaurer
+                      </Button>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => deleteSnapshotMutation.mutate(snapshot.id)}
+                        disabled={deleteSnapshotMutation.isPending}
+                        className="text-destructive hover:text-destructive"
+                        data-testid={`button-delete-snapshot-${snapshot.id}`}
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </Card>
+        )}
 
         {/* Budget Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">

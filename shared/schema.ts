@@ -164,16 +164,20 @@ export const catalogItemSchema = z.object({
   name: z.string().min(1),
   price: z.number().positive(),
   category: z.enum(["food", "clothing", "leisure"]),
+  subcategory: z.string().optional(),
   description: z.string(),
   isEssential: z.boolean(),
+  isTaxable: z.boolean(),
 });
 
 export const insertCatalogItemSchema = z.object({
   name: z.string().min(1),
   price: z.number().positive(),
   category: z.enum(["food", "clothing", "leisure"]),
+  subcategory: z.string().optional(),
   description: z.string(),
   isEssential: z.boolean(),
+  isTaxable: z.boolean(),
 });
 
 export const insertExpenseSchema = z.object({

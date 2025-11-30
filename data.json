@@ -2,293 +2,672 @@
   "classes": {},
   "students": {},
   "catalogItems": {
-    "80e5c45c-27da-4198-a8bb-c1bc3fcfd557": {
-      "id": "80e5c45c-27da-4198-a8bb-c1bc3fcfd557",
-      "name": "Lait 1L",
-      "price": 3,
+    "46838cbd-2323-468c-a2bf-444cd684c0c2": {
+      "id": "46838cbd-2323-468c-a2bf-444cd684c0c2",
+      "name": "Lait 2% 2L",
+      "price": 4.99,
       "category": "food",
-      "description": "Lait frais - 1 litre",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Lait partiellement écrémé",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "cfa7cd7f-ff8d-4139-885d-fa6d4beecf40": {
-      "id": "cfa7cd7f-ff8d-4139-885d-fa6d4beecf40",
-      "name": "Pain complet",
-      "price": 2,
+    "82240129-e2c1-4106-a823-8a6fcdbe926a": {
+      "id": "82240129-e2c1-4106-a823-8a6fcdbe926a",
+      "name": "Lait 3.25% 2L",
+      "price": 5.29,
       "category": "food",
-      "description": "Baguette pain complet",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Lait entier homogénéisé",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "92a512aa-0caf-4ec7-8793-98f5e1915ebb": {
-      "id": "92a512aa-0caf-4ec7-8793-98f5e1915ebb",
-      "name": "Œufs fermiers",
-      "price": 4,
+    "fa334c6f-d23b-4ce2-ae28-f436e244f38a": {
+      "id": "fa334c6f-d23b-4ce2-ae28-f436e244f38a",
+      "name": "Yogourt nature 650g",
+      "price": 4.49,
       "category": "food",
-      "description": "Douzaine d'œufs frais",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Yogourt nature sans sucre",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "f72f3804-b8de-43ef-af59-8374f64b8a0b": {
-      "id": "f72f3804-b8de-43ef-af59-8374f64b8a0b",
-      "name": "Poulet fermier",
-      "price": 8,
+    "24bed251-dd87-479a-a55e-69d7e5d7a2e4": {
+      "id": "24bed251-dd87-479a-a55e-69d7e5d7a2e4",
+      "name": "Fromage cheddar 400g",
+      "price": 7.99,
       "category": "food",
-      "description": "Poulet 1.5kg",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Cheddar fort vieilli",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "fc40c346-b959-4fde-9095-d0d601347b46": {
-      "id": "fc40c346-b959-4fde-9095-d0d601347b46",
-      "name": "Fromage blanc",
-      "price": 3.5,
+    "a8e4bc86-2103-413c-9162-c11b3cbfc5d8": {
+      "id": "a8e4bc86-2103-413c-9162-c11b3cbfc5d8",
+      "name": "Beurre salé 454g",
+      "price": 5.99,
       "category": "food",
-      "description": "Fromage blanc 500g",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Beurre de laiterie",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "eeb5352d-527b-4592-bb72-ffd23644cd31": {
-      "id": "eeb5352d-527b-4592-bb72-ffd23644cd31",
-      "name": "Riz blanc",
-      "price": 2.5,
+    "ada2996f-dd0b-4cbd-80a8-42358b7f04d3": {
+      "id": "ada2996f-dd0b-4cbd-80a8-42358b7f04d3",
+      "name": "Crème 35% 473ml",
+      "price": 4.29,
       "category": "food",
-      "description": "Riz blanc 1kg",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Crème à fouetter",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "5b55d937-869b-421a-9b71-6a71913fb0ce": {
-      "id": "5b55d937-869b-421a-9b71-6a71913fb0ce",
-      "name": "Pâtes",
-      "price": 1.5,
+    "ba1c095a-2975-4fcd-bf26-af38131133be": {
+      "id": "ba1c095a-2975-4fcd-bf26-af38131133be",
+      "name": "Mozzarella 340g",
+      "price": 6.49,
       "category": "food",
-      "description": "Pâtes 500g",
-      "isEssential": true
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage mozzarella",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "49c5367d-01c6-4523-9394-cea5891fea01": {
-      "id": "49c5367d-01c6-4523-9394-cea5891fea01",
+    "e8509859-c973-4a4a-beda-78fb9729013d": {
+      "id": "e8509859-c973-4a4a-beda-78fb9729013d",
+      "name": "Crème sure 500ml",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Crème sure 14%",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "097ec3ec-5704-4c41-a06a-4681528d0dea": {
+      "id": "097ec3ec-5704-4c41-a06a-4681528d0dea",
+      "name": "Poulet entier 1.5kg",
+      "price": 12.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Poulet frais entier",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "4feaa657-2dd8-48a9-b332-98b9e3998b27": {
+      "id": "4feaa657-2dd8-48a9-b332-98b9e3998b27",
+      "name": "Œufs gros calibre 12",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Œufs frais grade A",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "b4b8e1d4-47ca-477d-9581-0d0c17976a28": {
+      "id": "b4b8e1d4-47ca-477d-9581-0d0c17976a28",
+      "name": "Bœuf haché mi-maigre 450g",
+      "price": 7.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Bœuf haché frais",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "20566f75-c9ad-400b-bf33-174eaa42ef3d": {
+      "id": "20566f75-c9ad-400b-bf33-174eaa42ef3d",
+      "name": "Poitrines de poulet 900g",
+      "price": 15.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Poitrines désossées",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "c86b9bec-7766-4fc0-945c-81a0eb4e8ed0": {
+      "id": "c86b9bec-7766-4fc0-945c-81a0eb4e8ed0",
+      "name": "Côtelettes de porc 600g",
+      "price": 9.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Côtelettes avec os",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "37bbe54e-54de-4b67-944e-e7e0e216b9fc": {
+      "id": "37bbe54e-54de-4b67-944e-e7e0e216b9fc",
+      "name": "Bacon 375g",
+      "price": 6.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Bacon tranché",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "ab35d6a3-b9a7-4d85-9bec-0d44999b92d0": {
+      "id": "ab35d6a3-b9a7-4d85-9bec-0d44999b92d0",
+      "name": "Saumon filet 400g",
+      "price": 14.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Filet de saumon atlantique",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "37447d61-1afa-42a9-936b-487e176709c4": {
+      "id": "37447d61-1afa-42a9-936b-487e176709c4",
+      "name": "Crevettes 340g",
+      "price": 12.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Crevettes décortiquées",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "8aaf898f-9479-4f78-b453-7c1dd4466b37": {
+      "id": "8aaf898f-9479-4f78-b453-7c1dd4466b37",
       "name": "Bananes",
-      "price": 2,
+      "price": 1.49,
       "category": "food",
-      "description": "Régime de bananes",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Bananes fraîches /lb",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "b41406b2-70fd-4fc8-bdd3-87d661cd90d6": {
-      "id": "b41406b2-70fd-4fc8-bdd3-87d661cd90d6",
-      "name": "Pommes rouges",
-      "price": 3,
+    "ec2c1ca7-e63a-4f46-905b-96ead68b584b": {
+      "id": "ec2c1ca7-e63a-4f46-905b-96ead68b584b",
+      "name": "Pommes Gala 3lb",
+      "price": 4.99,
       "category": "food",
-      "description": "2kg pommes rouges",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Pommes Gala en sac",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "1e384d01-d17e-4b8a-97bf-a363020d4ae3": {
-      "id": "1e384d01-d17e-4b8a-97bf-a363020d4ae3",
-      "name": "Oranges",
-      "price": 3.5,
+    "a050cc5e-e42d-44fa-909a-2f58e52b14a3": {
+      "id": "a050cc5e-e42d-44fa-909a-2f58e52b14a3",
+      "name": "Oranges Navel 4lb",
+      "price": 6.99,
       "category": "food",
-      "description": "1kg oranges juteuses",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Oranges juteuses",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "01abdf7f-9c35-4453-a7e3-04780aa4a62c": {
-      "id": "01abdf7f-9c35-4453-a7e3-04780aa4a62c",
-      "name": "Carottes",
-      "price": 1.5,
+    "289b66c9-44d0-4b05-b7bf-6eb8d768d7c4": {
+      "id": "289b66c9-44d0-4b05-b7bf-6eb8d768d7c4",
+      "name": "Carottes 2lb",
+      "price": 2.49,
       "category": "food",
-      "description": "Botte de carottes 1kg",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Carottes fraîches",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "243e3061-4086-4448-8295-dc568748b138": {
-      "id": "243e3061-4086-4448-8295-dc568748b138",
+    "0af07053-25ac-4287-87d5-d12b41cb713c": {
+      "id": "0af07053-25ac-4287-87d5-d12b41cb713c",
       "name": "Brocoli",
-      "price": 2.5,
+      "price": 2.99,
       "category": "food",
+      "subcategory": "Fruits & Légumes",
       "description": "Brocoli frais",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": false
     },
-    "7cddcfc1-f424-461c-88cc-234daf1d9c24": {
-      "id": "7cddcfc1-f424-461c-88cc-234daf1d9c24",
-      "name": "Tomates",
-      "price": 2.5,
+    "75bc50c7-9d1c-469e-885e-6f943067210b": {
+      "id": "75bc50c7-9d1c-469e-885e-6f943067210b",
+      "name": "Tomates grappe",
+      "price": 3.99,
       "category": "food",
-      "description": "Tomates rouges 1kg",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Tomates sur vigne /lb",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "66463722-d89d-4050-a310-a6715d5f44a5": {
-      "id": "66463722-d89d-4050-a310-a6715d5f44a5",
-      "name": "Salade verte",
-      "price": 1.5,
+    "2a074786-ff75-4e29-8060-1e7ba8fa3ce6": {
+      "id": "2a074786-ff75-4e29-8060-1e7ba8fa3ce6",
+      "name": "Laitue romaine",
+      "price": 2.99,
       "category": "food",
-      "description": "Laitue verte",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Laitue fraîche",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "4622a33e-b3d0-4e2f-bb76-6c1808d3de61": {
-      "id": "4622a33e-b3d0-4e2f-bb76-6c1808d3de61",
-      "name": "Pizza surgelée",
-      "price": 5,
+    "93f4198c-af3d-45f8-bb28-d6455bc698f2": {
+      "id": "93f4198c-af3d-45f8-bb28-d6455bc698f2",
+      "name": "Pommes de terre 10lb",
+      "price": 5.99,
       "category": "food",
-      "description": "Pizza pepperoni",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Pommes de terre russet",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "44ce2031-1519-4bbf-9bfd-319809b951f2": {
-      "id": "44ce2031-1519-4bbf-9bfd-319809b951f2",
-      "name": "Chips nature",
-      "price": 3,
+    "c8cdddef-87f2-410d-a065-7388e6de43c8": {
+      "id": "c8cdddef-87f2-410d-a065-7388e6de43c8",
+      "name": "Oignons 3lb",
+      "price": 3.49,
       "category": "food",
-      "description": "Sac de chips nature",
-      "isEssential": false
+      "subcategory": "Fruits & Légumes",
+      "description": "Oignons jaunes",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "e1e74a6e-f9ac-4898-aea9-a22597fa34d2": {
-      "id": "e1e74a6e-f9ac-4898-aea9-a22597fa34d2",
-      "name": "Chocolat",
-      "price": 2.5,
+    "59f52ee5-5d57-475b-98b8-fc3e04af80f9": {
+      "id": "59f52ee5-5d57-475b-98b8-fc3e04af80f9",
+      "name": "Pâtes spaghetti 900g",
+      "price": 2.49,
       "category": "food",
-      "description": "Tablette chocolat",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Spaghetti Catelli",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "25366751-a6e8-4e8d-9bdc-c4747d0d916b": {
-      "id": "25366751-a6e8-4e8d-9bdc-c4747d0d916b",
-      "name": "Bonbons",
-      "price": 2,
+    "b68b7516-430b-476c-a44d-5866e735c1b2": {
+      "id": "b68b7516-430b-476c-a44d-5866e735c1b2",
+      "name": "Riz blanc 2kg",
+      "price": 4.99,
       "category": "food",
-      "description": "Assortiment bonbons",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Riz à grain long",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "037ed071-fe64-49fb-9d20-77e96afa5fdc": {
-      "id": "037ed071-fe64-49fb-9d20-77e96afa5fdc",
-      "name": "Yaourt",
-      "price": 3,
+    "29112ce3-d1df-4602-83d3-ab87cb68e3a0": {
+      "id": "29112ce3-d1df-4602-83d3-ab87cb68e3a0",
+      "name": "Sauce tomate 680ml",
+      "price": 2.99,
       "category": "food",
-      "description": "Pack yaourt 4x125g",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Sauce tomate Classico",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "c7ebd4eb-c66b-464b-a466-9266a5cabd4b": {
-      "id": "c7ebd4eb-c66b-464b-a466-9266a5cabd4b",
-      "name": "Beurre",
-      "price": 3.5,
+    "beb50987-7eb7-488d-b6d4-c01bc3ee6378": {
+      "id": "beb50987-7eb7-488d-b6d4-c01bc3ee6378",
+      "name": "Tomates en dés 796ml",
+      "price": 1.99,
       "category": "food",
-      "description": "Beurre 250g",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Tomates italiennes",
+      "isEssential": true,
+      "isTaxable": false
     },
-    "4837be7f-4bb7-42b2-a244-aa41c5574db6": {
-      "id": "4837be7f-4bb7-42b2-a244-aa41c5574db6",
-      "name": "Miel",
-      "price": 5,
+    "dd9531b7-922c-439f-b84d-73446f77d710": {
+      "id": "dd9531b7-922c-439f-b84d-73446f77d710",
+      "name": "Haricots rouges 540ml",
+      "price": 1.49,
       "category": "food",
-      "description": "Miel 500g",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Haricots en conserve",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "525670f4-1a72-4497-93d6-b9301802c393": {
-      "id": "525670f4-1a72-4497-93d6-b9301802c393",
-      "name": "Jus d'orange",
-      "price": 2.5,
+    "d198b00f-a170-4533-900b-959a1a7d0118": {
+      "id": "d198b00f-a170-4533-900b-959a1a7d0118",
+      "name": "Thon pâle 170g",
+      "price": 2.49,
       "category": "food",
-      "description": "Jus 1L",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Thon en morceaux",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "e6101cb1-876b-4fc2-a8de-51075601932e": {
-      "id": "e6101cb1-876b-4fc2-a8de-51075601932e",
-      "name": "Soda",
-      "price": 2,
+    "180bc9e8-2d4d-4e59-88ed-d6869622cdf3": {
+      "id": "180bc9e8-2d4d-4e59-88ed-d6869622cdf3",
+      "name": "Maïs en crème 398ml",
+      "price": 1.79,
       "category": "food",
-      "description": "Soda 1.5L",
-      "isEssential": false
+      "subcategory": "Conserves",
+      "description": "Maïs sucré",
+      "isEssential": false,
+      "isTaxable": false
     },
-    "7093fee2-7d55-4c78-8bf3-30e8cd0b21d9": {
-      "id": "7093fee2-7d55-4c78-8bf3-30e8cd0b21d9",
+    "6c3099b7-9a96-42e0-88d3-69c18de81ea9": {
+      "id": "6c3099b7-9a96-42e0-88d3-69c18de81ea9",
+      "name": "Soupe poulet nouilles",
+      "price": 1.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Soupe Campbell's",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "6b9beeba-4ba0-4c54-8a14-9e7163888b54": {
+      "id": "6b9beeba-4ba0-4c54-8a14-9e7163888b54",
+      "name": "Pain tranché blanc",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pain blanc 675g",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "4cef57a2-ddcf-495a-8e42-83c0bb08f816": {
+      "id": "4cef57a2-ddcf-495a-8e42-83c0bb08f816",
+      "name": "Pain blé entier",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pain 100% blé 675g",
+      "isEssential": true,
+      "isTaxable": false
+    },
+    "2019514b-b6f4-47be-821b-a886d2974cc1": {
+      "id": "2019514b-b6f4-47be-821b-a886d2974cc1",
+      "name": "Bagels nature 6",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Bagels frais",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "4592dcf3-1b97-4a02-9b0f-b8e292e96e9a": {
+      "id": "4592dcf3-1b97-4a02-9b0f-b8e292e96e9a",
+      "name": "Tortillas 10po 8",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Tortillas de blé",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "3b48547c-4e8f-4122-9af2-7d4b913392f9": {
+      "id": "3b48547c-4e8f-4122-9af2-7d4b913392f9",
+      "name": "Croissants 6",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Croissants au beurre",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "c45f8736-3c7b-459d-84ff-dea04879b577": {
+      "id": "c45f8736-3c7b-459d-84ff-dea04879b577",
+      "name": "Muffins anglais 6",
+      "price": 3.29,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Muffins anglais",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "79afc430-5af8-463e-a910-72cc5d2766cd": {
+      "id": "79afc430-5af8-463e-a910-72cc5d2766cd",
+      "name": "Chocolat Lindt 100g",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chocolat noir 70%",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "bbecc5f9-d342-42a1-a48f-ab54a6042f98": {
+      "id": "bbecc5f9-d342-42a1-a48f-ab54a6042f98",
+      "name": "Chips Lays 235g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Chips nature",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "83a92c1c-a714-4a15-b914-f53ddfd374e1": {
+      "id": "83a92c1c-a714-4a15-b914-f53ddfd374e1",
+      "name": "Bonbons gélifiés 175g",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Oursons gélifiés",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "3635db27-07da-4b24-be98-04bc7e10f3ec": {
+      "id": "3635db27-07da-4b24-be98-04bc7e10f3ec",
+      "name": "Biscuits Oreo 303g",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Biscuits Oreo",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "fbe30f7c-d413-4605-859c-bc18fbfcc6a8": {
+      "id": "fbe30f7c-d413-4605-859c-bc18fbfcc6a8",
+      "name": "Barres Oh Henry 4",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres chocolatées",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "82683dd1-303d-4fac-85f7-41ad60f1d558": {
+      "id": "82683dd1-303d-4fac-85f7-41ad60f1d558",
+      "name": "Crème glacée 1.5L",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Crème glacée vanille",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "1fdff8cd-9e34-48f4-bb26-ff6323fa8af2": {
+      "id": "1fdff8cd-9e34-48f4-bb26-ff6323fa8af2",
+      "name": "Popcorn micro-ondes 3",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Popcorn au beurre",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "cd315ca6-0dc6-4176-a706-88458fc719b8": {
+      "id": "cd315ca6-0dc6-4176-a706-88458fc719b8",
+      "name": "Doritos Nacho 255g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Tortillas nacho",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "3a41c67b-3f8d-4aba-9dea-1e15588869a1": {
+      "id": "3a41c67b-3f8d-4aba-9dea-1e15588869a1",
+      "name": "Jus d'orange 1.89L",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Jus 100% pur",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "bfba64a9-f62a-4d79-8aaa-ae2b1dacc8db": {
+      "id": "bfba64a9-f62a-4d79-8aaa-ae2b1dacc8db",
+      "name": "Pepsi 2L",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson gazeuse",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "37afb9f0-d0dd-4986-999c-46e5381e4e7f": {
+      "id": "37afb9f0-d0dd-4986-999c-46e5381e4e7f",
+      "name": "Coca-Cola 2L",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson gazeuse",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "36afb81a-a273-4ec1-a0ab-97bc4e832b75": {
+      "id": "36afb81a-a273-4ec1-a0ab-97bc4e832b75",
+      "name": "Eau Eska 12x500ml",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Eau de source",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "279aa773-3228-4534-b7f3-8853402a98de": {
+      "id": "279aa773-3228-4534-b7f3-8853402a98de",
+      "name": "Café moulu 340g",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Café Maxwell House",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "c0df238b-5272-43eb-bb4a-a37d8411e9c3": {
+      "id": "c0df238b-5272-43eb-bb4a-a37d8411e9c3",
+      "name": "Thé Red Rose 72",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Sachets de thé",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "48c8adec-dc69-4348-9345-8034dd5721d0": {
+      "id": "48c8adec-dc69-4348-9345-8034dd5721d0",
+      "name": "Gatorade 950ml",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson sportive",
+      "isEssential": false,
+      "isTaxable": true
+    },
+    "41b6cd7a-795a-4a54-b052-82983b08dd28": {
+      "id": "41b6cd7a-795a-4a54-b052-82983b08dd28",
+      "name": "Jus de pomme 1.89L",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Jus 100% pomme",
+      "isEssential": false,
+      "isTaxable": false
+    },
+    "c2d69b46-c403-4dff-8112-7e017fd557ea": {
+      "id": "c2d69b46-c403-4dff-8112-7e017fd557ea",
       "name": "T-shirt",
       "price": 15,
       "category": "clothing",
       "description": "T-shirt coton classique",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "58fb5c1a-ef0a-480d-8133-0f3c24c28db1": {
-      "id": "58fb5c1a-ef0a-480d-8133-0f3c24c28db1",
+    "94662721-52c2-4256-b435-31ac3553a0b8": {
+      "id": "94662721-52c2-4256-b435-31ac3553a0b8",
       "name": "Jeans bleu",
       "price": 40,
       "category": "clothing",
       "description": "Jeans bleu slim",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "8a9caa82-7e41-4330-9f13-affb92ba53d9": {
-      "id": "8a9caa82-7e41-4330-9f13-affb92ba53d9",
+    "68d71536-6fb3-44b0-8fd7-c6ee2dd73419": {
+      "id": "68d71536-6fb3-44b0-8fd7-c6ee2dd73419",
       "name": "Chaussures sport",
       "price": 60,
       "category": "clothing",
       "description": "Sneakers décontractées",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "2a5bffbc-cfc0-47ae-8db5-ed630a33bed9": {
-      "id": "2a5bffbc-cfc0-47ae-8db5-ed630a33bed9",
+    "de532670-82e7-4bdf-9966-f5662d8b6edf": {
+      "id": "de532670-82e7-4bdf-9966-f5662d8b6edf",
       "name": "Chaussettes",
       "price": 5,
       "category": "clothing",
       "description": "Paire de chaussettes",
-      "isEssential": true
+      "isEssential": true,
+      "isTaxable": true
     },
-    "db7f7d3c-1418-4560-94a6-0657715a05c4": {
-      "id": "db7f7d3c-1418-4560-94a6-0657715a05c4",
+    "6f453a28-9941-4b24-9b75-6770a2e1a719": {
+      "id": "6f453a28-9941-4b24-9b75-6770a2e1a719",
       "name": "Veste d'hiver",
       "price": 80,
       "category": "clothing",
       "description": "Veste d'hiver",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "8461fb47-6f9f-47f0-b574-bb1f9474065d": {
-      "id": "8461fb47-6f9f-47f0-b574-bb1f9474065d",
+    "f0b83610-0024-4745-923d-e74a4d635151": {
+      "id": "f0b83610-0024-4745-923d-e74a4d635151",
       "name": "Pull",
       "price": 35,
       "category": "clothing",
       "description": "Pull chaud",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "3465a537-3497-494e-a611-e755dac3de40": {
-      "id": "3465a537-3497-494e-a611-e755dac3de40",
+    "6d69b4dd-b236-416c-aa7d-16a0aea6d028": {
+      "id": "6d69b4dd-b236-416c-aa7d-16a0aea6d028",
       "name": "Bermuda",
       "price": 25,
       "category": "clothing",
       "description": "Bermuda coton",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "1c249ee9-4991-45f6-9e58-b52e3ffaf49b": {
-      "id": "1c249ee9-4991-45f6-9e58-b52e3ffaf49b",
+    "da69252d-9a49-41b7-8dd9-65ed1e5be2fd": {
+      "id": "da69252d-9a49-41b7-8dd9-65ed1e5be2fd",
       "name": "Cinéma",
-      "price": 10,
+      "price": 14.99,
       "category": "leisure",
       "description": "Billet de cinéma",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "2a26b879-31ec-406a-a67e-6c1b48fef8f8": {
-      "id": "2a26b879-31ec-406a-a67e-6c1b48fef8f8",
+    "3205f712-ff05-49cb-af93-2c1d23a47e5c": {
+      "id": "3205f712-ff05-49cb-af93-2c1d23a47e5c",
       "name": "Jeu vidéo",
-      "price": 20,
+      "price": 79.99,
       "category": "leisure",
       "description": "Jeu vidéo populaire",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "d8685d2b-d1d8-4080-a61c-cddc90595931": {
-      "id": "d8685d2b-d1d8-4080-a61c-cddc90595931",
+    "13062aa0-d26f-4eb3-8232-8f786cf9538c": {
+      "id": "13062aa0-d26f-4eb3-8232-8f786cf9538c",
       "name": "Entrée piscine",
-      "price": 12,
+      "price": 8,
       "category": "leisure",
       "description": "Entrée piscine/sport",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "a8f9c9ec-e7cb-4a1c-8076-8b6d54d8c0d2": {
-      "id": "a8f9c9ec-e7cb-4a1c-8076-8b6d54d8c0d2",
-      "name": "Café",
-      "price": 3,
+    "17937924-64a2-4661-9f3d-cf580e0e305a": {
+      "id": "17937924-64a2-4661-9f3d-cf580e0e305a",
+      "name": "Café Starbucks",
+      "price": 5.99,
       "category": "leisure",
-      "description": "Boisson café",
-      "isEssential": false
+      "description": "Grand latte",
+      "isEssential": false,
+      "isTaxable": true
     },
-    "5c5f818a-a3e3-4136-8f09-8d48cacd93fb": {
-      "id": "5c5f818a-a3e3-4136-8f09-8d48cacd93fb",
+    "c95cc62d-9b51-462c-bc6e-ac41669c2d0c": {
+      "id": "c95cc62d-9b51-462c-bc6e-ac41669c2d0c",
       "name": "Livre",
-      "price": 15,
+      "price": 24.99,
       "category": "leisure",
       "description": "Roman populaire",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     },
-    "506f1cf2-8280-44f0-974e-a1e2d9764bae": {
-      "id": "506f1cf2-8280-44f0-974e-a1e2d9764bae",
+    "6097ae82-18b2-4d23-a1b7-97d9c8e946be": {
+      "id": "6097ae82-18b2-4d23-a1b7-97d9c8e946be",
       "name": "Ticket concert",
-      "price": 25,
+      "price": 75,
       "category": "leisure",
       "description": "Entrée concert",
-      "isEssential": false
+      "isEssential": false,
+      "isTaxable": true
     }
   },
   "expenses": {},

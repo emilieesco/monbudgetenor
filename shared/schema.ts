@@ -113,6 +113,28 @@ export interface SurpriseEvent {
   appliedAt?: Date;
 }
 
+export interface BudgetSnapshot {
+  id: string;
+  studentId: string;
+  label: string;
+  createdAt: Date;
+  studentState: {
+    budget: number;
+    spent: number;
+    savings: number;
+  };
+  expenses: Expense[];
+  fixedExpenses: FixedExpense[];
+  bonusExpenses: BonusExpense[];
+  challenges: Challenge[];
+}
+
+export const createSnapshotSchema = z.object({
+  label: z.string().min(1).max(50),
+});
+
+export type CreateSnapshot = z.infer<typeof createSnapshotSchema>;
+
 // Zod schemas for validation
 export const studentSchema = z.object({
   id: z.string(),

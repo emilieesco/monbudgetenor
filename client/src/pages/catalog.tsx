@@ -142,17 +142,22 @@ export default function Catalog() {
 
   const addExpenseMutation = useMutation({
     mutationFn: async (cartItems: CartItem[]) => {
-      const promises = cartItems.flatMap(cartItem => 
-        Array.from({ length: cartItem.quantity }, () => 
+      const promises = cartItems.flatMap(cartItem => {
+        const priceWithTax = cartItem.item.isTaxable 
+          ? cartItem.item.price * (1 + QUEBEC_TAX_RATE) 
+          : cartItem.item.price;
+        const roundedPrice = Math.round(priceWithTax * 100) / 100;
+        
+        return Array.from({ length: cartItem.quantity }, () => 
           apiRequest("POST", "/api/expenses", {
             studentId,
             itemId: cartItem.item.id,
-            amount: cartItem.item.price,
+            amount: roundedPrice,
             category: cartItem.item.category,
             isEssential: cartItem.item.isEssential,
           })
-        )
-      );
+        );
+      });
       await Promise.all(promises);
     },
     onSuccess: () => {

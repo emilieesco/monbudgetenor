@@ -254,21 +254,16 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Student not found" });
       }
       
-      const expense = await storage.addExpense({
+      // Create as bonus expense with extended categories
+      const bonusExpense = await storage.createBonusExpense({
         studentId: req.params.id,
-        itemId: `manual-${Date.now()}`,
+        title: name,
+        description: `Dépense ajoutée par l'enseignant`,
         amount: parseFloat(amount),
-        category: category || "leisure",
-        isEssential: false,
-        feedback: "warning",
-        message: `Dépense manuelle: ${name}`,
-      });
+        category: category || "other",
+      }, student.classId);
       
-      const newBudget = student.budget - parseFloat(amount);
-      const newSpent = student.spent + parseFloat(amount);
-      await storage.updateStudentBudgetAndSpent(req.params.id, newBudget, newSpent);
-      
-      res.json(expense);
+      res.json(bonusExpense);
     } catch (error) {
       res.status(500).json({ error: "Failed to add manual expense" });
     }

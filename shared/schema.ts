@@ -66,6 +66,7 @@ export interface BonusExpense {
   title: string;
   description: string;
   amount: number;
+  category: "transport" | "education" | "health" | "entertainment" | "utilities" | "food" | "clothing" | "emergency" | "other";
   createdAt: Date;
   isPaid: boolean;
 }
@@ -227,6 +228,7 @@ export const createBonusExpenseSchema = z.object({
   title: z.string().min(1),
   description: z.string().min(1),
   amount: z.number().positive(),
+  category: z.enum(["transport", "education", "health", "entertainment", "utilities", "food", "clothing", "emergency", "other"]).default("other"),
 });
 
 export const createChallengeSchema = z.object({

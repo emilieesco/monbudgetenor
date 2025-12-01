@@ -40,7 +40,7 @@ export default function TeacherDashboard() {
   const [expenseStudentId, setExpenseStudentId] = useState("");
   const [expenseName, setExpenseName] = useState("");
   const [expenseAmount, setExpenseAmount] = useState("");
-  const [expenseCategory, setExpenseCategory] = useState<"food" | "clothing" | "leisure">("leisure");
+  const [expenseCategory, setExpenseCategory] = useState<"transport" | "education" | "health" | "entertainment" | "utilities" | "food" | "clothing" | "emergency" | "other">("other");
 
   // Queries
   const classQuery = useQuery({ queryKey: ["/api/classes", classId] });
@@ -438,13 +438,19 @@ export default function TeacherDashboard() {
                     <select
                       id="expense-category-teacher"
                       value={expenseCategory}
-                      onChange={(e) => setExpenseCategory(e.target.value as "food" | "clothing" | "leisure")}
+                      onChange={(e) => setExpenseCategory(e.target.value as "transport" | "education" | "health" | "entertainment" | "utilities" | "food" | "clothing" | "emergency" | "other")}
                       className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
                       data-testid="select-expense-category-teacher"
                     >
+                      <option value="transport">Transport</option>
+                      <option value="education">Éducation</option>
+                      <option value="health">Santé</option>
+                      <option value="entertainment">Divertissement</option>
+                      <option value="utilities">Services publics</option>
                       <option value="food">Nourriture</option>
                       <option value="clothing">Vêtements</option>
-                      <option value="leisure">Loisirs</option>
+                      <option value="emergency">Urgence</option>
+                      <option value="other">Autre</option>
                     </select>
                   </div>
                   <div className="flex items-end">

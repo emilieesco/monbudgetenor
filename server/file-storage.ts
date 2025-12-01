@@ -567,11 +567,13 @@ export class FileStorage implements IStorage {
     const newExpense: Expense = { ...expense, id, timestamp: new Date() };
     this.expenses.set(id, newExpense);
 
+    // Only add to spent - do NOT reduce budget (that would double-count)
+    // Budget stays fixed, spent increases, remaining = budget - spent
     const student = await this.getStudent(expense.studentId);
     if (student) {
-      const newBudget = student.budget - expense.amount;
       const newSpent = (student.spent || 0) + expense.amount;
-      await this.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
+      // Keep budget the same - only update spent
+      await this.updateStudentBudgetAndSpent(expense.studentId, student.budget, newSpent);
     }
 
     this.save();
@@ -590,12 +592,13 @@ export class FileStorage implements IStorage {
     const expense = this.expenses.get(id);
     if (!expense) return false;
     
-    // Refund the student
+    // Refund the student - only reduce spent, don't change budget
+    // Budget stays fixed, spent decreases, remaining = budget - spent
     const student = await this.getStudent(expense.studentId);
     if (student) {
-      const newBudget = student.budget + expense.amount;
       const newSpent = Math.max(0, (student.spent || 0) - expense.amount);
-      await this.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
+      // Keep budget the same - only update spent
+      await this.updateStudentBudgetAndSpent(expense.studentId, student.budget, newSpent);
     }
     
     this.expenses.delete(id);
@@ -605,18 +608,16 @@ export class FileStorage implements IStorage {
 
   async deleteStudentExpenses(studentId: string): Promise<void> {
     const studentExpenses = await this.getStudentExpenses(studentId);
-    let totalRefund = 0;
     
     for (const expense of studentExpenses) {
-      totalRefund += expense.amount;
       this.expenses.delete(expense.id);
     }
     
-    // Refund the student
+    // Refund the student - only reset spent to 0, don't change budget
     const student = await this.getStudent(studentId);
     if (student) {
-      const newBudget = student.budget + totalRefund;
-      await this.updateStudentBudgetAndSpent(studentId, newBudget, 0);
+      // Keep budget the same - only reset spent to 0
+      await this.updateStudentBudgetAndSpent(studentId, student.budget, 0);
     }
     
     this.save();
@@ -681,12 +682,7 @@ export class FileStorage implements IStorage {
     const id = randomUUID();
     const bonus: BonusExpense = { id, ...input, classId, createdAt: new Date(), isPaid: false };
     this.bonusExpenses.set(id, bonus);
-
-    const student = await this.getStudent(input.studentId);
-    if (student) {
-      await this.updateStudentBudget(input.studentId, student.budget - input.amount);
-    }
-
+    // Don't deduct from budget when creating - only when paying
     this.save();
     return bonus;
   }
@@ -700,6 +696,7 @@ export class FileStorage implements IStorage {
     if (!bonus) return undefined;
     const updated = { ...bonus, isPaid: true };
     this.bonusExpenses.set(id, updated);
+    // Note: The route handler will update spent when this is called
     this.save();
     return updated;
   }
@@ -708,10 +705,14 @@ export class FileStorage implements IStorage {
     const bonus = this.bonusExpenses.get(id);
     if (!bonus) return false;
     
-    // Refund the student
-    const student = await this.getStudent(bonus.studentId);
-    if (student) {
-      await this.updateStudentBudget(bonus.studentId, student.budget + bonus.amount);
+    // Refund the student only if the bonus was paid
+    // Reduce spent, don't add to budget
+    if (bonus.isPaid) {
+      const student = await this.getStudent(bonus.studentId);
+      if (student) {
+        const newSpent = Math.max(0, (student.spent || 0) - bonus.amount);
+        await this.updateStudentBudgetAndSpent(bonus.studentId, student.budget, newSpent);
+      }
     }
     
     this.bonusExpenses.delete(id);

@@ -185,21 +185,26 @@
     "0e1924a4-a129-4e09-b88e-32166f480bd6": {
       "name": "Emilie",
       "classId": "e7b221ff-e67c-49d9-9479-8fde5cfaeb31",
-      "budget": 950,
+      "budget": 2200,
       "id": "0e1924a4-a129-4e09-b88e-32166f480bd6",
-      "spent": 1300,
+      "spent": 0,
       "savings": 0,
       "createdAt": "2025-11-30T00:20:36.801Z",
-      "budgetHistory": [],
-      "currentMonth": 2,
+      "budgetHistory": [
+        {
+          "budget": 2200,
+          "date": "2025-12-01T22:58:44.574Z"
+        }
+      ],
+      "currentMonth": 3,
       "monthlyBudget": 1500,
       "customExpenses": {
-        "Loyer": 1150,
+        "Loyer": 1500,
         "Internet": 65,
         "Téléphone": 150,
-        "Hydro": 65,
+        "Hydro": 60,
         "Assurance Voiture": 110,
-        "Assurance Maison": 36
+        "Assurance Maison": 35
       }
     },
     "b9780201-d1f7-4f57-a017-c478a627c4b3": {
@@ -3538,53 +3543,53 @@
       "isPaid": false,
       "dueDate": "2025-12-31T19:06:43.598Z"
     },
-    "1cf6fb3e-47d5-4cca-97ce-a050a9f9b695": {
-      "id": "1cf6fb3e-47d5-4cca-97ce-a050a9f9b695",
+    "75b4e5b6-4dc6-4303-bbb2-cf56c921684f": {
+      "id": "75b4e5b6-4dc6-4303-bbb2-cf56c921684f",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Loyer",
-      "amount": 1150,
+      "amount": 1500,
       "isPaid": true,
-      "dueDate": "2025-12-01T19:21:28.928Z"
+      "dueDate": "2025-12-01T22:57:58.566Z"
     },
-    "c0cee110-ee1e-4192-93a6-969f10280e00": {
-      "id": "c0cee110-ee1e-4192-93a6-969f10280e00",
+    "f861850e-f29a-4f45-af4e-05213e804fbb": {
+      "id": "f861850e-f29a-4f45-af4e-05213e804fbb",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Internet",
       "amount": 65,
       "isPaid": false,
-      "dueDate": "2025-12-01T19:21:28.931Z"
+      "dueDate": "2025-12-01T22:57:58.566Z"
     },
-    "979003e4-fca3-48ef-b2b5-0888d09402b6": {
-      "id": "979003e4-fca3-48ef-b2b5-0888d09402b6",
+    "926ba25f-668e-4a07-9eaf-5ec65d841011": {
+      "id": "926ba25f-668e-4a07-9eaf-5ec65d841011",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Téléphone",
       "amount": 150,
-      "isPaid": true,
-      "dueDate": "2025-12-01T19:21:28.933Z"
+      "isPaid": false,
+      "dueDate": "2025-12-01T22:57:58.566Z"
     },
-    "ecdc4894-7bed-4ab8-a8ff-9ac785556362": {
-      "id": "ecdc4894-7bed-4ab8-a8ff-9ac785556362",
+    "f9b0493d-33ce-4dd8-a895-d1ab76fc534c": {
+      "id": "f9b0493d-33ce-4dd8-a895-d1ab76fc534c",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Hydro",
-      "amount": 65,
+      "amount": 60,
       "isPaid": false,
-      "dueDate": "2025-12-01T19:21:28.936Z"
+      "dueDate": "2025-12-01T22:57:58.566Z"
     },
-    "958da556-45ca-4024-9999-72d7933b5d6c": {
-      "id": "958da556-45ca-4024-9999-72d7933b5d6c",
+    "db7ec909-98cb-4b16-8df1-36dc0e4c767c": {
+      "id": "db7ec909-98cb-4b16-8df1-36dc0e4c767c",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Assurance Voiture",
       "amount": 110,
       "isPaid": false,
-      "dueDate": "2025-12-01T19:21:28.940Z"
+      "dueDate": "2025-12-01T22:57:58.566Z"
     },
-    "ac5fb06f-8938-4f64-9847-16706a791973": {
-      "id": "ac5fb06f-8938-4f64-9847-16706a791973",
+    "ccb9d3b8-dc66-4856-aeff-3a64316e4d11": {
+      "id": "ccb9d3b8-dc66-4856-aeff-3a64316e4d11",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "category": "Assurance Maison",
-      "amount": 36,
+      "amount": 35,
       "isPaid": false,
-      "dueDate": "2025-12-01T19:21:28.943Z"
+      "dueDate": "2025-12-01T22:57:58.566Z"
     }
   },
   "bonusExpenses": {
@@ -3961,45 +3966,45 @@
       "completed": false,
       "createdAt": "2025-12-01T19:05:46.219Z"
     },
-    "d72332c5-00a2-466b-ab9e-1c6922fac56a": {
-      "id": "d72332c5-00a2-466b-ab9e-1c6922fac56a",
+    "f74013d7-73a4-43f9-ac64-815658032d8e": {
+      "id": "f74013d7-73a4-43f9-ac64-815658032d8e",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "title": "Économe",
       "description": "Dépense moins de 30% de ton budget",
       "type": "spending",
-      "targetValue": 675,
+      "targetValue": 660,
       "completed": false,
-      "createdAt": "2025-12-01T19:21:28.913Z"
+      "createdAt": "2025-12-01T22:47:09.522Z"
     },
-    "188adb40-29d4-45e2-9549-d121bb1a3bf0": {
-      "id": "188adb40-29d4-45e2-9549-d121bb1a3bf0",
+    "ca58cec3-00fa-47b8-a547-bc8448746633": {
+      "id": "ca58cec3-00fa-47b8-a547-bc8448746633",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "title": "Essentiel d'abord",
       "description": "Achète 3 articles essentiels",
       "type": "essential",
       "targetValue": 3,
       "completed": false,
-      "createdAt": "2025-12-01T19:21:28.916Z"
+      "createdAt": "2025-12-01T22:47:09.525Z"
     },
-    "86c679cb-f812-46f5-b7b3-4b56d0b11523": {
-      "id": "86c679cb-f812-46f5-b7b3-4b56d0b11523",
+    "c4eb1c08-5cf0-40a4-b36e-fc207f00aa0d": {
+      "id": "c4eb1c08-5cf0-40a4-b36e-fc207f00aa0d",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "title": "Responsable",
       "description": "Paye toutes tes dépenses fixes",
       "type": "fixed",
       "targetValue": 100,
       "completed": false,
-      "createdAt": "2025-12-01T19:21:28.919Z"
+      "createdAt": "2025-12-01T22:47:09.529Z"
     },
-    "a536a1ce-4e51-43a1-8810-79db8ea6b5e8": {
-      "id": "a536a1ce-4e51-43a1-8810-79db8ea6b5e8",
+    "9a1e5aab-2f7f-4dee-ad5a-98b1707e933b": {
+      "id": "9a1e5aab-2f7f-4dee-ad5a-98b1707e933b",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "title": "Sage",
       "description": "Économise 50% de ton budget",
       "type": "savings",
-      "targetValue": 1125,
+      "targetValue": 1100,
       "completed": false,
-      "createdAt": "2025-12-01T19:21:28.922Z"
+      "createdAt": "2025-12-01T22:47:09.532Z"
     }
   },
   "customChallenges": {},

@@ -433,6 +433,16 @@ export async function registerRoutes(
       if (!bonus) {
         return res.status(404).json({ error: "Bonus not found" });
       }
+      
+      // Only add to spent - do NOT reduce budget (that would double-count)
+      // Budget stays fixed, spent increases, remaining = budget - spent
+      const student = await storage.getStudent(bonus.studentId);
+      if (student) {
+        const newSpent = student.spent + bonus.amount;
+        // Keep budget the same - only update spent
+        await storage.updateStudentBudgetAndSpent(bonus.studentId, student.budget, newSpent);
+      }
+      
       res.json(bonus);
     } catch (error) {
       res.status(500).json({ error: "Failed to pay bonus" });
@@ -446,12 +456,13 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Expense not found" });
       }
       
-      // Deduct from student budget and add to spent
+      // Only add to spent - do NOT reduce budget (that would double-count)
+      // Budget stays fixed, spent increases, remaining = budget - spent
       const student = await storage.getStudent(expense.studentId);
       if (student) {
         const newSpent = student.spent + expense.amount;
-        const newBudget = student.budget - expense.amount;
-        await storage.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
+        // Keep budget the same - only update spent
+        await storage.updateStudentBudgetAndSpent(expense.studentId, student.budget, newSpent);
       }
       
       res.json(expense);

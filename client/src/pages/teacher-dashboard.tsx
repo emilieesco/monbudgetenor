@@ -7,17 +7,24 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent } from "@shared/schema";
+import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent, ClassChallenge } from "@shared/schema";
 
 export default function TeacherDashboard() {
   const { classId } = useParams();
   const [_location, navigate] = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "config">("students");
+  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "leaderboard" | "config">("students");
   const [expenseAmounts, setExpenseAmounts] = useState<{ [key: string]: number }>({});
-  const [predefinedBudget, setPredefinedBudget] = useState<number | "">("");
+  const [predefinedBudget, setPredefinedBudget] = useState<number | "">(""); 
+  
+  // Class Challenge form states
+  const [classChallengeTitle, setClassChallengeTitle] = useState("");
+  const [classChallengeDesc, setClassChallengeDesc] = useState("");
+  const [classChallengeType, setClassChallengeType] = useState<"spending" | "savings" | "custom">("savings");
+  const [classChallengeTarget, setClassChallengeTarget] = useState("");
+  const [classChallengeReward, setClassChallengeReward] = useState("");
 
   // Form states
   const [challengeTitle, setChallengeTitle] = useState("");
@@ -48,6 +55,12 @@ export default function TeacherDashboard() {
   });
   const eventsQuery = useQuery({
     queryKey: ["/api/surprise-events", classId],
+  });
+  const classChallengesQuery = useQuery({
+    queryKey: ["/api/classes", classId, "challenges"],
+  });
+  const leaderboardQuery = useQuery({
+    queryKey: ["/api/classes", classId, "leaderboard"],
   });
 
   // Mutations
@@ -252,11 +265,59 @@ export default function TeacherDashboard() {
     },
   });
 
+  const createClassChallengeMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", "/api/class-challenges", {
+        classId,
+        title: classChallengeTitle,
+        description: classChallengeDesc,
+        type: classChallengeType,
+        targetValue: parseFloat(classChallengeTarget),
+        reward: classChallengeReward || undefined,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "challenges"] });
+      setClassChallengeTitle("");
+      setClassChallengeDesc("");
+      setClassChallengeTarget("");
+      setClassChallengeReward("");
+      toast({
+        title: "Défi de classe créé!",
+        description: "Le défi a été créé pour toute la classe.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de créer le défi.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteClassChallengeMutation = useMutation({
+    mutationFn: async (challengeId: string) => {
+      const res = await apiRequest("DELETE", `/api/class-challenges/${challengeId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "challenges"] });
+      toast({
+        title: "Défi supprimé",
+        description: "Le défi a été supprimé.",
+      });
+    },
+  });
+
   const classData = classQuery.data as Class | undefined;
   const students = studentsQuery.data as Student[] || [];
   const challenges = customChallengesQuery.data as CustomChallenge[] || [];
   const messages = messagesQuery.data as TeacherMessage[] || [];
   const events = eventsQuery.data as SurpriseEvent[] || [];
+  const classChallenges = classChallengesQuery.data as ClassChallenge[] || [];
+  const leaderboard = leaderboardQuery.data as Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}> || [];
 
   if (!classData) {
     return <div className="p-8">Chargement...</div>;
@@ -291,7 +352,7 @@ export default function TeacherDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
-          {["students", "challenges", "messages", "events", "config"].map(tab => (
+          {["students", "challenges", "messages", "events", "leaderboard", "config"].map(tab => (
             <Button
               key={tab}
               variant={activeTab === tab ? "default" : "outline"}
@@ -303,16 +364,19 @@ export default function TeacherDashboard() {
                 }
               }}
               className="flex items-center gap-2"
+              data-testid={`tab-${tab}`}
             >
               {tab === "students" && <Users className="w-4 h-4" />}
               {tab === "challenges" && <Target className="w-4 h-4" />}
               {tab === "messages" && <Send className="w-4 h-4" />}
               {tab === "events" && <Gift className="w-4 h-4" />}
+              {tab === "leaderboard" && <Trophy className="w-4 h-4" />}
               {tab === "config" && <Settings className="w-4 h-4" />}
               {tab === "students" && "Étudiants"}
               {tab === "challenges" && "Défis"}
               {tab === "messages" && "Messages"}
               {tab === "events" && "Événements"}
+              {tab === "leaderboard" && "Classement"}
               {tab === "config" && "Configuration"}
             </Button>
           ))}
@@ -464,8 +528,123 @@ export default function TeacherDashboard() {
         {/* Challenges Tab */}
         {activeTab === "challenges" && (
           <div className="space-y-8">
+            {/* Create Class Challenge */}
+            <Card className="p-6 border-primary/30">
+              <div className="flex items-center gap-2 mb-6">
+                <Award className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-bold">Créer un Défi de Classe</h2>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="space-y-2">
+                  <Label htmlFor="class-challenge-title">Titre du défi</Label>
+                  <Input
+                    id="class-challenge-title"
+                    placeholder="Ex: Défi Épargne Collective"
+                    value={classChallengeTitle}
+                    onChange={(e) => setClassChallengeTitle(e.target.value)}
+                    data-testid="input-class-challenge-title"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="class-challenge-type">Type de défi</Label>
+                  <select
+                    id="class-challenge-type"
+                    value={classChallengeType}
+                    onChange={(e) => setClassChallengeType(e.target.value as any)}
+                    className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                    data-testid="select-class-challenge-type"
+                  >
+                    <option value="savings">Objectif d'épargne</option>
+                    <option value="spending">Limite de dépenses</option>
+                    <option value="custom">Personnalisé</option>
+                  </select>
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <Label htmlFor="class-challenge-desc">Description</Label>
+                  <Input
+                    id="class-challenge-desc"
+                    placeholder="Décris le défi..."
+                    value={classChallengeDesc}
+                    onChange={(e) => setClassChallengeDesc(e.target.value)}
+                    data-testid="input-class-challenge-desc"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="class-challenge-target">Valeur cible ($)</Label>
+                  <Input
+                    id="class-challenge-target"
+                    type="number"
+                    placeholder="100"
+                    value={classChallengeTarget}
+                    onChange={(e) => setClassChallengeTarget(e.target.value)}
+                    data-testid="input-class-challenge-target"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="class-challenge-reward">Récompense (optionnel)</Label>
+                  <Input
+                    id="class-challenge-reward"
+                    placeholder="Ex: Bonus de 50$"
+                    value={classChallengeReward}
+                    onChange={(e) => setClassChallengeReward(e.target.value)}
+                    data-testid="input-class-challenge-reward"
+                  />
+                </div>
+              </div>
+              <Button
+                onClick={() => createClassChallengeMutation.mutate()}
+                disabled={!classChallengeTitle || !classChallengeDesc || !classChallengeTarget || createClassChallengeMutation.isPending}
+                className="mt-4 flex items-center gap-2"
+                data-testid="button-create-class-challenge"
+              >
+                <Plus className="w-4 h-4" />
+                {createClassChallengeMutation.isPending ? "Création..." : "Créer le Défi"}
+              </Button>
+            </Card>
+
+            {/* Class Challenges List */}
+            {classChallenges.length > 0 && (
+              <Card className="p-6">
+                <h3 className="text-xl font-bold mb-4 flex items-center gap-2">
+                  <Star className="w-5 h-5 text-yellow-500" />
+                  Défis de Classe Actifs
+                </h3>
+                <div className="space-y-3">
+                  {classChallenges.map(ch => (
+                    <div key={ch.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <p className="font-semibold">{ch.title}</p>
+                          <Badge variant="secondary" size="sm">
+                            {ch.type === "savings" ? "Épargne" : ch.type === "spending" ? "Dépenses" : "Personnalisé"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{ch.description}</p>
+                        <div className="flex items-center gap-4 mt-2 text-xs text-muted-foreground">
+                          <span>Objectif: ${ch.targetValue}</span>
+                          {ch.reward && <span>Récompense: {ch.reward}</span>}
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-3">
+                        <Badge variant="default">{ch.completedBy.length}/{students.length} complété</Badge>
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => deleteClassChallengeMutation.mutate(ch.id)}
+                          data-testid={`button-delete-challenge-${ch.id}`}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </Card>
+            )}
+
+            {/* Legacy Custom Challenges */}
             <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-6">Créer un Défi Personnalisé</h2>
+              <h2 className="text-2xl font-bold mb-6">Créer un Défi Personnalisé (Ancien système)</h2>
               <div className="space-y-4">
                 <div>
                   <Label htmlFor="challenge-title">Titre du défi</Label>
@@ -501,7 +680,8 @@ export default function TeacherDashboard() {
                 <Button
                   onClick={() => createChallengeMutation.mutate()}
                   disabled={!challengeTitle || !challengeDesc || !challengeTarget || createChallengeMutation.isPending}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700"
+                  className="flex items-center gap-2"
+                  variant="outline"
                 >
                   <Plus className="w-4 h-4" />
                   Créer le Défi
@@ -511,7 +691,7 @@ export default function TeacherDashboard() {
 
             {challenges.length > 0 && (
               <Card className="p-6">
-                <h3 className="text-xl font-bold mb-4">Défis Actifs</h3>
+                <h3 className="text-xl font-bold mb-4">Défis Personnalisés Actifs</h3>
                 <div className="space-y-3">
                   {challenges.map(ch => (
                     <div key={ch.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
@@ -728,6 +908,88 @@ export default function TeacherDashboard() {
                   ))}
                 </div>
               </Card>
+            )}
+          </div>
+        )}
+
+        {/* Leaderboard Tab */}
+        {activeTab === "leaderboard" && (
+          <div className="space-y-8">
+            <Card className="p-6">
+              <div className="flex items-center gap-3 mb-6">
+                <Trophy className="w-8 h-8 text-yellow-500" />
+                <h2 className="text-2xl font-bold">Classement de la Classe</h2>
+              </div>
+              
+              {leaderboard.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">
+                  Aucun étudiant dans la classe pour le moment.
+                </p>
+              ) : (
+                <div className="space-y-3">
+                  {leaderboard.map((entry, index) => (
+                    <div 
+                      key={entry.studentId} 
+                      className={`flex items-center gap-4 p-4 rounded-lg ${
+                        index === 0 ? "bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-300" :
+                        index === 1 ? "bg-gray-100 dark:bg-gray-800 border border-gray-300" :
+                        index === 2 ? "bg-orange-100 dark:bg-orange-900/30 border border-orange-300" :
+                        "bg-muted"
+                      }`}
+                      data-testid={`leaderboard-entry-${index}`}
+                    >
+                      <div className="w-10 h-10 flex items-center justify-center font-bold text-lg">
+                        {index === 0 && <Medal className="w-8 h-8 text-yellow-500" />}
+                        {index === 1 && <Medal className="w-8 h-8 text-gray-400" />}
+                        {index === 2 && <Medal className="w-8 h-8 text-orange-500" />}
+                        {index > 2 && <span className="text-muted-foreground">{index + 1}</span>}
+                      </div>
+                      <div className="flex-1">
+                        <p className="font-semibold text-lg">{entry.name}</p>
+                        <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                          <span className="flex items-center gap-1">
+                            <Award className="w-4 h-4" />
+                            {entry.badgeCount} badge{entry.badgeCount !== 1 ? "s" : ""}
+                          </span>
+                          <span className="flex items-center gap-1">
+                            <Target className="w-4 h-4" />
+                            {entry.challengesCompleted} défi{entry.challengesCompleted !== 1 ? "s" : ""}
+                          </span>
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-primary">${entry.savings.toFixed(2)}</p>
+                        <p className="text-xs text-muted-foreground">Épargne totale</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+            
+            {/* Stats Summary */}
+            {leaderboard.length > 0 && (
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <Card className="p-6 text-center">
+                  <Trophy className="w-8 h-8 mx-auto mb-2 text-yellow-500" />
+                  <p className="text-3xl font-bold">{leaderboard[0]?.name || "-"}</p>
+                  <p className="text-muted-foreground">Meilleur épargnant</p>
+                </Card>
+                <Card className="p-6 text-center">
+                  <DollarSign className="w-8 h-8 mx-auto mb-2 text-green-500" />
+                  <p className="text-3xl font-bold">
+                    ${leaderboard.reduce((acc, e) => acc + e.savings, 0).toFixed(2)}
+                  </p>
+                  <p className="text-muted-foreground">Épargne totale de la classe</p>
+                </Card>
+                <Card className="p-6 text-center">
+                  <Award className="w-8 h-8 mx-auto mb-2 text-purple-500" />
+                  <p className="text-3xl font-bold">
+                    {leaderboard.reduce((acc, e) => acc + e.badgeCount, 0)}
+                  </p>
+                  <p className="text-muted-foreground">Badges gagnés</p>
+                </Card>
+              </div>
             )}
           </div>
         )}

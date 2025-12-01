@@ -6,13 +6,13 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus, Trophy, Medal, Star } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
-import type { Student, Expense, BonusExpense, Challenge, BudgetSnapshot } from "@shared/schema";
+import type { Student, Expense, BonusExpense, Challenge, BudgetSnapshot, Badge as BadgeType, ClassChallenge, SavingsGoal, BADGE_DEFINITIONS } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
@@ -57,6 +57,14 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Erreur");
       return res.json();
     },
+  });
+
+  const badgesQuery = useQuery({
+    queryKey: ["/api/students", studentId, "badges"],
+  });
+
+  const savingsGoalsQuery = useQuery({
+    queryKey: ["/api/students", studentId, "savings-goals"],
   });
 
   const completeChallengeMutation = useMutation({
@@ -209,12 +217,59 @@ export default function Dashboard() {
     },
   });
 
+  const checkBadgesMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/students/${studentId}/check-badges`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      if (data.awardedBadges && data.awardedBadges.length > 0) {
+        queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "badges"] });
+        data.awardedBadges.forEach((badge: any) => {
+          toast({
+            title: "Nouveau Badge Obtenu!",
+            description: `${badge.icon} ${badge.name}`,
+          });
+        });
+      }
+    },
+  });
+
+  const createSavingsGoalMutation = useMutation({
+    mutationFn: async (data: { title: string; targetAmount: number }) => {
+      const res = await apiRequest("POST", "/api/savings-goals", {
+        studentId,
+        ...data,
+      });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "savings-goals"] });
+      toast({
+        title: "Objectif créé",
+        description: "Ton objectif d'épargne a été ajouté",
+      });
+    },
+  });
+
+  const deleteSavingsGoalMutation = useMutation({
+    mutationFn: async (goalId: string) => {
+      const res = await apiRequest("DELETE", `/api/savings-goals/${goalId}`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId, "savings-goals"] });
+    },
+  });
+
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
   const bonusExpenses = bonusExpensesQuery.data || [];
   const challenges = challengesQuery.data as Challenge[] || [];
   const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
+  const badges = badgesQuery.data as Array<BadgeType & { name: string; icon: string; tier: string }> || [];
+  const savingsGoals = savingsGoalsQuery.data as SavingsGoal[] || [];
 
   // Offline support - cache data
   useEffect(() => {
@@ -248,13 +303,20 @@ export default function Dashboard() {
     challenges.forEach(ch => {
       if (ch.completed && !notifiedChallenges.has(ch.id)) {
         toast({
-          title: "Défi Complété! 🎉",
+          title: "Défi Complété!",
           description: `Tu as réussi: ${ch.title}`,
         });
         setNotifiedChallenges(prev => new Set(prev).add(ch.id));
       }
     });
   }, [challenges, notifiedChallenges, toast]);
+
+  // Check for new badges periodically
+  useEffect(() => {
+    if (student && expenses.length > 0) {
+      checkBadgesMutation.mutate();
+    }
+  }, [student?.savings, expenses.length]);
 
   if (!student) {
     const cachedStudent = localStorage.getItem(`student_${studentId}`);
@@ -471,6 +533,122 @@ export default function Dashboard() {
           <p className="text-sm font-semibold mb-3">Utilisation du Budget</p>
           <Progress value={Math.min(spentPercentage, 100)} className="h-3" />
           <p className="text-xs text-muted-foreground mt-2">{Math.round(spentPercentage)}% utilisé</p>
+        </Card>
+
+        {/* Gamification Section - Badges */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Trophy className="w-6 h-6 text-yellow-500" />
+            <h2 className="text-xl font-semibold">Mes Badges</h2>
+            <Badge variant="secondary" className="ml-auto">{badges.length} badge{badges.length !== 1 ? "s" : ""}</Badge>
+          </div>
+          
+          {badges.length === 0 ? (
+            <div className="text-center py-6 text-muted-foreground">
+              <Award className="w-12 h-12 mx-auto mb-2 opacity-30" />
+              <p>Tu n'as pas encore de badges. Continue à bien gérer ton budget pour en débloquer!</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+              {badges.map((badge) => (
+                <div
+                  key={badge.id}
+                  className={`p-3 rounded-lg text-center border-2 ${
+                    badge.tier === "platinum" ? "bg-purple-100 dark:bg-purple-900/30 border-purple-400" :
+                    badge.tier === "gold" ? "bg-yellow-100 dark:bg-yellow-900/30 border-yellow-400" :
+                    badge.tier === "silver" ? "bg-gray-100 dark:bg-gray-700 border-gray-400" :
+                    "bg-orange-100 dark:bg-orange-900/30 border-orange-400"
+                  }`}
+                  data-testid={`badge-${badge.type}`}
+                >
+                  <span className="text-2xl">{badge.icon}</span>
+                  <p className="text-xs font-semibold mt-1">{badge.name}</p>
+                  <p className="text-[10px] text-muted-foreground capitalize">{badge.tier}</p>
+                </div>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        {/* Savings Goals Section */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Target className="w-6 h-6 text-green-500" />
+            <h2 className="text-xl font-semibold">Mes Objectifs d'Épargne</h2>
+          </div>
+          
+          {/* Create New Goal */}
+          <div className="flex gap-2 mb-4">
+            <Input
+              placeholder="Nom de l'objectif (ex: Vélo neuf)"
+              className="flex-1"
+              id="goal-title"
+              data-testid="input-goal-title"
+            />
+            <Input
+              type="number"
+              placeholder="Montant $"
+              className="w-32"
+              id="goal-amount"
+              min="1"
+              data-testid="input-goal-amount"
+            />
+            <Button
+              onClick={() => {
+                const title = (document.getElementById("goal-title") as HTMLInputElement)?.value;
+                const amount = parseFloat((document.getElementById("goal-amount") as HTMLInputElement)?.value);
+                if (title && amount > 0) {
+                  createSavingsGoalMutation.mutate({ title, targetAmount: amount });
+                  (document.getElementById("goal-title") as HTMLInputElement).value = "";
+                  (document.getElementById("goal-amount") as HTMLInputElement).value = "";
+                }
+              }}
+              disabled={createSavingsGoalMutation.isPending}
+              className="bg-green-600 hover:bg-green-700"
+              data-testid="button-create-goal"
+            >
+              <Plus className="w-4 h-4 mr-1" />
+              Ajouter
+            </Button>
+          </div>
+
+          {savingsGoals.length === 0 ? (
+            <p className="text-center text-muted-foreground py-4">
+              Aucun objectif d'épargne. Fixe-toi des objectifs pour mieux épargner!
+            </p>
+          ) : (
+            <div className="space-y-3">
+              {savingsGoals.map((goal) => {
+                const progress = Math.min((student.savings / goal.targetAmount) * 100, 100);
+                return (
+                  <div key={goal.id} className="p-4 bg-muted rounded-lg" data-testid={`goal-${goal.id}`}>
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="font-semibold">{goal.title}</p>
+                      <div className="flex items-center gap-2">
+                        {goal.completed ? (
+                          <Badge variant="default" className="bg-green-600">Atteint!</Badge>
+                        ) : (
+                          <span className="text-sm text-muted-foreground">
+                            ${student.savings.toFixed(0)} / ${goal.targetAmount}
+                          </span>
+                        )}
+                        <Button
+                          size="icon"
+                          variant="ghost"
+                          onClick={() => deleteSavingsGoalMutation.mutate(goal.id)}
+                          data-testid={`button-delete-goal-${goal.id}`}
+                        >
+                          <Trash2 className="w-4 h-4 text-destructive" />
+                        </Button>
+                      </div>
+                    </div>
+                    <Progress value={progress} className="h-2" />
+                    <p className="text-xs text-muted-foreground mt-1">{Math.round(progress)}% complété</p>
+                  </div>
+                );
+              })}
+            </div>
+          )}
         </Card>
 
         {/* Budget History */}

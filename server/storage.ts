@@ -52,6 +52,8 @@ export interface IStorage {
   getStudentSnapshots(studentId: string): Promise<BudgetSnapshot[]>;
   restoreSnapshot(snapshotId: string): Promise<Student | undefined>;
   deleteSnapshot(snapshotId: string): Promise<boolean>;
+  startNewMonth(studentId: string): Promise<Student | undefined>;
+  resetFixedExpensesForNewMonth(studentId: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -705,6 +707,55 @@ export class MemStorage implements IStorage {
 
   async deleteSnapshot(snapshotId: string): Promise<boolean> {
     return this.snapshots.delete(snapshotId);
+  }
+
+  async startNewMonth(studentId: string): Promise<Student | undefined> {
+    const student = this.students.get(studentId);
+    if (!student) return undefined;
+
+    const classData = await this.getClass(student.classId);
+    const classDefaultBudget = classData?.predefinedBudget || 1500;
+    
+    const monthlyBudget = student.monthlyBudget || classDefaultBudget;
+    const previousMonth = student.currentMonth || 1;
+    const newMonth = previousMonth + 1;
+    
+    const remainingBudget = Math.max(0, student.budget);
+    const totalSavings = student.savings + remainingBudget;
+    
+    const updatedStudent: Student = {
+      ...student,
+      budget: monthlyBudget,
+      spent: 0,
+      savings: totalSavings,
+      currentMonth: newMonth,
+      monthlyBudget,
+      budgetHistory: [
+        ...(student.budgetHistory || []),
+        { 
+          budget: student.budget, 
+          date: new Date(),
+        }
+      ],
+    };
+    
+    this.students.set(studentId, updatedStudent);
+    
+    await this.resetFixedExpensesForNewMonth(studentId);
+    
+    return updatedStudent;
+  }
+
+  async resetFixedExpensesForNewMonth(studentId: string): Promise<void> {
+    for (const [id, expense] of this.fixedExpenses.entries()) {
+      if (expense.studentId === studentId) {
+        this.fixedExpenses.set(id, {
+          ...expense,
+          isPaid: false,
+          dueDate: new Date(),
+        });
+      }
+    }
   }
 }
 

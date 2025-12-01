@@ -23,6 +23,8 @@ export interface Student {
   customExpenses?: { [key: string]: number };
   scenario?: string;
   budgetHistory?: Array<{ budget: number; date: Date }>;
+  currentMonth?: number;
+  monthlyBudget?: number;
 }
 
 export interface CatalogItem {

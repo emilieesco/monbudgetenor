@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users, Settings } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent } from "@shared/schema";
 
@@ -169,6 +169,27 @@ export default function TeacherDashboard() {
     },
   });
 
+  const newMonthMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/classes/${classId}/new-month`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      toast({
+        title: "Nouveau mois commencé!",
+        description: `${data.studentsUpdated} élève(s) ont reçu leur budget mensuel.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer un nouveau mois.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const classData = classQuery.data as Class | undefined;
   const students = studentsQuery.data as Student[] || [];
   const challenges = customChallengesQuery.data as CustomChallenge[] || [];
@@ -183,15 +204,27 @@ export default function TeacherDashboard() {
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-7xl mx-auto">
         {/* Header */}
-        <div className="mb-8 flex items-center justify-between">
+        <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold text-primary mb-2">Tableau de Bord - {classData.teacherName}</h1>
             <p className="text-lg text-muted-foreground">Code: <span className="font-mono font-bold">{classData.code}</span></p>
           </div>
-          <Button onClick={() => navigate("/")} variant="outline" className="flex items-center gap-2">
-            <Home className="w-5 h-5" />
-            Retour
-          </Button>
+          <div className="flex items-center gap-2 flex-wrap">
+            <Button 
+              onClick={() => newMonthMutation.mutate()}
+              disabled={newMonthMutation.isPending || students.length === 0}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              data-testid="button-class-new-month"
+            >
+              <Calendar className="w-5 h-5" />
+              {newMonthMutation.isPending ? "En cours..." : "Nouveau Mois"}
+              <ArrowRight className="w-4 h-4" />
+            </Button>
+            <Button onClick={() => navigate("/")} variant="outline" className="flex items-center gap-2">
+              <Home className="w-5 h-5" />
+              Retour
+            </Button>
+          </div>
         </div>
 
         {/* Tabs */}

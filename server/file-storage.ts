@@ -835,4 +835,55 @@ export class FileStorage implements IStorage {
     if (result) this.save();
     return result;
   }
+
+  async startNewMonth(studentId: string): Promise<Student | undefined> {
+    const student = this.students.get(studentId);
+    if (!student) return undefined;
+
+    const classData = await this.getClass(student.classId);
+    const classDefaultBudget = classData?.predefinedBudget || 1500;
+    
+    const monthlyBudget = student.monthlyBudget || classDefaultBudget;
+    const previousMonth = student.currentMonth || 1;
+    const newMonth = previousMonth + 1;
+    
+    const remainingBudget = Math.max(0, student.budget);
+    const totalSavings = student.savings + remainingBudget;
+    
+    const updatedStudent: Student = {
+      ...student,
+      budget: monthlyBudget,
+      spent: 0,
+      savings: totalSavings,
+      currentMonth: newMonth,
+      monthlyBudget,
+      budgetHistory: [
+        ...(student.budgetHistory || []),
+        { 
+          budget: student.budget, 
+          date: new Date(),
+        }
+      ],
+    };
+    
+    this.students.set(studentId, updatedStudent);
+    
+    await this.resetFixedExpensesForNewMonth(studentId);
+    
+    this.save();
+    return updatedStudent;
+  }
+
+  async resetFixedExpensesForNewMonth(studentId: string): Promise<void> {
+    for (const [id, expense] of this.fixedExpenses.entries()) {
+      if (expense.studentId === studentId) {
+        this.fixedExpenses.set(id, {
+          ...expense,
+          isPaid: false,
+          dueDate: new Date(),
+        });
+      }
+    }
+    this.save();
+  }
 }

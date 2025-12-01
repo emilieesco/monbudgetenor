@@ -224,6 +224,18 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/students/:id/new-month", async (req, res) => {
+    try {
+      const student = await storage.startNewMonth(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to start new month" });
+    }
+  });
+
   // Catalog endpoints
   app.get("/api/catalog", async (req, res) => {
     try {
@@ -615,6 +627,33 @@ export async function registerRoutes(
       res.json({ success: true });
     } catch (error) {
       res.status(500).json({ error: "Erreur lors de la suppression" });
+    }
+  });
+
+  app.post("/api/classes/:id/new-month", async (req, res) => {
+    try {
+      const classData = await storage.getClass(req.params.id);
+      if (!classData) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      
+      const students = await storage.getClassStudents(req.params.id);
+      const updatedStudents = [];
+      
+      for (const student of students) {
+        const updated = await storage.startNewMonth(student.id);
+        if (updated) {
+          updatedStudents.push(updated);
+        }
+      }
+      
+      res.json({ 
+        success: true, 
+        studentsUpdated: updatedStudents.length,
+        students: updatedStudents 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to start new month for class" });
     }
   });
 

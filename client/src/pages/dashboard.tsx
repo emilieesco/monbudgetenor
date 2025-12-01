@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
@@ -160,6 +160,28 @@ export default function Dashboard() {
     },
   });
 
+  const newMonthMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/students/${studentId}/new-month`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/fixed-expenses", studentId] });
+      toast({
+        title: "Nouveau mois commencé!",
+        description: `Mois ${data.currentMonth || 2} - Tu as reçu ton budget de $${data.monthlyBudget || data.budget}`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de démarrer un nouveau mois",
+        variant: "destructive",
+      });
+    },
+  });
+
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
@@ -246,9 +268,25 @@ export default function Dashboard() {
         <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
           <div>
             <h1 className="text-4xl font-bold text-primary mb-2">Mon Budget en Or</h1>
-            <p className="text-lg text-muted-foreground">Bienvenue, {student.name}</p>
+            <div className="flex items-center gap-3">
+              <p className="text-lg text-muted-foreground">Bienvenue, {student.name}</p>
+              <Badge variant="secondary" className="text-sm">
+                <Calendar className="w-3 h-3 mr-1" />
+                Mois {student.currentMonth || 1}
+              </Badge>
+            </div>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
+            <Button
+              onClick={() => newMonthMutation.mutate()}
+              disabled={newMonthMutation.isPending}
+              className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
+              data-testid="button-new-month"
+            >
+              <Calendar className="w-5 h-5" />
+              {newMonthMutation.isPending ? "En cours..." : "Nouveau Mois"}
+              <ArrowRight className="w-4 h-4" />
+            </Button>
             <Button
               onClick={() => setShowSnapshots(!showSnapshots)}
               variant={showSnapshots ? "default" : "outline"}

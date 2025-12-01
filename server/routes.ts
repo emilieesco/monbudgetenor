@@ -1,7 +1,13 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema, createSnapshotSchema, createSavingsGoalSchema, createClassChallengeSchema, BADGE_DEFINITIONS } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema, createSnapshotSchema, createSavingsGoalSchema, createClassChallengeSchema, BADGE_DEFINITIONS, BADGE_TIER_THRESHOLDS, BadgeTier } from "@shared/schema";
+
+// Helper to get tier rank for comparison
+function getTierRank(tier: BadgeTier): number {
+  const ranks: Record<BadgeTier, number> = { bronze: 1, silver: 2, gold: 3, platinum: 4 };
+  return ranks[tier];
+}
 
 export async function registerRoutes(
   httpServer: Server,
@@ -879,55 +885,89 @@ export async function registerRoutes(
 
       const expenses = await storage.getStudentExpenses(req.params.id);
       const fixedExpenses = await storage.getFixedExpenses(req.params.id);
-      const awardedBadges = [];
+      const challenges = await storage.getStudentChallenges(req.params.id);
+      const completedChallenges = challenges.filter(c => c.completed).length;
+      const awardedBadges: any[] = [];
 
-      // Check for first purchase
+      // Helper to determine tier based on thresholds
+      const getTier = (value: number, thresholds: { bronze: number; silver: number; gold: number; platinum: number }): "bronze" | "silver" | "gold" | "platinum" | null => {
+        if (value >= thresholds.platinum) return "platinum";
+        if (value >= thresholds.gold) return "gold";
+        if (value >= thresholds.silver) return "silver";
+        if (value >= thresholds.bronze) return "bronze";
+        return null;
+      };
+
+      // Check for first purchase (always bronze tier)
       if (expenses.length >= 1) {
         const hasBadge = await storage.hasStudentBadge(req.params.id, "first_purchase");
         if (!hasBadge) {
-          const badge = await storage.awardBadge(req.params.id, "first_purchase");
-          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.first_purchase });
+          const badge = await storage.awardBadge(req.params.id, "first_purchase", "bronze");
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.first_purchase, tier: "bronze" });
         }
       }
 
-      // Check for saver badge (100$ or more in savings)
-      if (student.savings >= 100) {
-        const hasBadge = await storage.hasStudentBadge(req.params.id, "saver");
-        if (!hasBadge) {
-          const badge = await storage.awardBadge(req.params.id, "saver");
-          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.saver });
+      // Check for saver badge (tiered based on savings)
+      const saverTier = getTier(student.savings, BADGE_TIER_THRESHOLDS.saver);
+      if (saverTier) {
+        const existingBadge = await storage.getStudentBadgeByType(req.params.id, "saver");
+        if (!existingBadge || (existingBadge && getTierRank(saverTier) > getTierRank(existingBadge.tier))) {
+          const badge = await storage.awardBadge(req.params.id, "saver", saverTier);
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.saver, tier: saverTier });
         }
       }
 
-      // Check for essential master (80% essential purchases)
+      // Check for essential master (tiered based on percentage)
       if (expenses.length >= 5) {
         const essentialCount = expenses.filter(e => e.isEssential).length;
-        const ratio = essentialCount / expenses.length;
-        if (ratio >= 0.8) {
-          const hasBadge = await storage.hasStudentBadge(req.params.id, "essential_master");
-          if (!hasBadge) {
-            const badge = await storage.awardBadge(req.params.id, "essential_master");
-            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.essential_master });
+        const ratio = (essentialCount / expenses.length) * 100;
+        const essentialTier = getTier(ratio, BADGE_TIER_THRESHOLDS.essential_master);
+        if (essentialTier) {
+          const existingBadge = await storage.getStudentBadgeByType(req.params.id, "essential_master");
+          if (!existingBadge || (existingBadge && getTierRank(essentialTier) > getTierRank(existingBadge.tier))) {
+            const badge = await storage.awardBadge(req.params.id, "essential_master", essentialTier);
+            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.essential_master, tier: essentialTier });
           }
         }
       }
 
-      // Check for monthly survivor (all fixed expenses paid)
-      const allPaid = fixedExpenses.every(e => e.isPaid);
-      if (allPaid && fixedExpenses.length > 0) {
-        const hasBadge = await storage.hasStudentBadge(req.params.id, "monthly_survivor");
-        if (!hasBadge) {
-          const badge = await storage.awardBadge(req.params.id, "monthly_survivor");
-          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.monthly_survivor });
+      // Check for challenge complete badge (tiered based on count)
+      if (completedChallenges >= 1) {
+        const challengeTier = getTier(completedChallenges, BADGE_TIER_THRESHOLDS.challenge_complete);
+        if (challengeTier) {
+          const existingBadge = await storage.getStudentBadgeByType(req.params.id, "challenge_complete");
+          if (!existingBadge || (existingBadge && getTierRank(challengeTier) > getTierRank(existingBadge.tier))) {
+            const badge = await storage.awardBadge(req.params.id, "challenge_complete", challengeTier);
+            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.challenge_complete, tier: challengeTier });
+          }
         }
       }
 
-      // Check for budget hero (positive budget at end of context)
-      if (student.budget > 0 && student.spent > 0) {
-        const hasBadge = await storage.hasStudentBadge(req.params.id, "budget_hero");
-        if (!hasBadge) {
-          const badge = await storage.awardBadge(req.params.id, "budget_hero");
-          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.budget_hero });
+      // Check for monthly survivor (tiered based on months survived)
+      const allPaid = fixedExpenses.every(e => e.isPaid);
+      const currentMonth = student.currentMonth || 1;
+      if (allPaid && fixedExpenses.length > 0) {
+        const survivorTier = getTier(currentMonth, BADGE_TIER_THRESHOLDS.monthly_survivor);
+        if (survivorTier) {
+          const existingBadge = await storage.getStudentBadgeByType(req.params.id, "monthly_survivor");
+          if (!existingBadge || (existingBadge && getTierRank(survivorTier) > getTierRank(existingBadge.tier))) {
+            const badge = await storage.awardBadge(req.params.id, "monthly_survivor", survivorTier);
+            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.monthly_survivor, tier: survivorTier });
+          }
+        }
+      }
+
+      // Check for budget hero (tiered based on budget remaining percentage)
+      const remaining = student.budget - student.spent;
+      const remainingPercent = (remaining / student.budget) * 100;
+      if (remaining > 0) {
+        const heroTier = getTier(remainingPercent, BADGE_TIER_THRESHOLDS.budget_hero);
+        if (heroTier) {
+          const existingBadge = await storage.getStudentBadgeByType(req.params.id, "budget_hero");
+          if (!existingBadge || (existingBadge && getTierRank(heroTier) > getTierRank(existingBadge.tier))) {
+            const badge = await storage.awardBadge(req.params.id, "budget_hero", heroTier);
+            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.budget_hero, tier: heroTier });
+          }
         }
       }
 

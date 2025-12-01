@@ -57,9 +57,10 @@ export interface IStorage {
   resetFixedExpensesForNewMonth(studentId: string): Promise<void>;
   
   // Gamification - Badges
-  awardBadge(studentId: string, type: Badge["type"]): Promise<Badge>;
+  awardBadge(studentId: string, type: Badge["type"], tier?: Badge["tier"]): Promise<Badge>;
   getStudentBadges(studentId: string): Promise<Badge[]>;
   hasStudentBadge(studentId: string, type: Badge["type"]): Promise<boolean>;
+  getStudentBadgeByType(studentId: string, type: Badge["type"]): Promise<Badge | undefined>;
   
   // Gamification - Savings Goals
   createSavingsGoal(input: CreateSavingsGoal): Promise<SavingsGoal>;
@@ -788,16 +789,19 @@ export class MemStorage implements IStorage {
   }
 
   // Gamification - Badges
-  async awardBadge(studentId: string, type: Badge["type"]): Promise<Badge> {
-    const existing = await this.hasStudentBadge(studentId, type);
-    if (existing) {
-      const badge = Array.from(this.badges.values()).find(b => b.studentId === studentId && b.type === type);
-      return badge!;
+  async awardBadge(studentId: string, type: Badge["type"], tier: Badge["tier"] = "bronze"): Promise<Badge> {
+    const existingBadge = await this.getStudentBadgeByType(studentId, type);
+    if (existingBadge) {
+      // Update to higher tier if needed
+      const updatedBadge: Badge = { ...existingBadge, tier, earnedAt: new Date() };
+      this.badges.set(existingBadge.id, updatedBadge);
+      return updatedBadge;
     }
     const id = randomUUID();
     const badge: Badge = {
       id,
       type,
+      tier,
       studentId,
       earnedAt: new Date(),
     };
@@ -811,6 +815,10 @@ export class MemStorage implements IStorage {
 
   async hasStudentBadge(studentId: string, type: Badge["type"]): Promise<boolean> {
     return Array.from(this.badges.values()).some(b => b.studentId === studentId && b.type === type);
+  }
+
+  async getStudentBadgeByType(studentId: string, type: Badge["type"]): Promise<Badge | undefined> {
+    return Array.from(this.badges.values()).find(b => b.studentId === studentId && b.type === type);
   }
 
   // Gamification - Savings Goals

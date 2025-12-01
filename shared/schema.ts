@@ -131,20 +131,32 @@ export interface BudgetSnapshot {
   challenges: Challenge[];
 }
 
+// Badge tiers for gamification
+export type BadgeTier = "bronze" | "silver" | "gold" | "platinum";
+
 // Badge system for gamification
 export interface Badge {
   id: string;
   type: "first_purchase" | "saver" | "essential_master" | "budget_hero" | "challenge_complete" | "monthly_survivor";
+  tier: BadgeTier;
   studentId: string;
   earnedAt: Date;
 }
 
+export const BADGE_TIER_THRESHOLDS = {
+  saver: { bronze: 50, silver: 100, gold: 250, platinum: 500 },
+  essential_master: { bronze: 50, silver: 70, gold: 85, platinum: 95 },
+  budget_hero: { bronze: 5, silver: 10, gold: 15, platinum: 25 },
+  challenge_complete: { bronze: 1, silver: 3, gold: 5, platinum: 10 },
+  monthly_survivor: { bronze: 1, silver: 3, gold: 6, platinum: 12 },
+};
+
 export const BADGE_DEFINITIONS: Record<Badge["type"], { name: string; description: string; icon: string }> = {
   first_purchase: { name: "Premier Achat", description: "Vous avez fait votre premier achat!", icon: "🛒" },
-  saver: { name: "Épargnant", description: "Vous avez économisé 100$ ou plus", icon: "💰" },
-  essential_master: { name: "Maître des Essentiels", description: "80% de vos achats sont essentiels", icon: "⭐" },
+  saver: { name: "Épargnant", description: "Vous avez économisé de l'argent", icon: "💰" },
+  essential_master: { name: "Maître des Essentiels", description: "Un bon pourcentage de vos achats sont essentiels", icon: "⭐" },
   budget_hero: { name: "Héros du Budget", description: "Vous avez terminé le mois avec un surplus", icon: "🏆" },
-  challenge_complete: { name: "Défi Relevé", description: "Vous avez complété un défi", icon: "🎯" },
+  challenge_complete: { name: "Défi Relevé", description: "Vous avez complété des défis", icon: "🎯" },
   monthly_survivor: { name: "Survivant Mensuel", description: "Vous avez payé toutes vos dépenses fixes", icon: "✅" },
 };
 

@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
@@ -26,6 +26,9 @@ export default function Dashboard() {
   const [notifiedChallenges, setNotifiedChallenges] = useState<Set<string>>(new Set());
   const [snapshotLabel, setSnapshotLabel] = useState("");
   const [showSnapshots, setShowSnapshots] = useState(false);
+  const [manualExpenseName, setManualExpenseName] = useState("");
+  const [manualExpenseAmount, setManualExpenseAmount] = useState("");
+  const [manualExpenseCategory, setManualExpenseCategory] = useState<"food" | "clothing" | "leisure">("food");
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -177,6 +180,30 @@ export default function Dashboard() {
       toast({
         title: "Erreur",
         description: "Impossible de démarrer un nouveau mois",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const addManualExpenseMutation = useMutation({
+    mutationFn: async (data: { name: string; amount: number; category: string }) => {
+      const res = await apiRequest("POST", `/api/students/${studentId}/manual-expense`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", studentId] });
+      setManualExpenseName("");
+      setManualExpenseAmount("");
+      toast({
+        title: "Dépense ajoutée",
+        description: "Ta dépense a été enregistrée",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la dépense",
         variant: "destructive",
       });
     },
@@ -534,6 +561,79 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+        </Card>
+
+        {/* Manual Expense Form */}
+        <Card className="p-6 mb-8">
+          <div className="flex items-center gap-2 mb-4">
+            <Plus className="w-6 h-6 text-primary" />
+            <h2 className="text-xl font-semibold">Ajouter une Dépense</h2>
+          </div>
+          <p className="text-sm text-muted-foreground mb-4">
+            Tu peux ajouter une dépense qui n'est pas dans le catalogue
+          </p>
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="expense-name">Description</Label>
+              <Input
+                id="expense-name"
+                placeholder="Ex: Billet de bus"
+                value={manualExpenseName}
+                onChange={(e) => setManualExpenseName(e.target.value)}
+                data-testid="input-manual-expense-name"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-amount">Montant ($)</Label>
+              <Input
+                id="expense-amount"
+                type="number"
+                placeholder="0.00"
+                value={manualExpenseAmount}
+                onChange={(e) => setManualExpenseAmount(e.target.value)}
+                min="0.01"
+                step="0.01"
+                data-testid="input-manual-expense-amount"
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="expense-category">Catégorie</Label>
+              <select
+                id="expense-category"
+                value={manualExpenseCategory}
+                onChange={(e) => setManualExpenseCategory(e.target.value as "food" | "clothing" | "leisure")}
+                className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                data-testid="select-manual-expense-category"
+              >
+                <option value="food">Nourriture</option>
+                <option value="clothing">Vêtements</option>
+                <option value="leisure">Loisirs</option>
+              </select>
+            </div>
+            <div className="flex items-end">
+              <Button
+                onClick={() => {
+                  const amount = parseFloat(manualExpenseAmount);
+                  if (manualExpenseName.trim() && amount > 0) {
+                    addManualExpenseMutation.mutate({
+                      name: manualExpenseName.trim(),
+                      amount,
+                      category: manualExpenseCategory,
+                    });
+                  }
+                }}
+                disabled={addManualExpenseMutation.isPending || !manualExpenseName.trim() || !manualExpenseAmount}
+                className="w-full"
+                data-testid="button-add-manual-expense"
+              >
+                <Plus className="w-4 h-4 mr-2" />
+                Ajouter
+              </Button>
+            </div>
+          </div>
+          {manualExpenseAmount && parseFloat(manualExpenseAmount) > remaining && (
+            <p className="text-xs text-destructive mt-2">Attention: Cette dépense dépasse ton budget restant</p>
+          )}
         </Card>
 
         {/* Bonus Expenses Alert */}

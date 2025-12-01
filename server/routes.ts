@@ -236,6 +236,38 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/students/:id/manual-expense", async (req, res) => {
+    try {
+      const { name, amount, category } = req.body;
+      if (!name || !amount || amount <= 0) {
+        return res.status(400).json({ error: "Invalid expense data" });
+      }
+      
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Student not found" });
+      }
+      
+      const expense = await storage.addExpense({
+        studentId: req.params.id,
+        itemId: `manual-${Date.now()}`,
+        amount: parseFloat(amount),
+        category: category || "leisure",
+        isEssential: false,
+        feedback: "warning",
+        message: `Dépense manuelle: ${name}`,
+      });
+      
+      const newBudget = student.budget - parseFloat(amount);
+      const newSpent = student.spent + parseFloat(amount);
+      await storage.updateStudentBudgetAndSpent(req.params.id, newBudget, newSpent);
+      
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to add manual expense" });
+    }
+  });
+
   // Catalog endpoints
   app.get("/api/catalog", async (req, res) => {
     try {

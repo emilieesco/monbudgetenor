@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent } from "@shared/schema";
 
@@ -30,6 +30,10 @@ export default function TeacherDashboard() {
   const [eventTitle, setEventTitle] = useState("");
   const [eventDesc, setEventDesc] = useState("");
   const [eventAmount, setEventAmount] = useState("");
+  const [expenseStudentId, setExpenseStudentId] = useState("");
+  const [expenseName, setExpenseName] = useState("");
+  const [expenseAmount, setExpenseAmount] = useState("");
+  const [expenseCategory, setExpenseCategory] = useState<"food" | "clothing" | "leisure">("leisure");
 
   // Queries
   const classQuery = useQuery({ queryKey: ["/api/classes", classId] });
@@ -190,6 +194,36 @@ export default function TeacherDashboard() {
     },
   });
 
+  const addStudentExpenseMutation = useMutation({
+    mutationFn: async (data: { studentId: string; name: string; amount: number; category: string }) => {
+      const res = await apiRequest("POST", `/api/students/${data.studentId}/manual-expense`, {
+        name: data.name,
+        amount: data.amount,
+        category: data.category,
+      });
+      return { expense: await res.json(), studentId: data.studentId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/students", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", data.studentId] });
+      setExpenseStudentId("");
+      setExpenseName("");
+      setExpenseAmount("");
+      toast({
+        title: "Dépense ajoutée!",
+        description: "La dépense a été ajoutée au budget de l'élève.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'ajouter la dépense.",
+        variant: "destructive",
+      });
+    },
+  });
+
   const classData = classQuery.data as Class | undefined;
   const students = studentsQuery.data as Student[] || [];
   const challenges = customChallengesQuery.data as CustomChallenge[] || [];
@@ -258,8 +292,94 @@ export default function TeacherDashboard() {
 
         {/* Students Tab */}
         {activeTab === "students" && (
-          <div className="space-y-4">
+          <div className="space-y-6">
             <h2 className="text-2xl font-bold mb-4">Étudiants de la Classe ({students.length})</h2>
+            
+            {/* Add Expense to Student Form */}
+            {students.length > 0 && (
+              <Card className="p-6 border-primary/30">
+                <div className="flex items-center gap-2 mb-4">
+                  <DollarSign className="w-6 h-6 text-primary" />
+                  <h3 className="text-lg font-semibold">Ajouter une Dépense à un Élève</h3>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="expense-student">Élève</Label>
+                    <select
+                      id="expense-student"
+                      value={expenseStudentId}
+                      onChange={(e) => setExpenseStudentId(e.target.value)}
+                      className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                      data-testid="select-expense-student"
+                    >
+                      <option value="">Sélectionner un élève</option>
+                      {students.map(s => (
+                        <option key={s.id} value={s.id}>{s.name}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="expense-name-teacher">Description</Label>
+                    <Input
+                      id="expense-name-teacher"
+                      placeholder="Ex: Sortie scolaire"
+                      value={expenseName}
+                      onChange={(e) => setExpenseName(e.target.value)}
+                      data-testid="input-expense-name-teacher"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="expense-amount-teacher">Montant ($)</Label>
+                    <Input
+                      id="expense-amount-teacher"
+                      type="number"
+                      placeholder="0.00"
+                      value={expenseAmount}
+                      onChange={(e) => setExpenseAmount(e.target.value)}
+                      min="0.01"
+                      step="0.01"
+                      data-testid="input-expense-amount-teacher"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="expense-category-teacher">Catégorie</Label>
+                    <select
+                      id="expense-category-teacher"
+                      value={expenseCategory}
+                      onChange={(e) => setExpenseCategory(e.target.value as "food" | "clothing" | "leisure")}
+                      className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
+                      data-testid="select-expense-category-teacher"
+                    >
+                      <option value="food">Nourriture</option>
+                      <option value="clothing">Vêtements</option>
+                      <option value="leisure">Loisirs</option>
+                    </select>
+                  </div>
+                  <div className="flex items-end">
+                    <Button
+                      onClick={() => {
+                        const amount = parseFloat(expenseAmount);
+                        if (expenseStudentId && expenseName.trim() && amount > 0) {
+                          addStudentExpenseMutation.mutate({
+                            studentId: expenseStudentId,
+                            name: expenseName.trim(),
+                            amount,
+                            category: expenseCategory,
+                          });
+                        }
+                      }}
+                      disabled={addStudentExpenseMutation.isPending || !expenseStudentId || !expenseName.trim() || !expenseAmount}
+                      className="w-full"
+                      data-testid="button-add-student-expense"
+                    >
+                      <Plus className="w-4 h-4 mr-2" />
+                      Ajouter
+                    </Button>
+                  </div>
+                </div>
+              </Card>
+            )}
+            
             {students.length === 0 ? (
               <Card className="p-8 text-center">
                 <p className="text-muted-foreground">Aucun étudiant n'a rejoint la classe pour le moment.</p>

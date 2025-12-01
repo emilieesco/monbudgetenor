@@ -59,7 +59,25 @@ This abstraction allows future migration to database storage (Drizzle ORM is con
 4. **Expense**: Transaction records linking students to catalog items with feedback messages
 5. **FixedExpense**: Recurring monthly expenses (rent, utilities, insurance) that students must pay
 6. **BonusExpense**: Teacher-created surprise expenses to challenge students
-7. **Challenge**: Optional goals students can complete for rewards
+7. **Challenge**: Class-level challenges created by teachers with participation tracking
+8. **Badge**: Tiered achievement badges (bronze/silver/gold/platinum) awarded automatically based on performance
+9. **SavingsGoal**: Student-defined savings targets with progress tracking
+
+### Gamification System
+
+**Badge Types & Tier Thresholds**:
+- `first_purchase`: Awarded on first catalog purchase (always bronze)
+- `saver`: Based on savings amount - bronze ($50), silver ($100), gold ($250), platinum ($500)
+- `essential_master`: Based on essential purchase ratio - bronze (50%), silver (70%), gold (85%), platinum (95%)
+- `budget_hero`: Based on remaining budget percentage - bronze (5%), silver (10%), gold (15%), platinum (25%)
+- `challenge_complete`: Based on challenges completed - bronze (1), silver (3), gold (5), platinum (10)
+- `monthly_survivor`: Based on months survived - bronze (1), silver (3), gold (6), platinum (12)
+
+**Badge Checking**: POST `/api/students/:id/check-badges` evaluates all badge criteria and awards/upgrades badges automatically
+
+**Class Challenges**: Teachers can create challenges with goals and rewards; students participate and track progress
+
+**Leaderboard**: Teacher dashboard includes a leaderboard ranking students by savings, badges earned, and budget efficiency
 
 **Validation**: Zod schemas (e.g., `insertStudentSchema`, `createClassSchema`) provide runtime type validation for API inputs, with drizzle-zod integration for potential database schema generation.
 

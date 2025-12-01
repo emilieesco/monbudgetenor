@@ -9,13 +9,13 @@ import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
 import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
-import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent, ClassChallenge } from "@shared/schema";
+import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent, ClassChallenge, BonusExpense, Expense } from "@shared/schema";
 
 export default function TeacherDashboard() {
   const { classId } = useParams();
   const [_location, navigate] = useLocation();
   const { toast } = useToast();
-  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "leaderboard" | "config">("students");
+  const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "leaderboard" | "historique" | "config">("students");
   const [expenseAmounts, setExpenseAmounts] = useState<{ [key: string]: number }>({});
   const [predefinedBudget, setPredefinedBudget] = useState<number | "">(""); 
   
@@ -61,6 +61,12 @@ export default function TeacherDashboard() {
   });
   const leaderboardQuery = useQuery({
     queryKey: ["/api/classes", classId, "leaderboard"],
+  });
+  const classBonusExpensesQuery = useQuery({
+    queryKey: ["/api/classes", classId, "bonus-expenses"],
+  });
+  const classExpensesQuery = useQuery({
+    queryKey: ["/api/classes", classId, "expenses"],
   });
 
   // Mutations
@@ -248,6 +254,7 @@ export default function TeacherDashboard() {
       queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
       queryClient.invalidateQueries({ queryKey: ["/api/students", data.studentId] });
       queryClient.invalidateQueries({ queryKey: ["/api/expenses", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bonus-expenses", data.studentId] });
       setExpenseStudentId("");
       setExpenseName("");
       setExpenseAmount("");
@@ -260,6 +267,54 @@ export default function TeacherDashboard() {
       toast({
         title: "Erreur",
         description: "Impossible d'ajouter la dépense.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteBonusExpenseMutation = useMutation({
+    mutationFn: async (data: { expenseId: string; studentId: string }) => {
+      const res = await apiRequest("DELETE", `/api/bonus-expenses/${data.expenseId}`);
+      return { result: await res.json(), studentId: data.studentId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "bonus-expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/students", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bonus-expenses", data.studentId] });
+      toast({
+        title: "Dépense supprimée!",
+        description: "La dépense a été supprimée et le budget remboursé.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la dépense.",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const deleteExpenseMutation = useMutation({
+    mutationFn: async (data: { expenseId: string; studentId: string }) => {
+      const res = await apiRequest("DELETE", `/api/expenses/${data.expenseId}`);
+      return { result: await res.json(), studentId: data.studentId };
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "expenses"] });
+      queryClient.invalidateQueries({ queryKey: ["/api/students", data.studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", data.studentId] });
+      toast({
+        title: "Dépense supprimée!",
+        description: "La dépense a été supprimée et le budget remboursé.",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de supprimer la dépense.",
         variant: "destructive",
       });
     },
@@ -318,6 +373,8 @@ export default function TeacherDashboard() {
   const events = eventsQuery.data as SurpriseEvent[] || [];
   const classChallenges = classChallengesQuery.data as ClassChallenge[] || [];
   const leaderboard = leaderboardQuery.data as Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}> || [];
+  const classBonusExpenses = classBonusExpensesQuery.data as Array<BonusExpense & { studentName: string }> || [];
+  const classExpenses = classExpensesQuery.data as Array<Expense & { studentName: string }> || [];
 
   if (!classData) {
     return <div className="p-8">Chargement...</div>;
@@ -352,7 +409,7 @@ export default function TeacherDashboard() {
 
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
-          {["students", "challenges", "messages", "events", "leaderboard", "config"].map(tab => (
+          {["students", "challenges", "messages", "events", "leaderboard", "historique", "config"].map(tab => (
             <Button
               key={tab}
               variant={activeTab === tab ? "default" : "outline"}
@@ -371,12 +428,14 @@ export default function TeacherDashboard() {
               {tab === "messages" && <Send className="w-4 h-4" />}
               {tab === "events" && <Gift className="w-4 h-4" />}
               {tab === "leaderboard" && <Trophy className="w-4 h-4" />}
+              {tab === "historique" && <Trash2 className="w-4 h-4" />}
               {tab === "config" && <Settings className="w-4 h-4" />}
               {tab === "students" && "Étudiants"}
               {tab === "challenges" && "Défis"}
               {tab === "messages" && "Messages"}
               {tab === "events" && "Événements"}
               {tab === "leaderboard" && "Classement"}
+              {tab === "historique" && "Historique"}
               {tab === "config" && "Configuration"}
             </Button>
           ))}
@@ -997,6 +1056,98 @@ export default function TeacherDashboard() {
                 </Card>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Historique Tab */}
+        {activeTab === "historique" && (
+          <div className="space-y-8">
+            {/* Bonus Expenses (Teacher-added) */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <DollarSign className="w-6 h-6 text-primary" />
+                <h2 className="text-2xl font-bold">Dépenses Ajoutées par l'Enseignant</h2>
+                <Badge variant="secondary">{classBonusExpenses.length}</Badge>
+              </div>
+              
+              {classBonusExpenses.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">Aucune dépense ajoutée par l'enseignant.</p>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {classBonusExpenses.map(expense => (
+                    <div key={expense.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold">{expense.title}</span>
+                          <Badge variant="outline">{expense.studentName}</Badge>
+                          {expense.category && <Badge variant="secondary">{expense.category}</Badge>}
+                        </div>
+                        <p className="text-sm text-muted-foreground">{expense.description}</p>
+                        <p className="text-sm text-muted-foreground">
+                          {new Date(expense.createdAt).toLocaleDateString('fr-CA')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-bold text-destructive">${expense.amount.toFixed(2)}</span>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          onClick={() => deleteBonusExpenseMutation.mutate({ expenseId: expense.id, studentId: expense.studentId })}
+                          disabled={deleteBonusExpenseMutation.isPending}
+                          data-testid={`button-delete-bonus-${expense.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
+
+            {/* Catalog Expenses (Student purchases) */}
+            <Card className="p-6">
+              <div className="flex items-center gap-2 mb-6">
+                <DollarSign className="w-6 h-6 text-orange-500" />
+                <h2 className="text-2xl font-bold">Achats des Élèves (Catalogue)</h2>
+                <Badge variant="secondary">{classExpenses.length}</Badge>
+              </div>
+              
+              {classExpenses.length === 0 ? (
+                <p className="text-muted-foreground text-center py-8">Aucun achat effectué par les élèves.</p>
+              ) : (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {classExpenses.map(expense => (
+                    <div key={expense.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="font-semibold">{expense.message}</span>
+                          <Badge variant="outline">{expense.studentName}</Badge>
+                          <Badge variant={expense.isEssential ? "default" : "destructive"}>
+                            {expense.isEssential ? "Essentiel" : "Non-essentiel"}
+                          </Badge>
+                        </div>
+                        <p className="text-sm text-muted-foreground">
+                          {expense.category} - {new Date(expense.timestamp).toLocaleDateString('fr-CA')}
+                        </p>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span className="font-bold text-destructive">${expense.amount.toFixed(2)}</span>
+                        <Button
+                          size="icon"
+                          variant="destructive"
+                          onClick={() => deleteExpenseMutation.mutate({ expenseId: expense.id, studentId: expense.studentId })}
+                          disabled={deleteExpenseMutation.isPending}
+                          data-testid={`button-delete-expense-${expense.id}`}
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </Card>
           </div>
         )}
 

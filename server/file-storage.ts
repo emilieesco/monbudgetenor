@@ -562,6 +562,42 @@ export class FileStorage implements IStorage {
     return Array.from(this.expenses.values());
   }
 
+  async deleteExpense(id: string): Promise<boolean> {
+    const expense = this.expenses.get(id);
+    if (!expense) return false;
+    
+    // Refund the student
+    const student = await this.getStudent(expense.studentId);
+    if (student) {
+      const newBudget = student.budget + expense.amount;
+      const newSpent = Math.max(0, (student.spent || 0) - expense.amount);
+      await this.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
+    }
+    
+    this.expenses.delete(id);
+    this.save();
+    return true;
+  }
+
+  async deleteStudentExpenses(studentId: string): Promise<void> {
+    const studentExpenses = await this.getStudentExpenses(studentId);
+    let totalRefund = 0;
+    
+    for (const expense of studentExpenses) {
+      totalRefund += expense.amount;
+      this.expenses.delete(expense.id);
+    }
+    
+    // Refund the student
+    const student = await this.getStudent(studentId);
+    if (student) {
+      const newBudget = student.budget + totalRefund;
+      await this.updateStudentBudgetAndSpent(studentId, newBudget, 0);
+    }
+    
+    this.save();
+  }
+
   async getFixedExpenses(studentId: string): Promise<FixedExpense[]> {
     return Array.from(this.fixedExpenses.values()).filter(e => e.studentId === studentId);
   }
@@ -642,6 +678,21 @@ export class FileStorage implements IStorage {
     this.bonusExpenses.set(id, updated);
     this.save();
     return updated;
+  }
+
+  async deleteBonusExpense(id: string): Promise<boolean> {
+    const bonus = this.bonusExpenses.get(id);
+    if (!bonus) return false;
+    
+    // Refund the student
+    const student = await this.getStudent(bonus.studentId);
+    if (student) {
+      await this.updateStudentBudget(bonus.studentId, student.budget + bonus.amount);
+    }
+    
+    this.bonusExpenses.delete(id);
+    this.save();
+    return true;
   }
 
   async deleteClassBonusExpenses(classId: string): Promise<void> {

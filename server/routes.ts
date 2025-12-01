@@ -269,6 +269,42 @@ export async function registerRoutes(
     }
   });
 
+  // Delete expense (catalog purchase)
+  app.delete("/api/expenses/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteExpense(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Dépense introuvable" });
+      }
+      res.json({ success: true, message: "Dépense supprimée et budget remboursé" });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression de la dépense" });
+    }
+  });
+
+  // Delete all expenses for a student
+  app.delete("/api/students/:id/expenses", async (req, res) => {
+    try {
+      await storage.deleteStudentExpenses(req.params.id);
+      res.json({ success: true, message: "Toutes les dépenses ont été supprimées" });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression des dépenses" });
+    }
+  });
+
+  // Delete bonus expense
+  app.delete("/api/bonus-expenses/:id", async (req, res) => {
+    try {
+      const deleted = await storage.deleteBonusExpense(req.params.id);
+      if (!deleted) {
+        return res.status(404).json({ error: "Dépense bonus introuvable" });
+      }
+      res.json({ success: true, message: "Dépense bonus supprimée et budget remboursé" });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression de la dépense bonus" });
+    }
+  });
+
   // Catalog endpoints
   app.get("/api/catalog", async (req, res) => {
     try {
@@ -867,6 +903,48 @@ export async function registerRoutes(
       res.json(leaderboard);
     } catch (error) {
       res.status(500).json({ error: "Erreur lors de la récupération du classement" });
+    }
+  });
+
+  // Get all bonus expenses for a class (for teacher history management)
+  app.get("/api/classes/:id/bonus-expenses", async (req, res) => {
+    try {
+      const students = await storage.getClassStudents(req.params.id);
+      const allExpenses: Array<BonusExpense & { studentName: string }> = [];
+      
+      for (const student of students) {
+        const expenses = await storage.getStudentBonusExpenses(student.id);
+        expenses.forEach(exp => {
+          allExpenses.push({ ...exp, studentName: student.name });
+        });
+      }
+      
+      // Sort by date, most recent first
+      allExpenses.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      res.json(allExpenses);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des dépenses" });
+    }
+  });
+
+  // Get all catalog expenses for a class (for teacher history management)
+  app.get("/api/classes/:id/expenses", async (req, res) => {
+    try {
+      const students = await storage.getClassStudents(req.params.id);
+      const allExpenses: Array<Expense & { studentName: string }> = [];
+      
+      for (const student of students) {
+        const expenses = await storage.getStudentExpenses(student.id);
+        expenses.forEach(exp => {
+          allExpenses.push({ ...exp, studentName: student.name });
+        });
+      }
+      
+      // Sort by date, most recent first
+      allExpenses.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      res.json(allExpenses);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des dépenses" });
     }
   });
 

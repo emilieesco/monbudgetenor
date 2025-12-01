@@ -23,6 +23,8 @@ export interface IStorage {
   addExpense(expense: InsertExpense): Promise<Expense>;
   getStudentExpenses(studentId: string): Promise<Expense[]>;
   getAllExpenses(): Promise<Expense[]>;
+  deleteExpense(id: string): Promise<boolean>;
+  deleteStudentExpenses(studentId: string): Promise<void>;
   getFixedExpenses(studentId: string): Promise<FixedExpense[]>;
   createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense>;
   deleteStudentFixedExpenses(studentId: string): Promise<void>;
@@ -34,6 +36,7 @@ export interface IStorage {
   createBonusExpense(input: CreateBonusExpense, classId: string): Promise<BonusExpense>;
   getStudentBonusExpenses(studentId: string): Promise<BonusExpense[]>;
   payBonusExpense(id: string): Promise<BonusExpense | undefined>;
+  deleteBonusExpense(id: string): Promise<boolean>;
   deleteClassBonusExpenses(classId: string): Promise<void>;
   createChallenge(input: CreateChallenge): Promise<Challenge>;
   getStudentChallenges(studentId: string): Promise<Challenge[]>;
@@ -433,6 +436,42 @@ export class MemStorage implements IStorage {
     return Array.from(this.expenses.values());
   }
 
+  async deleteExpense(id: string): Promise<boolean> {
+    const expense = this.expenses.get(id);
+    if (!expense) return false;
+    
+    // Refund the student
+    const student = await this.getStudent(expense.studentId);
+    if (student) {
+      const newBudget = student.budget + expense.amount;
+      const newSpent = Math.max(0, (student.spent || 0) - expense.amount);
+      await this.updateStudentBudgetAndSpent(expense.studentId, newBudget, newSpent);
+    }
+    
+    this.expenses.delete(id);
+    this.expenseSequence = this.expenseSequence.filter(e => e.id !== id);
+    return true;
+  }
+
+  async deleteStudentExpenses(studentId: string): Promise<void> {
+    const studentExpenses = await this.getStudentExpenses(studentId);
+    let totalRefund = 0;
+    
+    for (const expense of studentExpenses) {
+      totalRefund += expense.amount;
+      this.expenses.delete(expense.id);
+    }
+    
+    this.expenseSequence = this.expenseSequence.filter(e => e.studentId !== studentId);
+    
+    // Refund the student
+    const student = await this.getStudent(studentId);
+    if (student) {
+      const newBudget = student.budget + totalRefund;
+      await this.updateStudentBudgetAndSpent(studentId, newBudget, 0);
+    }
+  }
+
   async getFixedExpenses(studentId: string): Promise<FixedExpense[]> {
     return Array.from(this.fixedExpenses.values()).filter(e => e.studentId === studentId);
   }
@@ -522,6 +561,20 @@ export class MemStorage implements IStorage {
     const updated = { ...bonus, isPaid: true };
     this.bonusExpenses.set(id, updated);
     return updated;
+  }
+
+  async deleteBonusExpense(id: string): Promise<boolean> {
+    const bonus = this.bonusExpenses.get(id);
+    if (!bonus) return false;
+    
+    // Refund the student
+    const student = await this.getStudent(bonus.studentId);
+    if (student) {
+      await this.updateStudentBudget(bonus.studentId, student.budget + bonus.amount);
+    }
+    
+    this.bonusExpenses.delete(id);
+    return true;
   }
 
   async deleteClassBonusExpenses(classId: string): Promise<void> {

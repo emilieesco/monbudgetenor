@@ -128,6 +128,34 @@ export default function TeacherDashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/surprise-events", classId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      setSelectedStudentId("");
+      toast({
+        title: "Événement appliqué!",
+        description: "L'événement a été appliqué à l'élève.",
+      });
+    },
+  });
+
+  const applyEventToAllMutation = useMutation({
+    mutationFn: async (eventId: string) => {
+      const res = await apiRequest("PATCH", `/api/surprise-events/${eventId}/apply-all`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/surprise-events", classId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "students"] });
+      toast({
+        title: "Événement appliqué à toute la classe!",
+        description: `${data.appliedTo} élève(s) ont reçu cet événement.`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'appliquer l'événement à la classe.",
+        variant: "destructive",
+      });
     },
   });
 
@@ -646,39 +674,55 @@ export default function TeacherDashboard() {
                 <h3 className="text-xl font-bold mb-4">Événements Actifs</h3>
                 <div className="space-y-3">
                   {events.map(event => (
-                    <div key={event.id} className="flex items-center justify-between p-4 bg-muted rounded-lg">
-                      <div className="flex-1">
-                        <p className="font-semibold">{event.title}</p>
-                        <p className="text-sm text-muted-foreground">{event.description}</p>
-                        <p className="text-sm font-bold mt-1">
-                          {event.type === "bonus_salary" && "💰 "}
-                          {event.type === "emergency_expense" && "⚠️ "}
-                          {event.type === "promo" && "🏪 "}
-                          ${event.amount}
-                        </p>
+                    <div key={event.id} className="p-4 bg-muted rounded-lg">
+                      <div className="flex items-center justify-between mb-3">
+                        <div className="flex-1">
+                          <p className="font-semibold">{event.title}</p>
+                          <p className="text-sm text-muted-foreground">{event.description}</p>
+                          <p className="text-sm font-bold mt-1">
+                            {event.type === "bonus_salary" && <span className="text-green-600">+ ${event.amount}</span>}
+                            {event.type === "emergency_expense" && <span className="text-destructive">- ${event.amount}</span>}
+                            {event.type === "promo" && <span className="text-blue-600">Promo ${event.amount}</span>}
+                          </p>
+                        </div>
                       </div>
-                      {event.type === "bonus_salary" || event.type === "emergency_expense" ? (
-                        <select
-                          value={selectedStudentId}
-                          onChange={(e) => setSelectedStudentId(e.target.value)}
-                          className="px-2 py-1 border border-border rounded text-sm bg-background"
-                          data-testid="select-event-student"
-                        >
-                          <option value="">Appliquer à...</option>
-                          {students.map(s => (
-                            <option key={s.id} value={s.id}>{s.name}</option>
-                          ))}
-                        </select>
-                      ) : null}
-                      {selectedStudentId && (event.type === "bonus_salary" || event.type === "emergency_expense") && (
-                        <Button
-                          size="sm"
-                          onClick={() => applyEventMutation.mutate(event.id)}
-                          disabled={applyEventMutation.isPending}
-                          className="ml-2"
-                        >
-                          Appliquer
-                        </Button>
+                      {(event.type === "bonus_salary" || event.type === "emergency_expense") && (
+                        <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-border/50">
+                          <Button
+                            size="sm"
+                            variant="default"
+                            onClick={() => applyEventToAllMutation.mutate(event.id)}
+                            disabled={applyEventToAllMutation.isPending || students.length === 0}
+                            className="bg-purple-600 hover:bg-purple-700"
+                            data-testid={`button-apply-all-${event.id}`}
+                          >
+                            <Users className="w-4 h-4 mr-2" />
+                            Appliquer à toute la classe ({students.length})
+                          </Button>
+                          <span className="text-muted-foreground text-sm">ou</span>
+                          <select
+                            value={selectedStudentId}
+                            onChange={(e) => setSelectedStudentId(e.target.value)}
+                            className="px-2 py-1 border border-border rounded text-sm bg-background"
+                            data-testid={`select-event-student-${event.id}`}
+                          >
+                            <option value="">Un élève...</option>
+                            {students.map(s => (
+                              <option key={s.id} value={s.id}>{s.name}</option>
+                            ))}
+                          </select>
+                          {selectedStudentId && (
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => applyEventMutation.mutate(event.id)}
+                              disabled={applyEventMutation.isPending}
+                              data-testid={`button-apply-one-${event.id}`}
+                            >
+                              Appliquer
+                            </Button>
+                          )}
+                        </div>
                       )}
                     </div>
                   ))}

@@ -618,6 +618,43 @@ export async function registerRoutes(
     }
   });
 
+  // Apply surprise event to ALL students in the class
+  app.patch("/api/surprise-events/:id/apply-all", async (req, res) => {
+    try {
+      const event = await storage.getSurpriseEvent(req.params.id);
+      if (!event) {
+        return res.status(404).json({ error: "Event not found" });
+      }
+      
+      const students = await storage.getClassStudents(event.classId);
+      if (students.length === 0) {
+        return res.status(400).json({ error: "No students in class" });
+      }
+      
+      const results = [];
+      for (const student of students) {
+        // Apply event to student budget
+        let newBudget = student.budget;
+        if (event.type === "bonus_salary") {
+          newBudget += event.amount;
+        } else if (event.type === "emergency_expense") {
+          newBudget -= event.amount;
+        }
+        await storage.updateStudentBudget(student.id, newBudget);
+        await storage.applyStudentSurpriseEvent(req.params.id, student.id);
+        results.push({ studentId: student.id, studentName: student.name, newBudget });
+      }
+      
+      res.json({ 
+        event, 
+        appliedTo: results.length, 
+        students: results 
+      });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to apply event to all students" });
+    }
+  });
+
   // Budget Snapshot endpoints
   app.post("/api/students/:id/snapshots", async (req, res) => {
     try {

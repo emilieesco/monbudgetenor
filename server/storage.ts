@@ -46,6 +46,7 @@ export interface IStorage {
   getClassMessages(classId: string): Promise<TeacherMessage[]>;
   getStudentMessages(studentId: string): Promise<TeacherMessage[]>;
   createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent>;
+  getSurpriseEvent(eventId: string): Promise<SurpriseEvent | undefined>;
   getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]>;
   applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined>;
   createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot>;
@@ -594,6 +595,10 @@ export class MemStorage implements IStorage {
     };
     this.surpriseEvents.set(id, event);
     return event;
+  }
+
+  async getSurpriseEvent(eventId: string): Promise<SurpriseEvent | undefined> {
+    return this.surpriseEvents.get(eventId);
   }
 
   async getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]> {

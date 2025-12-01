@@ -718,6 +718,10 @@ export class FileStorage implements IStorage {
     return event;
   }
 
+  async getSurpriseEvent(eventId: string): Promise<SurpriseEvent | undefined> {
+    return this.surpriseEvents.get(eventId);
+  }
+
   async getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]> {
     return Array.from(this.surpriseEvents.values()).filter(e => e.classId === classId && !e.appliedAt);
   }

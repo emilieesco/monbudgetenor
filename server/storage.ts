@@ -15,6 +15,8 @@ export interface IStorage {
   updateStudentBudget(id: string, budget: number): Promise<Student | undefined>;
   updateStudentBudgetWithHistory(id: string, budget: number): Promise<Student | undefined>;
   updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined>;
+  clearStudentBudgetHistory(id: string): Promise<Student | undefined>;
+  resetStudentBudget(id: string, newBudget: number): Promise<Student | undefined>;
   updateStudentSavings(id: string, savings: number): Promise<Student | undefined>;
   updateStudentCustomExpenses(id: string, customExpenses: Record<string, number>): Promise<Student | undefined>;
   getCatalogItems(category?: string): Promise<CatalogItem[]>;
@@ -356,6 +358,28 @@ export class MemStorage implements IStorage {
     const budgetHistory = student.budgetHistory || [];
     budgetHistory.push({ budget, date: new Date() });
     const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory };
+    this.students.set(id, updated);
+    return updated;
+  }
+
+  async clearStudentBudgetHistory(id: string): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, budgetHistory: [] };
+    this.students.set(id, updated);
+    return updated;
+  }
+
+  async resetStudentBudget(id: string, newBudget: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { 
+      ...student, 
+      budget: newBudget, 
+      spent: 0, 
+      savings: 0,
+      budgetHistory: [{ budget: newBudget, date: new Date() }]
+    };
     this.students.set(id, updated);
     return updated;
   }

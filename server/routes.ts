@@ -230,6 +230,33 @@ export async function registerRoutes(
     }
   });
 
+  // Clear budget history (essais)
+  app.delete("/api/students/:id/budget-history", async (req, res) => {
+    try {
+      const student = await storage.clearStudentBudgetHistory(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Étudiant introuvable" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression de l'historique" });
+    }
+  });
+
+  // Reset student budget completely (new budget, clear spent/savings, reset history)
+  app.post("/api/students/:id/reset-budget", async (req, res) => {
+    try {
+      const { budget } = updateBudgetSchema.parse(req.body);
+      const student = await storage.resetStudentBudget(req.params.id, budget);
+      if (!student) {
+        return res.status(404).json({ error: "Étudiant introuvable" });
+      }
+      res.json(student);
+    } catch (error) {
+      res.status(400).json({ error: "Données invalides" });
+    }
+  });
+
   app.post("/api/students/:id/new-month", async (req, res) => {
     try {
       const student = await storage.startNewMonth(req.params.id);

@@ -171,6 +171,27 @@ export default function Dashboard() {
     },
   });
 
+  const clearBudgetHistoryMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("DELETE", `/api/students/${studentId}/budget-history`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      toast({
+        title: "Historique effacé",
+        description: "L'historique de tes essais de budget a été supprimé",
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible d'effacer l'historique",
+        variant: "destructive",
+      });
+    },
+  });
+
   const newMonthMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/students/${studentId}/new-month`);
@@ -654,15 +675,35 @@ export default function Dashboard() {
         {/* Budget History */}
         {student.budgetHistory && student.budgetHistory.length > 1 && (
           <Card className="p-6 mb-8">
-            <h2 className="text-xl font-semibold mb-4">Historique de tes Budgets</h2>
-            <div className="space-y-2">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <History className="w-5 h-5 text-muted-foreground" />
+                <h2 className="text-xl font-semibold">Historique de tes Budgets</h2>
+                <Badge variant="secondary">{student.budgetHistory.length} essais</Badge>
+              </div>
+              <Button
+                variant="destructive"
+                size="sm"
+                onClick={() => clearBudgetHistoryMutation.mutate()}
+                disabled={clearBudgetHistoryMutation.isPending}
+                className="flex items-center gap-2"
+                data-testid="button-clear-budget-history"
+              >
+                <Trash2 className="w-4 h-4" />
+                {clearBudgetHistoryMutation.isPending ? "Suppression..." : "Effacer l'historique"}
+              </Button>
+            </div>
+            <p className="text-sm text-muted-foreground mb-4">
+              Cet historique montre tes différentes tentatives de configuration du budget. Tu peux l'effacer pour repartir proprement.
+            </p>
+            <div className="space-y-2 max-h-64 overflow-y-auto">
               {student.budgetHistory.map((h, i) => {
                 const date = typeof h.date === 'string' ? new Date(h.date) : h.date;
                 return (
                   <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">
-                    <span className="text-sm">Essai {student.budgetHistory!.length - i}</span>
-                    <span className="font-bold">${h.budget.toFixed(2)}</span>
-                    <span className="text-xs text-muted-foreground">{date.toLocaleDateString()}</span>
+                    <span className="text-sm font-medium">Essai {student.budgetHistory!.length - i}</span>
+                    <span className="font-bold text-primary">${h.budget.toFixed(2)}</span>
+                    <span className="text-xs text-muted-foreground">{date.toLocaleDateString('fr-CA')}</span>
                   </div>
                 );
               })}

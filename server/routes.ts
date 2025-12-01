@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema, createSnapshotSchema } from "@shared/schema";
+import { insertStudentSchema, insertExpenseSchema, updateBudgetSchema, insertCatalogItemSchema, createClassSchema, joinClassSchema, createBonusExpenseSchema, createChallengeSchema, createCustomChallengeSchema, createTeacherMessageSchema, createSurpriseEventSchema, createSnapshotSchema, createSavingsGoalSchema, createClassChallengeSchema, BADGE_DEFINITIONS } from "@shared/schema";
 
 export async function registerRoutes(
   httpServer: Server,
@@ -723,6 +723,217 @@ export async function registerRoutes(
       });
     } catch (error) {
       res.status(500).json({ error: "Failed to start new month for class" });
+    }
+  });
+
+  // ============ GAMIFICATION ENDPOINTS ============
+
+  // Badge endpoints
+  app.get("/api/students/:id/badges", async (req, res) => {
+    try {
+      const badges = await storage.getStudentBadges(req.params.id);
+      const enrichedBadges = badges.map(badge => ({
+        ...badge,
+        ...BADGE_DEFINITIONS[badge.type],
+      }));
+      res.json(enrichedBadges);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des badges" });
+    }
+  });
+
+  app.post("/api/students/:id/badges", async (req, res) => {
+    try {
+      const { type } = req.body;
+      if (!type || !BADGE_DEFINITIONS[type as keyof typeof BADGE_DEFINITIONS]) {
+        return res.status(400).json({ error: "Type de badge invalide" });
+      }
+      const badge = await storage.awardBadge(req.params.id, type);
+      res.json({ ...badge, ...BADGE_DEFINITIONS[badge.type] });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de l'attribution du badge" });
+    }
+  });
+
+  app.get("/api/badge-definitions", async (req, res) => {
+    res.json(BADGE_DEFINITIONS);
+  });
+
+  // Savings Goals endpoints
+  app.get("/api/students/:id/savings-goals", async (req, res) => {
+    try {
+      const goals = await storage.getStudentSavingsGoals(req.params.id);
+      res.json(goals);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des objectifs" });
+    }
+  });
+
+  app.post("/api/savings-goals", async (req, res) => {
+    try {
+      const data = createSavingsGoalSchema.parse(req.body);
+      const goal = await storage.createSavingsGoal(data);
+      res.json(goal);
+    } catch (error) {
+      res.status(400).json({ error: "Données d'objectif invalides" });
+    }
+  });
+
+  app.patch("/api/savings-goals/:id/progress", async (req, res) => {
+    try {
+      const { currentAmount } = req.body;
+      if (typeof currentAmount !== "number") {
+        return res.status(400).json({ error: "Montant invalide" });
+      }
+      const goal = await storage.updateSavingsGoalProgress(req.params.id, currentAmount);
+      if (!goal) {
+        return res.status(404).json({ error: "Objectif introuvable" });
+      }
+      res.json(goal);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la mise à jour" });
+    }
+  });
+
+  app.delete("/api/savings-goals/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteSavingsGoal(req.params.id);
+      if (!result) {
+        return res.status(404).json({ error: "Objectif introuvable" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression" });
+    }
+  });
+
+  // Class Challenges endpoints
+  app.get("/api/classes/:id/challenges", async (req, res) => {
+    try {
+      const challenges = await storage.getClassChallenges(req.params.id);
+      res.json(challenges);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération des défis" });
+    }
+  });
+
+  app.post("/api/class-challenges", async (req, res) => {
+    try {
+      const data = createClassChallengeSchema.parse(req.body);
+      const challenge = await storage.createClassChallenge(data);
+      res.json(challenge);
+    } catch (error) {
+      res.status(400).json({ error: "Données de défi invalides" });
+    }
+  });
+
+  app.patch("/api/class-challenges/:id/complete", async (req, res) => {
+    try {
+      const { studentId } = req.body;
+      if (!studentId) {
+        return res.status(400).json({ error: "ID étudiant requis" });
+      }
+      const challenge = await storage.completeClassChallenge(req.params.id, studentId);
+      if (!challenge) {
+        return res.status(404).json({ error: "Défi introuvable" });
+      }
+      
+      // Award challenge complete badge
+      await storage.awardBadge(studentId, "challenge_complete");
+      
+      res.json(challenge);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la complétion" });
+    }
+  });
+
+  app.delete("/api/class-challenges/:id", async (req, res) => {
+    try {
+      const result = await storage.deleteClassChallenge(req.params.id);
+      if (!result) {
+        return res.status(404).json({ error: "Défi introuvable" });
+      }
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la suppression" });
+    }
+  });
+
+  // Leaderboard endpoint
+  app.get("/api/classes/:id/leaderboard", async (req, res) => {
+    try {
+      const leaderboard = await storage.getClassLeaderboard(req.params.id);
+      res.json(leaderboard);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la récupération du classement" });
+    }
+  });
+
+  // Auto-check badges for student (called after purchases, etc.)
+  app.post("/api/students/:id/check-badges", async (req, res) => {
+    try {
+      const student = await storage.getStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Étudiant introuvable" });
+      }
+
+      const expenses = await storage.getStudentExpenses(req.params.id);
+      const fixedExpenses = await storage.getFixedExpenses(req.params.id);
+      const awardedBadges = [];
+
+      // Check for first purchase
+      if (expenses.length >= 1) {
+        const hasBadge = await storage.hasStudentBadge(req.params.id, "first_purchase");
+        if (!hasBadge) {
+          const badge = await storage.awardBadge(req.params.id, "first_purchase");
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.first_purchase });
+        }
+      }
+
+      // Check for saver badge (100$ or more in savings)
+      if (student.savings >= 100) {
+        const hasBadge = await storage.hasStudentBadge(req.params.id, "saver");
+        if (!hasBadge) {
+          const badge = await storage.awardBadge(req.params.id, "saver");
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.saver });
+        }
+      }
+
+      // Check for essential master (80% essential purchases)
+      if (expenses.length >= 5) {
+        const essentialCount = expenses.filter(e => e.isEssential).length;
+        const ratio = essentialCount / expenses.length;
+        if (ratio >= 0.8) {
+          const hasBadge = await storage.hasStudentBadge(req.params.id, "essential_master");
+          if (!hasBadge) {
+            const badge = await storage.awardBadge(req.params.id, "essential_master");
+            awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.essential_master });
+          }
+        }
+      }
+
+      // Check for monthly survivor (all fixed expenses paid)
+      const allPaid = fixedExpenses.every(e => e.isPaid);
+      if (allPaid && fixedExpenses.length > 0) {
+        const hasBadge = await storage.hasStudentBadge(req.params.id, "monthly_survivor");
+        if (!hasBadge) {
+          const badge = await storage.awardBadge(req.params.id, "monthly_survivor");
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.monthly_survivor });
+        }
+      }
+
+      // Check for budget hero (positive budget at end of context)
+      if (student.budget > 0 && student.spent > 0) {
+        const hasBadge = await storage.hasStudentBadge(req.params.id, "budget_hero");
+        if (!hasBadge) {
+          const badge = await storage.awardBadge(req.params.id, "budget_hero");
+          awardedBadges.push({ ...badge, ...BADGE_DEFINITIONS.budget_hero });
+        }
+      }
+
+      res.json({ awardedBadges });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur lors de la vérification des badges" });
     }
   });
 

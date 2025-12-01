@@ -131,6 +131,49 @@ export interface BudgetSnapshot {
   challenges: Challenge[];
 }
 
+// Badge system for gamification
+export interface Badge {
+  id: string;
+  type: "first_purchase" | "saver" | "essential_master" | "budget_hero" | "challenge_complete" | "monthly_survivor";
+  studentId: string;
+  earnedAt: Date;
+}
+
+export const BADGE_DEFINITIONS: Record<Badge["type"], { name: string; description: string; icon: string }> = {
+  first_purchase: { name: "Premier Achat", description: "Vous avez fait votre premier achat!", icon: "🛒" },
+  saver: { name: "Épargnant", description: "Vous avez économisé 100$ ou plus", icon: "💰" },
+  essential_master: { name: "Maître des Essentiels", description: "80% de vos achats sont essentiels", icon: "⭐" },
+  budget_hero: { name: "Héros du Budget", description: "Vous avez terminé le mois avec un surplus", icon: "🏆" },
+  challenge_complete: { name: "Défi Relevé", description: "Vous avez complété un défi", icon: "🎯" },
+  monthly_survivor: { name: "Survivant Mensuel", description: "Vous avez payé toutes vos dépenses fixes", icon: "✅" },
+};
+
+// Savings goal set by student
+export interface SavingsGoal {
+  id: string;
+  studentId: string;
+  title: string;
+  targetAmount: number;
+  currentAmount: number;
+  deadline?: Date;
+  completed: boolean;
+  createdAt: Date;
+}
+
+// Class challenge created by teacher (extending existing CustomChallenge)
+export interface ClassChallenge {
+  id: string;
+  classId: string;
+  title: string;
+  description: string;
+  type: "save_amount" | "limit_spending" | "essential_ratio" | "custom";
+  targetValue: number;
+  reward?: string;
+  deadline?: Date;
+  createdAt: Date;
+  completedBy: string[]; // student IDs who completed it
+}
+
 export const createSnapshotSchema = z.object({
   label: z.string().min(1).max(50),
 });
@@ -251,3 +294,24 @@ export type CreateBonusExpense = z.infer<typeof createBonusExpenseSchema>;
 export type CreateCustomChallenge = z.infer<typeof createCustomChallengeSchema>;
 export type CreateTeacherMessage = z.infer<typeof createTeacherMessageSchema>;
 export type CreateSurpriseEvent = z.infer<typeof createSurpriseEventSchema>;
+
+// Schemas for gamification
+export const createSavingsGoalSchema = z.object({
+  studentId: z.string().min(1),
+  title: z.string().min(1).max(100),
+  targetAmount: z.number().positive(),
+  deadline: z.string().optional(),
+});
+
+export const createClassChallengeSchema = z.object({
+  classId: z.string().min(1),
+  title: z.string().min(1).max(100),
+  description: z.string().min(1).max(500),
+  type: z.enum(["save_amount", "limit_spending", "essential_ratio", "custom"]),
+  targetValue: z.number().positive(),
+  reward: z.string().optional(),
+  deadline: z.string().optional(),
+});
+
+export type CreateSavingsGoal = z.infer<typeof createSavingsGoalSchema>;
+export type CreateClassChallenge = z.infer<typeof createClassChallengeSchema>;

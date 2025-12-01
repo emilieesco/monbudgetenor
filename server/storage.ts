@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type CreateSnapshot } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type CreateSnapshot, type Badge, type SavingsGoal, type CreateSavingsGoal, type ClassChallenge, type CreateClassChallenge } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -55,6 +55,27 @@ export interface IStorage {
   deleteSnapshot(snapshotId: string): Promise<boolean>;
   startNewMonth(studentId: string): Promise<Student | undefined>;
   resetFixedExpensesForNewMonth(studentId: string): Promise<void>;
+  
+  // Gamification - Badges
+  awardBadge(studentId: string, type: Badge["type"]): Promise<Badge>;
+  getStudentBadges(studentId: string): Promise<Badge[]>;
+  hasStudentBadge(studentId: string, type: Badge["type"]): Promise<boolean>;
+  
+  // Gamification - Savings Goals
+  createSavingsGoal(input: CreateSavingsGoal): Promise<SavingsGoal>;
+  getStudentSavingsGoals(studentId: string): Promise<SavingsGoal[]>;
+  updateSavingsGoalProgress(goalId: string, currentAmount: number): Promise<SavingsGoal | undefined>;
+  completeSavingsGoal(goalId: string): Promise<SavingsGoal | undefined>;
+  deleteSavingsGoal(goalId: string): Promise<boolean>;
+  
+  // Gamification - Class Challenges
+  createClassChallenge(input: CreateClassChallenge): Promise<ClassChallenge>;
+  getClassChallenges(classId: string): Promise<ClassChallenge[]>;
+  completeClassChallenge(challengeId: string, studentId: string): Promise<ClassChallenge | undefined>;
+  deleteClassChallenge(challengeId: string): Promise<boolean>;
+  
+  // Leaderboard
+  getClassLeaderboard(classId: string): Promise<Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}>>;
 }
 
 export class MemStorage implements IStorage {
@@ -71,6 +92,9 @@ export class MemStorage implements IStorage {
   private snapshots: Map<string, BudgetSnapshot> = new Map();
   private expenseSequence: Expense[] = [];
   private defaultExpenseAmounts: Map<string, number> = new Map();
+  private badges: Map<string, Badge> = new Map();
+  private savingsGoals: Map<string, SavingsGoal> = new Map();
+  private classChallenges: Map<string, ClassChallenge> = new Map();
 
   constructor() {
     this.students = new Map();
@@ -761,6 +785,139 @@ export class MemStorage implements IStorage {
         });
       }
     }
+  }
+
+  // Gamification - Badges
+  async awardBadge(studentId: string, type: Badge["type"]): Promise<Badge> {
+    const existing = await this.hasStudentBadge(studentId, type);
+    if (existing) {
+      const badge = Array.from(this.badges.values()).find(b => b.studentId === studentId && b.type === type);
+      return badge!;
+    }
+    const id = randomUUID();
+    const badge: Badge = {
+      id,
+      type,
+      studentId,
+      earnedAt: new Date(),
+    };
+    this.badges.set(id, badge);
+    return badge;
+  }
+
+  async getStudentBadges(studentId: string): Promise<Badge[]> {
+    return Array.from(this.badges.values()).filter(b => b.studentId === studentId);
+  }
+
+  async hasStudentBadge(studentId: string, type: Badge["type"]): Promise<boolean> {
+    return Array.from(this.badges.values()).some(b => b.studentId === studentId && b.type === type);
+  }
+
+  // Gamification - Savings Goals
+  async createSavingsGoal(input: CreateSavingsGoal): Promise<SavingsGoal> {
+    const id = randomUUID();
+    const goal: SavingsGoal = {
+      id,
+      studentId: input.studentId,
+      title: input.title,
+      targetAmount: input.targetAmount,
+      currentAmount: 0,
+      deadline: input.deadline ? new Date(input.deadline) : undefined,
+      completed: false,
+      createdAt: new Date(),
+    };
+    this.savingsGoals.set(id, goal);
+    return goal;
+  }
+
+  async getStudentSavingsGoals(studentId: string): Promise<SavingsGoal[]> {
+    return Array.from(this.savingsGoals.values()).filter(g => g.studentId === studentId);
+  }
+
+  async updateSavingsGoalProgress(goalId: string, currentAmount: number): Promise<SavingsGoal | undefined> {
+    const goal = this.savingsGoals.get(goalId);
+    if (!goal) return undefined;
+    const updated = { ...goal, currentAmount };
+    if (currentAmount >= goal.targetAmount) {
+      updated.completed = true;
+    }
+    this.savingsGoals.set(goalId, updated);
+    return updated;
+  }
+
+  async completeSavingsGoal(goalId: string): Promise<SavingsGoal | undefined> {
+    const goal = this.savingsGoals.get(goalId);
+    if (!goal) return undefined;
+    const updated = { ...goal, completed: true, currentAmount: goal.targetAmount };
+    this.savingsGoals.set(goalId, updated);
+    return updated;
+  }
+
+  async deleteSavingsGoal(goalId: string): Promise<boolean> {
+    return this.savingsGoals.delete(goalId);
+  }
+
+  // Gamification - Class Challenges
+  async createClassChallenge(input: CreateClassChallenge): Promise<ClassChallenge> {
+    const id = randomUUID();
+    const challenge: ClassChallenge = {
+      id,
+      classId: input.classId,
+      title: input.title,
+      description: input.description,
+      type: input.type,
+      targetValue: input.targetValue,
+      reward: input.reward,
+      deadline: input.deadline ? new Date(input.deadline) : undefined,
+      createdAt: new Date(),
+      completedBy: [],
+    };
+    this.classChallenges.set(id, challenge);
+    return challenge;
+  }
+
+  async getClassChallenges(classId: string): Promise<ClassChallenge[]> {
+    return Array.from(this.classChallenges.values()).filter(c => c.classId === classId);
+  }
+
+  async completeClassChallenge(challengeId: string, studentId: string): Promise<ClassChallenge | undefined> {
+    const challenge = this.classChallenges.get(challengeId);
+    if (!challenge) return undefined;
+    if (!challenge.completedBy.includes(studentId)) {
+      challenge.completedBy.push(studentId);
+    }
+    this.classChallenges.set(challengeId, challenge);
+    return challenge;
+  }
+
+  async deleteClassChallenge(challengeId: string): Promise<boolean> {
+    return this.classChallenges.delete(challengeId);
+  }
+
+  // Leaderboard
+  async getClassLeaderboard(classId: string): Promise<Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}>> {
+    const students = await this.getClassStudents(classId);
+    const challenges = await this.getClassChallenges(classId);
+    
+    const leaderboard = await Promise.all(students.map(async (student) => {
+      const badges = await this.getStudentBadges(student.id);
+      const challengesCompleted = challenges.filter(c => c.completedBy.includes(student.id)).length;
+      
+      return {
+        studentId: student.id,
+        name: student.name,
+        savings: student.savings,
+        badgeCount: badges.length,
+        challengesCompleted,
+      };
+    }));
+    
+    // Sort by savings (descending), then by badges, then by challenges
+    return leaderboard.sort((a, b) => {
+      if (b.savings !== a.savings) return b.savings - a.savings;
+      if (b.badgeCount !== a.badgeCount) return b.badgeCount - a.badgeCount;
+      return b.challengesCompleted - a.challengesCompleted;
+    });
   }
 }
 

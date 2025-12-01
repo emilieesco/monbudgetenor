@@ -162,6 +162,7 @@ export const joinClassSchema = z.object({
   classCode: z.string().min(1),
   budget: z.number().positive(),
   scenario: z.string().optional(),
+  customExpenses: z.record(z.number()).optional(),
 });
 
 export const createBonusExpenseSchema = z.object({

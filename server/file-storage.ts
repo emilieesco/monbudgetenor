@@ -472,6 +472,15 @@ export class FileStorage implements IStorage {
     return updated;
   }
 
+  async updateStudentCustomExpenses(id: string, customExpenses: Record<string, number>): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, customExpenses };
+    this.students.set(id, updated);
+    this.save();
+    return updated;
+  }
+
   private getDefaultAmounts(): Record<string, number> {
     return {
       "Loyer": 15, "Internet": 5, "Téléphone": 3, "Hydro": 8,

@@ -1,18 +1,36 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Switch } from "@/components/ui/switch";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useMutation, useQuery } from "@tanstack/react-query";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Home, Wifi, Phone, Zap, Car, Shield, Fuel, Utensils, PartyPopper } from "lucide-react";
 import type { Class } from "@shared/schema";
 
 const SCENARIOS = {
   student: { budget: 1800, name: "Étudiant", desc: "Budget étudiant limité" },
   worker: { budget: 2400, name: "Travailleur", desc: "Salaire stable" },
 };
+
+const EXPENSE_ICONS: Record<string, any> = {
+  "Loyer": Home,
+  "Internet": Wifi,
+  "Téléphone": Phone,
+  "Hydro": Zap,
+  "Assurance Voiture": Car,
+  "Assurance Maison": Shield,
+  "Essence": Fuel,
+  "Nourriture": Utensils,
+  "Sortie": PartyPopper,
+};
+
+interface CustomExpense {
+  enabled: boolean;
+  amount: number;
+}
 
 export default function StudentSetup() {
   const [_location, navigate] = useLocation();
@@ -22,11 +40,38 @@ export default function StudentSetup() {
   const [mode, setMode] = useState<"predefined" | "custom" | "scenario">("predefined");
   const [customBudget, setCustomBudget] = useState("");
   const [selectedScenario, setSelectedScenario] = useState<string>("student");
+  const [customExpenses, setCustomExpenses] = useState<Record<string, CustomExpense>>({});
   
   const classQuery = useQuery({
     queryKey: ["/api/classes/code", classCode],
     enabled: !!classCode,
   });
+  
+  const classData = classQuery.data as Class | undefined;
+  
+  const getInitialExpenses = () => {
+    if (!classData?.expenseAmounts) return {};
+    const initialExpenses: Record<string, CustomExpense> = {};
+    Object.entries(classData.expenseAmounts).forEach(([key, value]) => {
+      initialExpenses[key] = { enabled: true, amount: value };
+    });
+    return initialExpenses;
+  };
+
+  useEffect(() => {
+    if (classData?.expenseAmounts) {
+      setCustomExpenses(getInitialExpenses());
+    }
+  }, [classData]);
+
+  const handleModeChange = (newMode: "predefined" | "custom" | "scenario") => {
+    setMode(newMode);
+    if (newMode === "custom") {
+      setCustomExpenses(getInitialExpenses());
+    } else {
+      setCustomBudget("");
+    }
+  };
 
   const joinMutation = useMutation({
     mutationFn: async (data: any) => {
@@ -39,7 +84,30 @@ export default function StudentSetup() {
     },
   });
 
-  const classData = classQuery.data as Class | undefined;
+  const handleExpenseToggle = (key: string, enabled: boolean) => {
+    setCustomExpenses(prev => ({
+      ...prev,
+      [key]: { ...prev[key], enabled }
+    }));
+  };
+
+  const handleExpenseAmountChange = (key: string, amount: number) => {
+    const validAmount = isNaN(amount) ? 0 : Math.max(0, amount);
+    setCustomExpenses(prev => ({
+      ...prev,
+      [key]: { ...prev[key], amount: validAmount }
+    }));
+  };
+
+  const getActiveCustomExpenses = (): Record<string, number> => {
+    const result: Record<string, number> = {};
+    Object.entries(customExpenses).forEach(([key, value]) => {
+      if (value.enabled && value.amount > 0) {
+        result[key] = value.amount;
+      }
+    });
+    return result;
+  };
 
   const handleJoin = () => {
     if (!studentName) {
@@ -50,21 +118,31 @@ export default function StudentSetup() {
     const calculatedBudget = Math.round(Object.values(classData?.expenseAmounts || {}).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
     const defaultBudget = classData?.predefinedBudget || calculatedBudget;
     let budget = defaultBudget;
-    let scenario = undefined;
+    let scenario: string | undefined = undefined;
 
-    if (mode === "custom") {
-      budget = parseInt(customBudget) || 50;
-    } else if (mode === "scenario") {
-      budget = SCENARIOS[selectedScenario as keyof typeof SCENARIOS]?.budget || 50;
-      scenario = selectedScenario;
+    interface JoinPayload {
+      name: string;
+      classCode: string | null;
+      budget: number;
+      scenario?: string;
+      customExpenses?: Record<string, number>;
     }
 
-    joinMutation.mutate({
+    const payload: JoinPayload = {
       name: studentName,
       classCode,
       budget,
-      scenario,
-    });
+    };
+
+    if (mode === "custom") {
+      payload.budget = parseInt(customBudget) || 50;
+      payload.customExpenses = getActiveCustomExpenses();
+    } else if (mode === "scenario") {
+      payload.budget = SCENARIOS[selectedScenario as keyof typeof SCENARIOS]?.budget || 50;
+      payload.scenario = selectedScenario;
+    }
+
+    joinMutation.mutate(payload);
   };
 
   if (!classData) {
@@ -110,12 +188,13 @@ export default function StudentSetup() {
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Prédéfini */}
                 <button
-                  onClick={() => setMode("predefined")}
+                  onClick={() => handleModeChange("predefined")}
                   className={`p-4 rounded-lg border-2 text-left transition ${
                     mode === "predefined"
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-primary/50"
                   }`}
+                  data-testid="button-mode-predefined"
                 >
                   <p className="font-semibold mb-1">Budget Prédéfini</p>
                   <p className="text-sm text-muted-foreground mb-3">Défini par ton prof</p>
@@ -124,12 +203,13 @@ export default function StudentSetup() {
 
                 {/* Personnalisé */}
                 <button
-                  onClick={() => setMode("custom")}
+                  onClick={() => handleModeChange("custom")}
                   className={`p-4 rounded-lg border-2 text-left transition ${
                     mode === "custom"
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-primary/50"
                   }`}
+                  data-testid="button-mode-custom"
                 >
                   <p className="font-semibold mb-1">Budget Personnel</p>
                   <p className="text-sm text-muted-foreground mb-3">Ta propre réalité</p>
@@ -138,12 +218,13 @@ export default function StudentSetup() {
 
                 {/* Scénario */}
                 <button
-                  onClick={() => setMode("scenario")}
+                  onClick={() => handleModeChange("scenario")}
                   className={`p-4 rounded-lg border-2 text-left transition ${
                     mode === "scenario"
                       ? "border-primary bg-primary/10"
                       : "border-border hover:border-primary/50"
                   }`}
+                  data-testid="button-mode-scenario"
                 >
                   <p className="font-semibold mb-1">Profils Réalistes</p>
                   <p className="text-sm text-muted-foreground mb-3">Choisir un profil</p>
@@ -154,18 +235,78 @@ export default function StudentSetup() {
 
             {/* Mode-specific content */}
             {mode === "custom" && (
-              <div className="space-y-4 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
-                <Label htmlFor="budget">Ton Budget Personnel ($)</Label>
-                <Input
-                  id="budget"
-                  type="number"
-                  placeholder="Ex: 75"
-                  value={customBudget}
-                  onChange={(e) => setCustomBudget(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Entre le montant qui correspond à ta réalité
-                </p>
+              <div className="space-y-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
+                <div>
+                  <Label htmlFor="budget">Ton Budget Personnel ($)</Label>
+                  <Input
+                    id="budget"
+                    type="number"
+                    placeholder="Ex: 1500"
+                    value={customBudget}
+                    onChange={(e) => setCustomBudget(e.target.value)}
+                    data-testid="input-custom-budget"
+                  />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Entre le montant mensuel qui correspond à ta réalité
+                  </p>
+                </div>
+                
+                <div>
+                  <Label className="mb-3 block">Personnalise tes dépenses fixes</Label>
+                  <p className="text-xs text-muted-foreground mb-4">
+                    Active ou désactive les dépenses selon ta situation et ajuste les montants
+                  </p>
+                  <div className="space-y-3">
+                    {Object.entries(customExpenses).map(([key, value]) => {
+                      const IconComponent = EXPENSE_ICONS[key] || Home;
+                      return (
+                        <div 
+                          key={key} 
+                          className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                            value.enabled 
+                              ? "bg-white dark:bg-gray-900 border-blue-300 dark:border-blue-700" 
+                              : "bg-gray-100 dark:bg-gray-800 border-gray-200 dark:border-gray-700 opacity-60"
+                          }`}
+                        >
+                          <Switch
+                            checked={value.enabled}
+                            onCheckedChange={(checked) => handleExpenseToggle(key, checked)}
+                            data-testid={`switch-expense-${key.toLowerCase().replace(/\s/g, '-')}`}
+                          />
+                          <IconComponent className={`w-5 h-5 ${value.enabled ? "text-primary" : "text-muted-foreground"}`} />
+                          <span className={`flex-1 font-medium ${!value.enabled && "text-muted-foreground"}`}>
+                            {key}
+                          </span>
+                          <div className="flex items-center gap-1">
+                            <span className="text-muted-foreground">$</span>
+                            <Input
+                              type="number"
+                              value={value.amount}
+                              onChange={(e) => handleExpenseAmountChange(key, parseFloat(e.target.value) || 0)}
+                              disabled={!value.enabled}
+                              className="w-24 h-8 text-right"
+                              data-testid={`input-expense-${key.toLowerCase().replace(/\s/g, '-')}`}
+                            />
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                  
+                  {Object.keys(customExpenses).length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-blue-200 dark:border-blue-700">
+                      <div className="flex justify-between items-center">
+                        <span className="font-semibold">Total dépenses fixes:</span>
+                        <span className="text-lg font-bold text-primary">
+                          ${Object.entries(customExpenses)
+                            .filter(([_, v]) => v.enabled)
+                            .reduce((sum, [_, v]) => sum + v.amount, 0)
+                            .toFixed(2)}
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

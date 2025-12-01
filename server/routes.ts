@@ -90,11 +90,19 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Class not found" });
       }
       
+      // Determine which expense amounts to use: custom (if provided) or class defaults
+      const expenseAmounts = data.customExpenses || classData.expenseAmounts || {};
+      
       // Check if student with same name already exists in this class
       const existingStudent = await storage.getStudentByNameAndClass(data.name, classData.id);
       if (existingStudent) {
-        // Update the student's budget and add to history
+        // Update the student's budget, custom expenses and add to history
         const updatedStudent = await storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget);
+        
+        // Update custom expenses if provided
+        if (data.customExpenses) {
+          await storage.updateStudentCustomExpenses(existingStudent.id, data.customExpenses);
+        }
         
         // Recreate challenges for the new budget
         const newChallenges = [
@@ -116,10 +124,9 @@ export async function registerRoutes(
           });
         }
         
-        // Delete old fixed expenses and create new ones
+        // Delete old fixed expenses and create new ones with custom or class amounts
         await storage.deleteStudentFixedExpenses(existingStudent.id);
-        const amounts = classData.expenseAmounts || {};
-        for (const [category, amount] of Object.entries(amounts)) {
+        for (const [category, amount] of Object.entries(expenseAmounts)) {
           await storage.createFixedExpense(existingStudent.id, category, amount as number);
         }
         
@@ -131,6 +138,7 @@ export async function registerRoutes(
         classId: classData.id,
         budget: data.budget,
         scenario: data.scenario,
+        customExpenses: data.customExpenses,
       });
       
       // Create default challenges
@@ -149,6 +157,11 @@ export async function registerRoutes(
           type: ch.type,
           targetValue: ch.target,
         });
+      }
+      
+      // Create fixed expenses with custom or class amounts
+      for (const [category, amount] of Object.entries(expenseAmounts)) {
+        await storage.createFixedExpense(student.id, category, amount as number);
       }
       
       res.json(student);

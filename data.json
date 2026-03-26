@@ -179,6 +179,24 @@
         "Nourriture": 20,
         "Sortie": 5
       }
+    },
+    "3549b0c0-2a37-4489-9ede-2afdc9a2b174": {
+      "id": "3549b0c0-2a37-4489-9ede-2afdc9a2b174",
+      "code": "MATHS2024",
+      "teacherName": "Madame Escobar",
+      "mode": "predefined",
+      "createdAt": "2026-03-25T12:28:08.527Z",
+      "expenseAmounts": {
+        "Loyer": 15,
+        "Internet": 5,
+        "Téléphone": 3,
+        "Hydro": 8,
+        "Assurance Voiture": 10,
+        "Assurance Maison": 7,
+        "Essence": 12,
+        "Nourriture": 20,
+        "Sortie": 5
+      }
     }
   },
   "students": {
@@ -356,6 +374,21 @@
         {
           "budget": 128,
           "date": "2025-12-01T19:06:43.598Z"
+        }
+      ]
+    },
+    "a1b155f7-2b3c-4424-8245-27805e67a85f": {
+      "name": "Emi",
+      "classId": "3549b0c0-2a37-4489-9ede-2afdc9a2b174",
+      "budget": 128,
+      "id": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "spent": 60,
+      "savings": 0,
+      "createdAt": "2026-03-25T12:28:37.759Z",
+      "budgetHistory": [
+        {
+          "budget": 128,
+          "date": "2026-03-25T12:28:37.759Z"
         }
       ]
     }
@@ -3609,6 +3642,150 @@
       "amount": 5,
       "isPaid": false,
       "dueDate": "2025-12-02T01:28:51.502Z"
+    },
+    "5dd1a7d1-94d3-4865-8f2e-5cf933c170ab": {
+      "id": "5dd1a7d1-94d3-4865-8f2e-5cf933c170ab",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Loyer",
+      "amount": 15,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "edc3ef9f-4f8a-4205-83c4-b568cbcd223a": {
+      "id": "edc3ef9f-4f8a-4205-83c4-b568cbcd223a",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Internet",
+      "amount": 5,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "a3333d4b-3ed1-40c9-9cdc-cd340d6472bd": {
+      "id": "a3333d4b-3ed1-40c9-9cdc-cd340d6472bd",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Téléphone",
+      "amount": 3,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "d1c9c4de-8d54-4f24-96d0-50dbcd2779d8": {
+      "id": "d1c9c4de-8d54-4f24-96d0-50dbcd2779d8",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Hydro",
+      "amount": 8,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "1d9f3696-1c61-4286-a6e6-803908111ac7": {
+      "id": "1d9f3696-1c61-4286-a6e6-803908111ac7",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Assurance Voiture",
+      "amount": 10,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "0d4b8a00-3c9c-4329-81ae-45a6292cd796": {
+      "id": "0d4b8a00-3c9c-4329-81ae-45a6292cd796",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Assurance Maison",
+      "amount": 7,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "58a55357-67ac-4604-9d5d-bad979a1204e": {
+      "id": "58a55357-67ac-4604-9d5d-bad979a1204e",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Essence",
+      "amount": 12,
+      "isPaid": true,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "ee6f2383-5793-41e2-a971-6cb461bca5ce": {
+      "id": "ee6f2383-5793-41e2-a971-6cb461bca5ce",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Nourriture",
+      "amount": 20,
+      "isPaid": false,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "b25727cb-e853-4194-9501-c37706e04545": {
+      "id": "b25727cb-e853-4194-9501-c37706e04545",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Sortie",
+      "amount": 5,
+      "isPaid": false,
+      "dueDate": "2026-04-24T12:28:37.759Z"
+    },
+    "844b5bcf-3eff-424b-84fc-065719e7f53c": {
+      "id": "844b5bcf-3eff-424b-84fc-065719e7f53c",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Loyer",
+      "amount": 15,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.782Z"
+    },
+    "186219e6-d0d4-4b23-82ea-16f01fe6593c": {
+      "id": "186219e6-d0d4-4b23-82ea-16f01fe6593c",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Internet",
+      "amount": 5,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.785Z"
+    },
+    "e6e1ac6f-4e8f-40b9-9c06-2e81f6011065": {
+      "id": "e6e1ac6f-4e8f-40b9-9c06-2e81f6011065",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Téléphone",
+      "amount": 3,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.788Z"
+    },
+    "28f33670-f114-457e-8277-5683a7067318": {
+      "id": "28f33670-f114-457e-8277-5683a7067318",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Hydro",
+      "amount": 8,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.790Z"
+    },
+    "b9061369-7677-4b64-bdd9-001a3c317741": {
+      "id": "b9061369-7677-4b64-bdd9-001a3c317741",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Assurance Voiture",
+      "amount": 10,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.793Z"
+    },
+    "07b99e00-2b1c-4ce2-b416-e1ca9fd05000": {
+      "id": "07b99e00-2b1c-4ce2-b416-e1ca9fd05000",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Assurance Maison",
+      "amount": 7,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.796Z"
+    },
+    "925d6523-614a-4c08-82e0-8de29d5a37b7": {
+      "id": "925d6523-614a-4c08-82e0-8de29d5a37b7",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Essence",
+      "amount": 12,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.798Z"
+    },
+    "d6550c4e-2b0f-4fdf-9c16-d90eb909f83c": {
+      "id": "d6550c4e-2b0f-4fdf-9c16-d90eb909f83c",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Nourriture",
+      "amount": 20,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.801Z"
+    },
+    "255e2bba-0ea1-4cbd-9e17-a9c5d33787cd": {
+      "id": "255e2bba-0ea1-4cbd-9e17-a9c5d33787cd",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "category": "Sortie",
+      "amount": 5,
+      "isPaid": false,
+      "dueDate": "2026-03-25T12:28:37.804Z"
     }
   },
   "bonusExpenses": {
@@ -4024,6 +4201,46 @@
       "targetValue": 64,
       "completed": false,
       "createdAt": "2025-12-02T01:28:40.704Z"
+    },
+    "863f00f3-ae36-4935-9cc1-8436f00599ca": {
+      "id": "863f00f3-ae36-4935-9cc1-8436f00599ca",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "title": "Économe",
+      "description": "Dépense moins de 30% de ton budget",
+      "type": "spending",
+      "targetValue": 38,
+      "completed": false,
+      "createdAt": "2026-03-25T12:28:37.761Z"
+    },
+    "007e85f4-f95a-47d6-88fc-9b2d0d1f4758": {
+      "id": "007e85f4-f95a-47d6-88fc-9b2d0d1f4758",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "title": "Essentiel d'abord",
+      "description": "Achète 3 articles essentiels",
+      "type": "essential",
+      "targetValue": 3,
+      "completed": false,
+      "createdAt": "2026-03-25T12:28:37.772Z"
+    },
+    "e86eccab-eaa9-4457-aa0c-1b436e646420": {
+      "id": "e86eccab-eaa9-4457-aa0c-1b436e646420",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "title": "Responsable",
+      "description": "Paye toutes tes dépenses fixes",
+      "type": "fixed",
+      "targetValue": 100,
+      "completed": false,
+      "createdAt": "2026-03-25T12:28:37.775Z"
+    },
+    "0543cfa7-b071-4401-9d59-c14fc19c52c1": {
+      "id": "0543cfa7-b071-4401-9d59-c14fc19c52c1",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "title": "Sage",
+      "description": "Économise 50% de ton budget",
+      "type": "savings",
+      "targetValue": 64,
+      "completed": false,
+      "createdAt": "2026-03-25T12:28:37.779Z"
     }
   },
   "customChallenges": {},

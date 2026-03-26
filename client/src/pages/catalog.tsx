@@ -38,74 +38,165 @@ interface CartItem {
 }
 
 function getProductEmoji(name: string, category: string): string {
-  const lower = name.toLowerCase();
+  const n = name.toLowerCase();
+
   if (category === "food") {
-    if (lower.includes("lait")) return "🥛";
-    if (lower.includes("pain")) return "🍞";
-    if (lower.includes("œuf") || lower.includes("oeuf")) return "🥚";
-    if (lower.includes("poulet")) return "🍗";
-    if (lower.includes("bœuf") || lower.includes("boeuf") || lower.includes("steak")) return "🥩";
-    if (lower.includes("fromage") || lower.includes("cheddar") || lower.includes("mozzarella")) return "🧀";
-    if (lower.includes("riz")) return "🍚";
-    if (lower.includes("pâte") || lower.includes("spaghetti")) return "🍝";
-    if (lower.includes("banane")) return "🍌";
-    if (lower.includes("pomme") && !lower.includes("terre")) return "🍎";
-    if (lower.includes("orange")) return "🍊";
-    if (lower.includes("carotte")) return "🥕";
-    if (lower.includes("brocoli")) return "🥦";
-    if (lower.includes("tomate")) return "🍅";
-    if (lower.includes("salade") || lower.includes("laitue")) return "🥬";
-    if (lower.includes("pomme de terre") || lower.includes("patate")) return "🥔";
-    if (lower.includes("oignon")) return "🧅";
-    if (lower.includes("chips") || lower.includes("doritos")) return "🥔";
-    if (lower.includes("chocolat")) return "🍫";
-    if (lower.includes("bonbon") || lower.includes("gélifié")) return "🍬";
-    if (lower.includes("biscuit") || lower.includes("oreo")) return "🍪";
-    if (lower.includes("crème glacée")) return "🍦";
-    if (lower.includes("popcorn")) return "🍿";
-    if (lower.includes("yaourt") || lower.includes("yogourt")) return "🥛";
-    if (lower.includes("beurre")) return "🧈";
-    if (lower.includes("crème")) return "🥛";
-    if (lower.includes("jus")) return "🧃";
-    if (lower.includes("soda") || lower.includes("pepsi") || lower.includes("coca")) return "🥤";
-    if (lower.includes("eau")) return "💧";
-    if (lower.includes("café")) return "☕";
-    if (lower.includes("thé")) return "🍵";
-    if (lower.includes("gatorade")) return "🧴";
-    if (lower.includes("saumon") || lower.includes("poisson") || lower.includes("truite")) return "🐟";
-    if (lower.includes("crevette")) return "🦐";
-    if (lower.includes("bacon")) return "🥓";
-    if (lower.includes("porc") || lower.includes("côtelette")) return "🥩";
-    if (lower.includes("bagel")) return "🥯";
-    if (lower.includes("croissant")) return "🥐";
-    if (lower.includes("tortilla")) return "🌯";
-    if (lower.includes("muffin")) return "🧁";
-    if (lower.includes("soupe")) return "🥣";
-    if (lower.includes("thon")) return "🐟";
-    if (lower.includes("maïs")) return "🌽";
-    if (lower.includes("haricot")) return "🫘";
-    if (lower.includes("barre")) return "🍫";
-    return "🍽️";
+    // === Produits Laitiers ===
+    if (n.includes("lait au chocolat")) return "🍫";
+    if (n.includes("lait")) return "🥛";
+    if (n.includes("yogourt aux fruits")) return "🍓";
+    if (n.includes("yogourt") || n.includes("yaourt")) return "🥣";
+    if (n.includes("brie")) return "🧀";
+    if (n.includes("parmesan")) return "🧀";
+    if (n.includes("mozzarella")) return "🧀";
+    if (n.includes("cheddar")) return "🧀";
+    if (n.includes("cottage")) return "🧀";
+    if (n.includes("fromage en grains")) return "🧀";
+    if (n.includes("fromage")) return "🧀";
+    if (n.includes("beurre")) return "🧈";
+    if (n.includes("crème sure")) return "🥛";
+    if (n.includes("crème 35") || n.includes("crème glacée")) return "🍦";
+    if (n.includes("crème")) return "🥛";
+
+    // === Viandes & Protéines ===
+    if (n.includes("œuf") || n.includes("oeuf")) return "🥚";
+    if (n.includes("bacon")) return "🥓";
+    if (n.includes("saumon")) return "🐟";
+    if (n.includes("tilapia")) return "🐟";
+    if (n.includes("crevette")) return "🦐";
+    if (n.includes("dinde")) return "🦃";
+    if (n.includes("saucisse")) return "🌭";
+    if (n.includes("jambon")) return "🥩";
+    if (n.includes("pepperoni")) return "🍕";
+    if (n.includes("tofu")) return "🫘";
+    if (n.includes("poulet")) return "🍗";
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak")) return "🥩";
+    if (n.includes("porc") || n.includes("côtelette")) return "🥩";
+    if (n.includes("poitrines")) return "🍗";
+
+    // === Fruits & Légumes ===
+    if (n.includes("banane")) return "🍌";
+    if (n.includes("pomme de terre") || n.includes("patate")) return "🥔";
+    if (n.includes("pomme")) return "🍎";
+    if (n.includes("orange")) return "🍊";
+    if (n.includes("fraise")) return "🍓";
+    if (n.includes("bleuet")) return "🫐";
+    if (n.includes("raisin")) return "🍇";
+    if (n.includes("mangue")) return "🥭";
+    if (n.includes("pêche")) return "🍑";
+    if (n.includes("avocat")) return "🥑";
+    if (n.includes("citron")) return "🍋";
+    if (n.includes("tomate")) return "🍅";
+    if (n.includes("carotte")) return "🥕";
+    if (n.includes("brocoli")) return "🥦";
+    if (n.includes("chou-fleur")) return "🥦";
+    if (n.includes("laitue") || n.includes("romaine") || n.includes("épinard")) return "🥬";
+    if (n.includes("concombre") || n.includes("courgette")) return "🥒";
+    if (n.includes("poivron")) return "🫑";
+    if (n.includes("champignon")) return "🍄";
+    if (n.includes("ail")) return "🧄";
+    if (n.includes("oignon")) return "🧅";
+    if (n.includes("céleri")) return "🌿";
+
+    // === Conserves & Épicerie ===
+    if (n.includes("spaghetti") || n.includes("macaroni") || n.includes("pâtes")) return "🍝";
+    if (n.includes("riz")) return "🍚";
+    if (n.includes("soupe")) return "🍜";
+    if (n.includes("thon")) return "🐟";
+    if (n.includes("maïs")) return "🌽";
+    if (n.includes("haricot") || n.includes("pois chiche") || n.includes("lentille")) return "🫘";
+    if (n.includes("sirop d'érable")) return "🍁";
+    if (n.includes("miel")) return "🍯";
+    if (n.includes("confiture")) return "🍯";
+    if (n.includes("arachide") || n.includes("beurre d'ara")) return "🥜";
+    if (n.includes("céréale") || n.includes("cheerio") || n.includes("flocon")) return "🥣";
+    if (n.includes("huile")) return "🫙";
+    if (n.includes("ketchup") || n.includes("sauce tomate")) return "🍅";
+    if (n.includes("moutarde") || n.includes("mayonnaise")) return "🫙";
+
+    // === Boulangerie ===
+    if (n.includes("bagel")) return "🥯";
+    if (n.includes("croissant")) return "🥐";
+    if (n.includes("tortilla")) return "🌮";
+    if (n.includes("baguette") || n.includes("pain à l'ail")) return "🥖";
+    if (n.includes("hot-dog") || n.includes("hamburger")) return "🍔";
+    if (n.includes("naan")) return "🫓";
+    if (n.includes("muffin anglais")) return "🥐";
+    if (n.includes("pain")) return "🍞";
+
+    // === Bonbons & Sucreries ===
+    if (n.includes("crème glacée")) return "🍦";
+    if (n.includes("gâteau")) return "🎂";
+    if (n.includes("brownie")) return "🍫";
+    if (n.includes("popcorn")) return "🍿";
+    if (n.includes("biscuit") || n.includes("oreo") || n.includes("chips ahoy")) return "🍪";
+    if (n.includes("craquelins") || n.includes("ritz")) return "🍘";
+    if (n.includes("granola")) return "🌾";
+    if (n.includes("chocolat") || n.includes("lindt") || n.includes("kit kat") ||
+        n.includes("oh henry") || n.includes("aero") || n.includes("caramilk") ||
+        n.includes("coffee crisp") || n.includes("barre")) return "🍫";
+    if (n.includes("bonbon") || n.includes("gélifié") || n.includes("réglisse") ||
+        n.includes("skittles") || n.includes("m&m") || n.includes("smartie")) return "🍬";
+    if (n.includes("chips") || n.includes("lays") || n.includes("doritos") ||
+        n.includes("ruffles") || n.includes("pringles") || n.includes("cheetos")) return "🍟";
+
+    // === Boissons ===
+    if (n.includes("eau")) return "💧";
+    if (n.includes("café") || n.includes("chocolat chaud")) return "☕";
+    if (n.includes("thé glacé") || n.includes("nestea")) return "🧋";
+    if (n.includes("thé")) return "🍵";
+    if (n.includes("jus")) return "🧃";
+    if (n.includes("gatorade")) return "🧴";
+    if (n.includes("limonade")) return "🍋";
+    if (n.includes("pepsi") || n.includes("coca") || n.includes("sprite") ||
+        n.includes("7-up") || n.includes("red bull") || n.includes("monster") ||
+        n.includes("soda") || n.includes("v8")) return "🥤";
+
+    return "🛒";
   }
+
   if (category === "clothing") {
-    if (lower.includes("t-shirt")) return "👕";
-    if (lower.includes("jeans")) return "👖";
-    if (lower.includes("chaussure")) return "👟";
-    if (lower.includes("chaussette")) return "🧦";
-    if (lower.includes("veste")) return "🧥";
-    if (lower.includes("pull")) return "🧶";
-    if (lower.includes("bermuda")) return "🩳";
+    if (n.includes("t-shirt")) return "👕";
+    if (n.includes("jeans") || n.includes("pantalon")) return "👖";
+    if (n.includes("chaussette")) return "🧦";
+    if (n.includes("chaussure") || n.includes("sandales")) return "👟";
+    if (n.includes("bottes")) return "👢";
+    if (n.includes("casquette")) return "🧢";
+    if (n.includes("tuque")) return "🎩";
+    if (n.includes("gants")) return "🧤";
+    if (n.includes("écharpe")) return "🧣";
+    if (n.includes("robe")) return "👗";
+    if (n.includes("bermuda")) return "🩳";
+    if (n.includes("sous-vêtement") || n.includes("sous-vetement")) return "🩲";
+    if (n.includes("manteau") || n.includes("veste") || n.includes("pull")) return "🧥";
     return "👕";
   }
+
   if (category === "leisure") {
-    if (lower.includes("cinéma")) return "🎬";
-    if (lower.includes("jeu")) return "🎮";
-    if (lower.includes("piscine")) return "🏊";
-    if (lower.includes("café")) return "☕";
-    if (lower.includes("livre")) return "📚";
-    if (lower.includes("concert")) return "🎵";
+    if (n.includes("cinéma") || n.includes("cinema")) return "🎬";
+    if (n.includes("netflix")) return "📺";
+    if (n.includes("spotify")) return "🎧";
+    if (n.includes("concert") || n.includes("ticket")) return "🎵";
+    if (n.includes("karaoké") || n.includes("karaoke")) return "🎤";
+    if (n.includes("jeu vidéo") || n.includes("jeu video")) return "🎮";
+    if (n.includes("bowling")) return "🎳";
+    if (n.includes("piscine")) return "🏊";
+    if (n.includes("gym")) return "🏋️";
+    if (n.includes("livre")) return "📚";
+    if (n.includes("pizza")) return "🍕";
+    if (n.includes("mcdonald") || n.includes("repas")) return "🍔";
+    if (n.includes("café") || n.includes("starbucks")) return "☕";
+    if (n.includes("escape")) return "🔐";
+    if (n.includes("manucure")) return "💅";
+    if (n.includes("coupe")) return "✂️";
+    if (n.includes("uber")) return "🚗";
+    if (n.includes("autobus") || n.includes("billet")) return "🚌";
+    if (n.includes("vélo") || n.includes("velo")) return "🚲";
+    if (n.includes("tatouage")) return "🎨";
+    if (n.includes("piercing")) return "💎";
     return "🎮";
   }
+
   return "🛒";
 }
 

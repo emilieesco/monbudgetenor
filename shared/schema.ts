@@ -206,6 +206,7 @@ export const insertStudentSchema = z.object({
   name: z.string().min(1),
   classId: z.string().min(1),
   budget: z.number().positive(),
+  monthlyBudget: z.number().optional(),
   customExpenses: z.record(z.number()).optional(),
   scenario: z.string().optional(),
 });

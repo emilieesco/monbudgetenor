@@ -6,7 +6,18 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus, Trophy, Medal, Star } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus, Trophy, Medal, Star, RefreshCw } from "lucide-react";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
@@ -187,6 +198,31 @@ export default function Dashboard() {
       toast({
         title: "Erreur",
         description: "Impossible d'effacer l'historique",
+        variant: "destructive",
+      });
+    },
+  });
+
+  const fullResetMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("POST", `/api/students/${studentId}/full-reset`);
+      return res.json();
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/expenses", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/fixed-expenses", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/challenges", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/badges", studentId] });
+      toast({
+        title: "Remis à zéro!",
+        description: `Mois 1 — Budget de ${data.budget}$ — Bonne chance ${data.name}!`,
+      });
+    },
+    onError: () => {
+      toast({
+        title: "Erreur",
+        description: "Impossible de réinitialiser le profil",
         variant: "destructive",
       });
     },
@@ -409,6 +445,36 @@ export default function Dashboard() {
                 <Badge variant="secondary" className="ml-1">{snapshots.length}</Badge>
               )}
             </Button>
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="flex items-center gap-2 text-destructive border-destructive/40 hover:bg-destructive/10"
+                  disabled={fullResetMutation.isPending}
+                  data-testid="button-full-reset"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  {fullResetMutation.isPending ? "Réinitialisation..." : "Recommencer"}
+                </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Recommencer à zéro?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Cette action va effacer tous tes achats, remettre ton budget au mois 1 et supprimer tes badges. Ton argent économisé sera perdu. Es-tu sûr(e)?
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Annuler</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => fullResetMutation.mutate()}
+                    className="bg-destructive text-destructive-foreground"
+                  >
+                    Oui, recommencer
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
             <Button
               onClick={() => navigate("/")}
               variant="outline"

@@ -1049,5 +1049,21 @@ export class MemStorage implements IStorage {
 
 import { FileStorage } from "./file-storage";
 
-export const storage = new FileStorage();
-export const getStorage = async () => storage;
+export let storage: IStorage = new FileStorage();
+
+export async function initializeStorage(): Promise<void> {
+  const dbUrl = process.env.DATABASE_URL;
+  if (dbUrl) {
+    try {
+      const { DatabaseStorage } = await import("./db-storage");
+      const dbStorage = new DatabaseStorage(dbUrl);
+      await dbStorage.initialize();
+      storage = dbStorage;
+      console.log("Using PostgreSQL storage");
+    } catch (err) {
+      console.error("Failed to initialize PostgreSQL, falling back to file storage:", err);
+    }
+  } else {
+    console.log("Using File storage (no DATABASE_URL)");
+  }
+}

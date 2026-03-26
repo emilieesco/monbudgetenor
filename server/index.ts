@@ -1,7 +1,6 @@
 import express, { type Request, Response, NextFunction } from "express";
-import { registerRoutes } from "./routes";
-import { serveStatic } from "./static";
 import { createServer } from "http";
+import { initializeStorage } from "./storage";
 
 const app = express();
 const httpServer = createServer(app);
@@ -60,6 +59,11 @@ app.use((req, res, next) => {
 });
 
 (async () => {
+  // Initialize storage FIRST (PostgreSQL if DATABASE_URL is set, file otherwise)
+  await initializeStorage();
+
+  // Dynamic import ensures routes load AFTER storage is ready
+  const { registerRoutes } = await import("./routes");
   await registerRoutes(httpServer, app);
 
   app.use((err: any, _req: Request, res: Response, _next: NextFunction) => {
@@ -74,6 +78,7 @@ app.use((req, res, next) => {
   // setting up all the other routes so the catch-all route
   // doesn't interfere with the other routes
   if (process.env.NODE_ENV === "production") {
+    const { serveStatic } = await import("./static");
     serveStatic(app);
   } else {
     const { setupVite } = await import("./vite");

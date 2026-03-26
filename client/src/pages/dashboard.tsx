@@ -6,7 +6,10 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell } from "recharts";
-import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus, Trophy, Medal, Star, RefreshCw } from "lucide-react";
+import { AlertCircle, CheckCircle2, DollarSign, ShoppingBag, ShoppingCart, Home, Target, Award, Zap, PiggyBank, Download, Search, Save, RotateCcw, Trash2, History, Calendar, ArrowRight, Plus, Trophy, Medal, Star, RefreshCw, ThumbsUp, AlertTriangle, Lightbulb, TrendingUp, TrendingDown, Wallet, BarChart2 } from "lucide-react";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { Separator } from "@/components/ui/separator";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,6 +43,7 @@ export default function Dashboard() {
   const [manualExpenseName, setManualExpenseName] = useState("");
   const [manualExpenseAmount, setManualExpenseAmount] = useState("");
   const [manualExpenseCategory, setManualExpenseCategory] = useState<"food" | "clothing" | "leisure">("food");
+  const [showMonthSummary, setShowMonthSummary] = useState(false);
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -424,7 +428,7 @@ export default function Dashboard() {
           </div>
           <div className="flex items-center gap-2 flex-wrap">
             <Button
-              onClick={() => newMonthMutation.mutate()}
+              onClick={() => setShowMonthSummary(true)}
               disabled={newMonthMutation.isPending}
               className="flex items-center gap-2 bg-green-600 hover:bg-green-700"
               data-testid="button-new-month"
@@ -1215,6 +1219,201 @@ export default function Dashboard() {
           </div>
         </Card>
       </div>
+
+      {/* ── END-OF-MONTH SUMMARY DIALOG ── */}
+      {(() => {
+        if (!student) return null;
+        const monthlyBudget = (student as any).monthlyBudget || (student.budget + student.spent);
+        const savingsThisMonth = student.budget;
+        const savingsPct = monthlyBudget > 0 ? (savingsThisMonth / monthlyBudget) * 100 : 0;
+        const essentialAmt = expenses.filter(e => e.isEssential).reduce((s: number, e: Expense) => s + e.amount, 0);
+        const totalCatalogAmt = expenses.reduce((s: number, e: Expense) => s + e.amount, 0);
+        const essentialRatio = totalCatalogAmt > 0 ? essentialAmt / totalCatalogAmt : 1;
+        const fixedPaidCount = (fixedExpenses as any[]).filter((fe: any) => fe.isPaid).length;
+        const fixedTotal = (fixedExpenses as any[]).length;
+
+        let score = 0;
+        if (savingsPct >= 20) score += 3;
+        else if (savingsPct >= 10) score += 2;
+        else if (savingsPct >= 5) score += 1;
+        if (essentialRatio >= 0.7) score += 2;
+        else if (essentialRatio >= 0.5) score += 1;
+        if (fixedTotal > 0 && fixedPaidCount === fixedTotal) score += 2;
+        else if (fixedPaidCount > 0) score += 1;
+
+        type Grade = "excellent" | "tres_bien" | "correct" | "a_ameliorer";
+        let grade: Grade;
+        if (score >= 6) grade = "excellent";
+        else if (score >= 4) grade = "tres_bien";
+        else if (score >= 2) grade = "correct";
+        else grade = "a_ameliorer";
+
+        const gradeInfo: Record<Grade, { Icon: typeof CheckCircle2; label: string; bg: string; border: string; iconColor: string; titleColor: string; tip: string }> = {
+          excellent: {
+            Icon: Trophy, label: "Excellent!", bg: "bg-yellow-50 dark:bg-yellow-900/20", border: "border-yellow-300 dark:border-yellow-700",
+            iconColor: "text-yellow-500", titleColor: "text-yellow-700 dark:text-yellow-400",
+            tip: "Tu es un(e) champion(ne) de la gestion budgétaire! Continue comme ça le mois prochain!",
+          },
+          tres_bien: {
+            Icon: ThumbsUp, label: "Très bien!", bg: "bg-blue-50 dark:bg-blue-900/20", border: "border-blue-300 dark:border-blue-700",
+            iconColor: "text-blue-500", titleColor: "text-blue-700 dark:text-blue-400",
+            tip: "Super mois! Pour encore mieux faire, essaie d'augmenter ton épargne de 5% le mois prochain.",
+          },
+          correct: {
+            Icon: CheckCircle2, label: "Correct!", bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-300 dark:border-green-700",
+            iconColor: "text-green-500", titleColor: "text-green-700 dark:text-green-400",
+            tip: "Pas mal! Concentre-toi sur réduire tes dépenses de loisirs pour épargner davantage le mois prochain.",
+          },
+          a_ameliorer: {
+            Icon: AlertTriangle, label: "À améliorer", bg: "bg-orange-50 dark:bg-orange-900/20", border: "border-orange-300 dark:border-orange-700",
+            iconColor: "text-orange-500", titleColor: "text-orange-700 dark:text-orange-400",
+            tip: "Ce mois était difficile. Identifie 2 ou 3 dépenses que tu aurais pu éviter. Chaque dollar économisé compte!",
+          },
+        };
+        const { Icon, label, bg, border, iconColor, titleColor, tip } = gradeInfo[grade];
+
+        const catRows = [
+          { label: "Nourriture", key: "food", Icon: ShoppingCart, color: "text-red-600 dark:text-red-400" },
+          { label: "Vêtements", key: "clothing", Icon: ShoppingBag, color: "text-blue-600 dark:text-blue-400" },
+          { label: "Loisirs", key: "leisure", Icon: Zap, color: "text-purple-600 dark:text-purple-400" },
+          { label: "Loyer / fixes", key: "rent", Icon: Home, color: "text-gray-600 dark:text-gray-400" },
+        ].map(r => ({
+          ...r,
+          amount: expenses.filter((e: Expense) => e.category === r.key).reduce((s: number, e: Expense) => s + e.amount, 0),
+        })).filter(r => r.amount > 0);
+
+        return (
+          <Dialog open={showMonthSummary} onOpenChange={setShowMonthSummary}>
+            <DialogContent className="max-w-lg max-h-[90vh] flex flex-col" data-testid="dialog-month-summary">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <Calendar className="w-5 h-5 text-green-500" />
+                  Bilan du mois {student.currentMonth || 1}
+                </DialogTitle>
+                <DialogDescription>Voici un résumé de ta gestion budgétaire ce mois</DialogDescription>
+              </DialogHeader>
+
+              <ScrollArea className="flex-1">
+                <div className="space-y-4 pr-1">
+                  {/* Grade Banner */}
+                  <div className={`rounded-lg border p-4 flex items-start gap-3 ${bg} ${border}`}>
+                    <Icon className={`w-7 h-7 shrink-0 mt-0.5 ${iconColor}`} />
+                    <div>
+                      <p className={`font-black text-lg ${titleColor}`}>{label}</p>
+                      <p className="text-sm text-foreground/80 mt-0.5">
+                        Score: {score}/7 — {grade === "excellent" ? "Gestion exemplaire" : grade === "tres_bien" ? "Très bonne gestion" : grade === "correct" ? "Gestion acceptable" : "Des améliorations à faire"}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Budget Overview */}
+                  <div className="rounded-lg border bg-muted/40 p-4 space-y-3">
+                    <p className="font-bold text-sm flex items-center gap-2"><Wallet className="w-4 h-4" /> Budget du mois</p>
+                    <div className="space-y-2">
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Budget total</span>
+                        <span className="font-bold">{monthlyBudget.toFixed(2)} $</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground flex items-center gap-1"><TrendingDown className="w-3.5 h-3.5 text-red-500" /> Total dépensé</span>
+                        <span className="font-bold text-red-600 dark:text-red-400">{student.spent.toFixed(2)} $</span>
+                      </div>
+                      <Separator />
+                      <div className="flex justify-between text-sm">
+                        <span className="font-semibold flex items-center gap-1"><PiggyBank className="w-3.5 h-3.5 text-green-500" /> Économies ce mois</span>
+                        <span className={`font-black ${savingsThisMonth > 0 ? "text-green-600 dark:text-green-400" : "text-muted-foreground"}`}>
+                          {savingsThisMonth.toFixed(2)} $ ({savingsPct.toFixed(0)}%)
+                        </span>
+                      </div>
+                      <Progress value={Math.min(savingsPct, 100)} className="h-2" />
+                      <p className="text-xs text-muted-foreground">Objectif recommandé: 20% ou plus</p>
+                    </div>
+                  </div>
+
+                  {/* Category Breakdown */}
+                  {catRows.length > 0 && (
+                    <div className="rounded-lg border bg-muted/40 p-4 space-y-3">
+                      <p className="font-bold text-sm flex items-center gap-2"><BarChart2 className="w-4 h-4" /> Dépenses par catégorie</p>
+                      <div className="space-y-2">
+                        {catRows.map(r => (
+                          <div key={r.key} className="flex items-center gap-3">
+                            <r.Icon className={`w-4 h-4 shrink-0 ${r.color}`} />
+                            <span className="text-sm flex-1">{r.label}</span>
+                            <span className="text-sm font-bold">{r.amount.toFixed(2)} $</span>
+                            <span className="text-xs text-muted-foreground w-10 text-right">
+                              {totalCatalogAmt > 0 ? Math.round((r.amount / monthlyBudget) * 100) : 0}%
+                            </span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Essential ratio */}
+                  {totalCatalogAmt > 0 && (
+                    <div className="rounded-lg border bg-muted/40 p-4 space-y-3">
+                      <p className="font-bold text-sm flex items-center gap-2"><TrendingUp className="w-4 h-4" /> Essentiels vs Plaisirs</p>
+                      <div className="flex gap-3">
+                        <div className="flex-1 text-center p-3 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                          <p className="text-2xl font-black text-green-700 dark:text-green-400">{Math.round(essentialRatio * 100)}%</p>
+                          <p className="text-xs text-green-700 dark:text-green-400 font-semibold">Essentiels</p>
+                        </div>
+                        <div className="flex-1 text-center p-3 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                          <p className="text-2xl font-black text-amber-700 dark:text-amber-400">{Math.round((1 - essentialRatio) * 100)}%</p>
+                          <p className="text-xs text-amber-700 dark:text-amber-400 font-semibold">Plaisirs</p>
+                        </div>
+                      </div>
+                      {essentialRatio >= 0.7 ? (
+                        <p className="text-xs text-green-700 dark:text-green-400">Excellent ratio! Tu priorises bien tes besoins de base.</p>
+                      ) : essentialRatio >= 0.5 ? (
+                        <p className="text-xs text-amber-700 dark:text-amber-400">Attention: essaie d'augmenter la part des essentiels le mois prochain.</p>
+                      ) : (
+                        <p className="text-xs text-red-700 dark:text-red-400">Alerte: plus de la moitié de tes achats sont des plaisirs!</p>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Fixed expenses status */}
+                  {fixedTotal > 0 && (
+                    <div className="flex items-center justify-between p-3 rounded-lg border bg-muted/40 text-sm">
+                      <span className="flex items-center gap-2 font-semibold">
+                        <Home className="w-4 h-4" /> Dépenses fixes payées
+                      </span>
+                      <span className={`font-black ${fixedPaidCount === fixedTotal ? "text-green-600 dark:text-green-400" : "text-red-600 dark:text-red-400"}`}>
+                        {fixedPaidCount}/{fixedTotal}
+                      </span>
+                    </div>
+                  )}
+
+                  {/* Tip */}
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-muted border">
+                    <Lightbulb className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-sm mb-0.5">Conseil pour le prochain mois</p>
+                      <p className="text-sm text-muted-foreground">{tip}</p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+
+              <DialogFooter className="mt-4 gap-2 flex-wrap">
+                <Button variant="outline" onClick={() => setShowMonthSummary(false)} data-testid="button-month-summary-cancel">
+                  Annuler
+                </Button>
+                <Button
+                  className="bg-green-600 hover:bg-green-700 font-bold"
+                  onClick={() => { setShowMonthSummary(false); newMonthMutation.mutate(); }}
+                  disabled={newMonthMutation.isPending}
+                  data-testid="button-month-summary-confirm"
+                >
+                  <ArrowRight className="w-4 h-4 mr-2" />
+                  {newMonthMutation.isPending ? "En cours..." : "Passer au mois suivant"}
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }

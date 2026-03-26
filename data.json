@@ -206,15 +206,19 @@
       "budget": 1500,
       "id": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "spent": 0,
-      "savings": 0,
+      "savings": 1500,
       "createdAt": "2025-11-30T00:20:36.801Z",
       "budgetHistory": [
         {
           "budget": 1500,
           "date": "2026-03-26T03:10:37.161Z"
+        },
+        {
+          "budget": 1500,
+          "date": "2026-03-26T03:42:58.322Z"
         }
       ],
-      "currentMonth": 1,
+      "currentMonth": 2,
       "monthlyBudget": 1500,
       "customExpenses": {
         "Loyer": 1500,
@@ -2640,6 +2644,17 @@
       "message": "Bon choix! C'est un achat essentiel.",
       "id": "184eaecd-fa5c-4d8c-aa26-56bb96011543",
       "timestamp": "2026-03-26T02:25:35.753Z"
+    },
+    "7df5df09-cff1-4b00-a153-2c49542d8262": {
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "itemId": "ada2996f-dd0b-4cbd-80a8-42358b7f04d3",
+      "amount": 4.29,
+      "category": "food",
+      "isEssential": false,
+      "feedback": "warning",
+      "message": "Attention, ceci n'est pas un achat essentiel.",
+      "id": "7df5df09-cff1-4b00-a153-2c49542d8262",
+      "timestamp": "2026-03-26T03:42:13.645Z"
     }
   },
   "fixedExpenses": {
@@ -4017,7 +4032,7 @@
       "category": "Loyer",
       "amount": 1500,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.162Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     },
     "3f91e69e-5c53-4ade-900c-09df0009b935": {
       "id": "3f91e69e-5c53-4ade-900c-09df0009b935",
@@ -4025,7 +4040,7 @@
       "category": "Internet",
       "amount": 65,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.165Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     },
     "718d056d-2148-4df8-8467-bc4e61cb0f05": {
       "id": "718d056d-2148-4df8-8467-bc4e61cb0f05",
@@ -4033,7 +4048,7 @@
       "category": "Téléphone",
       "amount": 150,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.177Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     },
     "586cd093-9eee-408a-96fd-17bbd16706c4": {
       "id": "586cd093-9eee-408a-96fd-17bbd16706c4",
@@ -4041,7 +4056,7 @@
       "category": "Hydro",
       "amount": 60,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.180Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     },
     "69fcaed2-f670-41d6-b58d-a801019a4fdb": {
       "id": "69fcaed2-f670-41d6-b58d-a801019a4fdb",
@@ -4049,7 +4064,7 @@
       "category": "Assurance Voiture",
       "amount": 110,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.182Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     },
     "186cef19-b8bd-4a7a-8447-a5e6c6a6e265": {
       "id": "186cef19-b8bd-4a7a-8447-a5e6c6a6e265",
@@ -4057,7 +4072,7 @@
       "category": "Assurance Maison",
       "amount": 35,
       "isPaid": false,
-      "dueDate": "2026-03-26T03:10:37.185Z"
+      "dueDate": "2026-03-26T03:42:58.323Z"
     }
   },
   "bonusExpenses": {
@@ -4710,6 +4725,27 @@
       "tier": "platinum",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "earnedAt": "2026-03-26T02:50:55.146Z"
+    },
+    "b0ecdf4c-19f8-43e7-af47-f5af8c9e08cb": {
+      "id": "b0ecdf4c-19f8-43e7-af47-f5af8c9e08cb",
+      "type": "first_purchase",
+      "tier": "bronze",
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "earnedAt": "2026-03-26T03:42:34.737Z"
+    },
+    "2794b8fe-47c4-4e8f-b07c-e520fe2dfd2f": {
+      "id": "2794b8fe-47c4-4e8f-b07c-e520fe2dfd2f",
+      "type": "budget_hero",
+      "tier": "platinum",
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "earnedAt": "2026-03-26T03:42:34.741Z"
+    },
+    "ef94424d-9a05-455b-ae49-0bc76b3e4fb0": {
+      "id": "ef94424d-9a05-455b-ae49-0bc76b3e4fb0",
+      "type": "saver",
+      "tier": "platinum",
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "earnedAt": "2026-03-26T03:42:58.404Z"
     }
   },
   "savingsGoals": {

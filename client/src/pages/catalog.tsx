@@ -9,7 +9,7 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, Plus, Minus, Trash2, Receipt, Leaf, Star, Tag } from "lucide-react";
+import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, Plus, Minus, Trash2, Receipt, Leaf, Star, Tag, ThumbsUp, AlertTriangle, TrendingUp, Lightbulb, Heart } from "lucide-react";
 import type { CatalogItem, Student } from "@shared/schema";
 
 const QUEBEC_TAX_RATE = 0.14975;
@@ -264,6 +264,96 @@ function getWeekDates() {
   return `${fmt(start)} au ${fmt(end)}`;
 }
 
+function getItemExplanation(item: CatalogItem): string {
+  const n = item.name.toLowerCase();
+  if (item.category === "food") {
+    if (n.includes("chips") || n.includes("doritos") || n.includes("cheetos") || n.includes("pringles") || n.includes("ruffles") || n.includes("lays")) {
+      return "Collation salée — occasionnellement c'est correct, mais ça s'accumule!";
+    }
+    if (n.includes("chocolat") || n.includes("bonbon") || n.includes("crème glacée") || n.includes("gâteau") || n.includes("twix") || n.includes("reese") || n.includes("macaron") || n.includes("cookie")) {
+      return "Sucrerie — à savourer avec modération. Ça peut attendre.";
+    }
+    if (n.includes("pepsi") || n.includes("coca") || n.includes("sprite") || n.includes("red bull") || n.includes("monster") || n.includes("celsius") || n.includes("gatorade")) {
+      return "Boisson sucrée ou énergisante — l'eau reste la meilleure option pour le portefeuille et la santé!";
+    }
+    if (n.includes("restaurant") || n.includes("pizza") || n.includes("mcdonald") || n.includes("burger") || n.includes("poutine") || n.includes("sous-marin") || n.includes("sushi")) {
+      return "Repas au restaurant — coûte souvent 3 à 5 fois plus cher que cuisiner à la maison.";
+    }
+    if (n.includes("kombucha") || n.includes("jus")) {
+      return "Boisson de confort — meilleur que les sodas, mais pas indispensable.";
+    }
+    return "Plaisir alimentaire — délicieux, mais pas indispensable au quotidien.";
+  }
+  if (item.category === "clothing") {
+    if (n.includes("basket") || n.includes("jordan") || n.includes("air force") || n.includes("yeezy") || n.includes("vans") || n.includes("adidas") || n.includes("nike")) {
+      return "Chaussures de marque — cool, mais des chaussures ordinaires font le même travail!";
+    }
+    if (n.includes("sac à main") || n.includes("bijou") || n.includes("montre") || n.includes("lunettes de soleil")) {
+      return "Accessoire de mode — envie plutôt que besoin. Peut attendre une occasion spéciale.";
+    }
+    return "Vêtement non essentiel — demande-toi si tu en as vraiment besoin ou si c'est une envie du moment.";
+  }
+  if (item.category === "leisure") {
+    if (n.includes("netflix") || n.includes("spotify") || n.includes("youtube") || n.includes("disney") || n.includes("apple")) {
+      return "Abonnement numérique — pratique, mais peut être partagé pour économiser jusqu'à 50%!";
+    }
+    if (n.includes("restaurant") || n.includes("pizza") || n.includes("cinéma") || n.includes("bowling") || n.includes("escape")) {
+      return "Sortie — agréable, mais coûte plus cher que des activités maison. À planifier dans le budget!";
+    }
+    if (n.includes("voyage") || n.includes("avion") || n.includes("hôtel")) {
+      return "Voyage — une dépense importante! À mettre de côté longtemps à l'avance.";
+    }
+    return "Divertissement — bon pour le moral! Assure-toi d'avoir d'abord payé tous tes essentiels.";
+  }
+  return "Article non essentiel — une envie plutôt qu'un besoin.";
+}
+
+interface PurchaseFeedback {
+  grade: "excellent" | "bien" | "attention" | "alerte";
+  title: string;
+  message: string;
+  tip: string;
+}
+
+function getPurchaseFeedback(cart: CartItem[]): PurchaseFeedback {
+  const essentialAmt = cart.filter(c => c.item.isEssential).reduce((s, c) => s + c.item.price * c.quantity, 0);
+  const totalAmt = cart.reduce((s, c) => s + c.item.price * c.quantity, 0);
+  const essentialRatio = totalAmt > 0 ? essentialAmt / totalAmt : 1;
+  const hasNonEssential = cart.some(c => !c.item.isEssential);
+  const hasEssential = cart.some(c => c.item.isEssential);
+
+  if (!hasNonEssential) {
+    return {
+      grade: "excellent",
+      title: "Achats 100% essentiels!",
+      message: "Tous tes achats répondent à des besoins de base. Tu gères ton budget comme un(e) pro!",
+      tip: "Continue de prioriser tes essentiels. Pense aussi à mettre de l'argent de côté chaque mois pour l'épargne.",
+    };
+  }
+  if (!hasEssential) {
+    return {
+      grade: "alerte",
+      title: "Que des plaisirs!",
+      message: "Aucun de tes achats n'est essentiel ce mois-ci. Assure-toi d'avoir ton loyer, ta nourriture de base et tes autres besoins couverts!",
+      tip: "Règle d'or: essentiels d'abord, plaisirs ensuite. Tes besoins de base passent toujours en priorité.",
+    };
+  }
+  if (essentialRatio >= 0.7) {
+    return {
+      grade: "bien",
+      title: "Bon équilibre!",
+      message: `${Math.round(essentialRatio * 100)}% de tes dépenses vont vers des essentiels — c'est un très bon ratio!`,
+      tip: "La règle 50/30/20 suggère: 50% besoins, 30% désirs, 20% épargne. Tu es sur la bonne voie!",
+    };
+  }
+  return {
+    grade: "attention",
+    title: "Beaucoup de plaisirs!",
+    message: `${Math.round((1 - essentialRatio) * 100)}% de tes achats sont des plaisirs. C'est beaucoup pour un seul passage à la caisse!`,
+    tip: "Astuce: avant chaque achat, pose-toi la question — \"Est-ce que j'en ai besoin, ou j'en ai juste envie?\" Cette simple question peut t'économiser des centaines de dollars par année!",
+  };
+}
+
 export default function Catalog() {
   const { studentId } = useParams();
   const [location, navigate] = useLocation();
@@ -274,6 +364,8 @@ export default function Catalog() {
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [showCheckoutConfirm, setShowCheckoutConfirm] = useState(false);
   const [purchaseSuccess, setPurchaseSuccess] = useState(false);
+  const [showPurchaseFeedback, setShowPurchaseFeedback] = useState(false);
+  const [purchasedCart, setPurchasedCart] = useState<CartItem[]>([]);
 
   useEffect(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
@@ -305,14 +397,14 @@ export default function Catalog() {
       });
       await Promise.all(promises);
     },
-    onSuccess: () => {
+    onSuccess: (_data, variables) => {
       queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
       queryClient.invalidateQueries({ queryKey: ["/api/expenses", studentId] });
+      setPurchasedCart(variables);
       setCart([]);
       setShowCheckoutConfirm(false);
       setIsCartOpen(false);
-      setPurchaseSuccess(true);
-      setTimeout(() => setPurchaseSuccess(false), 3000);
+      setShowPurchaseFeedback(true);
     },
   });
 
@@ -416,18 +508,6 @@ export default function Catalog() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
-      {/* Success Toast */}
-      {purchaseSuccess && (
-        <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
-          <div className="bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 border-2 border-green-400">
-            <CheckCircle2 className="w-6 h-6 shrink-0" />
-            <div>
-              <p className="font-black text-lg">Achat complété!</p>
-              <p className="text-sm opacity-90">Votre panier a été validé avec succès</p>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* ── CIRCULAIRE HEADER ── */}
       <div className={`${currentCategory?.color} text-white`}>
@@ -812,6 +892,126 @@ export default function Catalog() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* ── PURCHASE FEEDBACK MODAL ── */}
+      {(() => {
+        if (!showPurchaseFeedback || purchasedCart.length === 0) return null;
+        const feedback = getPurchaseFeedback(purchasedCart);
+        const nonEssentialItems = purchasedCart.filter(c => !c.item.isEssential);
+        const essentialItems = purchasedCart.filter(c => c.item.isEssential);
+        const totalPaid = purchasedCart.reduce((s, c) => {
+          const price = c.item.isTaxable ? c.item.price * (1 + QUEBEC_TAX_RATE) : c.item.price;
+          return s + price * c.quantity;
+        }, 0);
+
+        const gradeConfig = {
+          excellent: { Icon: CheckCircle2, bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-300 dark:border-green-700", iconColor: "text-green-600", titleColor: "text-green-700 dark:text-green-400", badgeClass: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
+          bien: { Icon: ThumbsUp, bg: "bg-blue-50 dark:bg-blue-900/20", border: "border-blue-300 dark:border-blue-700", iconColor: "text-blue-600", titleColor: "text-blue-700 dark:text-blue-400", badgeClass: "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200" },
+          attention: { Icon: AlertTriangle, bg: "bg-yellow-50 dark:bg-yellow-900/20", border: "border-yellow-300 dark:border-yellow-700", iconColor: "text-yellow-600", titleColor: "text-yellow-700 dark:text-yellow-400", badgeClass: "bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200" },
+          alerte: { Icon: AlertCircle, bg: "bg-red-50 dark:bg-red-900/20", border: "border-red-300 dark:border-red-700", iconColor: "text-red-600", titleColor: "text-red-700 dark:text-red-400", badgeClass: "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200" },
+        }[feedback.grade];
+        const { Icon } = gradeConfig;
+
+        return (
+          <Dialog open={showPurchaseFeedback} onOpenChange={setShowPurchaseFeedback}>
+            <DialogContent className="max-w-lg max-h-[90vh] flex flex-col" data-testid="dialog-purchase-feedback">
+              <DialogHeader>
+                <DialogTitle className="flex items-center gap-2 text-xl">
+                  <CheckCircle2 className="w-5 h-5 text-green-500" />
+                  Achat complété — {totalPaid.toFixed(2)} $
+                </DialogTitle>
+                <DialogDescription>Voici une analyse de tes achats</DialogDescription>
+              </DialogHeader>
+
+              <ScrollArea className="flex-1">
+                <div className="space-y-4 pr-1">
+                  {/* Grade Banner */}
+                  <div className={`rounded-lg border p-4 flex items-start gap-3 ${gradeConfig.bg} ${gradeConfig.border}`}>
+                    <Icon className={`w-6 h-6 shrink-0 mt-0.5 ${gradeConfig.iconColor}`} />
+                    <div>
+                      <p className={`font-black text-base ${gradeConfig.titleColor}`}>{feedback.title}</p>
+                      <p className="text-sm text-foreground/80 mt-0.5">{feedback.message}</p>
+                    </div>
+                  </div>
+
+                  {/* Essential items */}
+                  {essentialItems.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <Heart className="w-4 h-4 text-green-600" />
+                        <p className="font-bold text-sm text-green-700 dark:text-green-400">Essentiels ({essentialItems.length} article{essentialItems.length > 1 ? "s" : ""})</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        {essentialItems.map(cartItem => (
+                          <div key={cartItem.item.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
+                            <span className="text-xl w-8 text-center shrink-0">{getProductEmoji(cartItem.item.name, cartItem.item.category)}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold truncate">{cartItem.quantity > 1 ? `${cartItem.quantity}x ` : ""}{cartItem.item.name}</p>
+                              <p className="text-xs text-green-700 dark:text-green-400">Besoin essentiel — bon choix!</p>
+                            </div>
+                            <Badge variant="outline" className="shrink-0 text-xs border-green-400 text-green-700 dark:text-green-400">
+                              {(cartItem.item.price * cartItem.quantity).toFixed(2)} $
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Non-essential items */}
+                  {nonEssentialItems.length > 0 && (
+                    <div>
+                      <div className="flex items-center gap-2 mb-2">
+                        <TrendingUp className="w-4 h-4 text-amber-600" />
+                        <p className="font-bold text-sm text-amber-700 dark:text-amber-400">Plaisirs ({nonEssentialItems.length} article{nonEssentialItems.length > 1 ? "s" : ""})</p>
+                      </div>
+                      <div className="space-y-1.5">
+                        {nonEssentialItems.map(cartItem => (
+                          <div key={cartItem.item.id} className="flex items-start gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
+                            <span className="text-xl w-8 text-center shrink-0 mt-0.5">{getProductEmoji(cartItem.item.name, cartItem.item.category)}</span>
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm font-semibold truncate">{cartItem.quantity > 1 ? `${cartItem.quantity}x ` : ""}{cartItem.item.name}</p>
+                              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">{getItemExplanation(cartItem.item)}</p>
+                            </div>
+                            <Badge variant="outline" className="shrink-0 text-xs border-amber-400 text-amber-700 dark:text-amber-400">
+                              {(cartItem.item.price * cartItem.quantity).toFixed(2)} $
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Tip */}
+                  <div className="flex items-start gap-3 p-4 rounded-lg bg-muted border">
+                    <Lightbulb className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
+                    <div>
+                      <p className="font-bold text-sm mb-0.5">Conseil budgétaire</p>
+                      <p className="text-sm text-muted-foreground">{feedback.tip}</p>
+                    </div>
+                  </div>
+                </div>
+              </ScrollArea>
+
+              <DialogFooter className="mt-4 gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => { setShowPurchaseFeedback(false); navigate(`/student/${studentId}`); }}
+                  data-testid="button-feedback-go-dashboard"
+                >
+                  Retour au tableau de bord
+                </Button>
+                <Button
+                  onClick={() => setShowPurchaseFeedback(false)}
+                  data-testid="button-feedback-continue"
+                >
+                  Continuer mes achats
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </div>
   );
 }

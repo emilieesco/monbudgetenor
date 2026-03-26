@@ -18,6 +18,7 @@ const CATEGORIES = [
   { id: "food", name: "Épicerie", icon: "🛒", color: "bg-red-700", accent: "bg-red-600" },
   { id: "clothing", name: "Vêtements", icon: "👕", color: "bg-blue-700", accent: "bg-blue-600" },
   { id: "leisure", name: "Loisirs", icon: "🎮", color: "bg-purple-700", accent: "bg-purple-600" },
+  { id: "sale", name: "Soldes", icon: "🏷️", color: "bg-yellow-600", accent: "bg-yellow-500" },
 ];
 
 const FOOD_SUBCATEGORIES = [
@@ -32,8 +33,13 @@ const FOOD_SUBCATEGORIES = [
 
 const ITEMS_PER_PAGE = 18;
 
+interface CatalogItemWithPromo extends CatalogItem {
+  originalPrice?: number;
+  discountPct?: number;
+}
+
 interface CartItem {
-  item: CatalogItem;
+  item: CatalogItemWithPromo;
   quantity: number;
 }
 
@@ -252,6 +258,92 @@ function getProductEmoji(name: string, category: string): string {
   return "🛒";
 }
 
+type PromoEntry = { name: string; discountPct: number };
+
+const PROMO_SETS: PromoEntry[][] = [
+  [
+    { name: "Poulet entier 1.5kg", discountPct: 25 },
+    { name: "Bœuf haché mi-maigre 450g", discountPct: 25 },
+    { name: "Beurre salé 454g", discountPct: 20 },
+    { name: "Pommes Gala 3lb", discountPct: 30 },
+    { name: "Oranges Navel 4lb", discountPct: 25 },
+    { name: "Carottes 2lb", discountPct: 20 },
+    { name: "Mozzarella 340g", discountPct: 20 },
+    { name: "Yogourt nature 650g", discountPct: 25 },
+    { name: "T-shirt", discountPct: 35 },
+    { name: "Jeans bleu", discountPct: 30 },
+    { name: "Chaussettes", discountPct: 40 },
+    { name: "Cinéma", discountPct: 20 },
+    { name: "Zoo de Granby (entrée)", discountPct: 20 },
+    { name: "Abonnement Netflix", discountPct: 20 },
+    { name: "Bowling", discountPct: 30 },
+  ],
+  [
+    { name: "Poitrines de poulet 900g", discountPct: 25 },
+    { name: "Saumon filet 400g", discountPct: 30 },
+    { name: "Fromage cheddar 400g", discountPct: 25 },
+    { name: "Pommes de terre 10lb", discountPct: 35 },
+    { name: "Lait 2% 2L", discountPct: 20 },
+    { name: "Tomates grappe", discountPct: 25 },
+    { name: "Crème sure 500ml", discountPct: 30 },
+    { name: "Œufs gros calibre 12", discountPct: 25 },
+    { name: "Veste d'hiver", discountPct: 30 },
+    { name: "Bottes d'hiver", discountPct: 25 },
+    { name: "Casquette", discountPct: 35 },
+    { name: "Entrée piscine", discountPct: 25 },
+    { name: "Musée des beaux-arts", discountPct: 35 },
+    { name: "Abonnement Spotify", discountPct: 25 },
+    { name: "Parc d'attractions", discountPct: 20 },
+  ],
+  [
+    { name: "Bacon 375g", discountPct: 30 },
+    { name: "Crème 35% 473ml", discountPct: 30 },
+    { name: "Côtelettes de porc 600g", discountPct: 25 },
+    { name: "Crevettes 340g", discountPct: 30 },
+    { name: "Brocoli", discountPct: 25 },
+    { name: "Laitue romaine", discountPct: 25 },
+    { name: "Bananes", discountPct: 20 },
+    { name: "Lait 3.25% 2L", discountPct: 20 },
+    { name: "Pull", discountPct: 30 },
+    { name: "Bermuda", discountPct: 35 },
+    { name: "Robe d'été", discountPct: 30 },
+    { name: "Cours de guitare (cours)", discountPct: 25 },
+    { name: "Ski de fond (journée)", discountPct: 30 },
+    { name: "Karaoké", discountPct: 30 },
+    { name: "Abonnement YouTube Premium", discountPct: 25 },
+  ],
+];
+
+function getPromoSetIndex(): number {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  return Math.floor(dayOfYear / 14) % PROMO_SETS.length;
+}
+
+function getPromoValidDates(): { start: Date; end: Date } {
+  const now = new Date();
+  const startOfYear = new Date(now.getFullYear(), 0, 1);
+  const dayOfYear = Math.floor((now.getTime() - startOfYear.getTime()) / (1000 * 60 * 60 * 24));
+  const period = Math.floor(dayOfYear / 14);
+  const start = new Date(startOfYear);
+  start.setDate(1 + period * 14);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 13);
+  return { start, end };
+}
+
+function applyPromos(items: CatalogItem[]): CatalogItemWithPromo[] {
+  const currentPromos = PROMO_SETS[getPromoSetIndex()];
+  return items.map(item => {
+    const promo = currentPromos.find(p => p.name.toLowerCase() === item.name.toLowerCase());
+    if (!promo) return item;
+    const originalPrice = item.price;
+    const discountedPrice = Math.round(originalPrice * (1 - promo.discountPct / 100) * 100) / 100;
+    return { ...item, price: discountedPrice, originalPrice, discountPct: promo.discountPct };
+  });
+}
+
 function getWeekDates() {
   const now = new Date();
   const start = new Date(now);
@@ -370,7 +462,7 @@ export default function Catalog() {
   useEffect(() => {
     const params = new URLSearchParams(location.split("?")[1] || "");
     const cat = params.get("category");
-    if (cat === "food" || cat === "clothing" || cat === "leisure") {
+    if (cat === "food" || cat === "clothing" || cat === "leisure" || cat === "sale") {
       setSelectedCategory(cat);
     }
   }, [location]);
@@ -409,8 +501,11 @@ export default function Catalog() {
   });
 
   const student = studentQuery.data as Student | undefined;
-  const allItems = (catalogQuery.data as CatalogItem[]) || [];
-  let filteredItems = allItems.filter(item => item.category === selectedCategory);
+  const allRawItems = (catalogQuery.data as CatalogItem[]) || [];
+  const allItems = applyPromos(allRawItems);
+  let filteredItems = selectedCategory === "sale"
+    ? allItems.filter(item => !!item.originalPrice)
+    : allItems.filter(item => item.category === selectedCategory);
   if (selectedCategory === "food" && selectedSubcategory) {
     filteredItems = filteredItems.filter(item => item.subcategory === selectedSubcategory);
   }
@@ -432,7 +527,7 @@ export default function Catalog() {
     setCurrentPage(1);
   };
 
-  const addToCart = (item: CatalogItem) => {
+  const addToCart = (item: CatalogItemWithPromo) => {
     setCart(prev => {
       const existing = prev.find(c => c.item.id === item.id);
       if (existing) {
@@ -482,10 +577,10 @@ export default function Catalog() {
   const canAffordCart = remaining >= cartTotals.total;
 
   // Group items by subcategory for food display
-  const groupedItems: { subcat: string | null; icon: string; items: CatalogItem[] }[] = [];
+  const groupedItems: { subcat: string | null; icon: string; items: CatalogItemWithPromo[] }[] = [];
   if (selectedCategory === "food" && !selectedSubcategory) {
-    const grouped: Record<string, CatalogItem[]> = {};
-    const noSubcat: CatalogItem[] = [];
+    const grouped: Record<string, CatalogItemWithPromo[]> = {};
+    const noSubcat: CatalogItemWithPromo[] = [];
     pageItems.forEach(item => {
       if (item.subcategory) {
         if (!grouped[item.subcategory]) grouped[item.subcategory] = [];
@@ -511,10 +606,20 @@ export default function Catalog() {
 
       {/* ── CIRCULAIRE HEADER ── */}
       <div className={`${currentCategory?.color} text-white`}>
-        {/* Top bar */}
-        <div className="bg-black/30 py-1 px-4 text-center text-xs font-semibold tracking-widest uppercase">
-          Valide: {getWeekDates()}
-        </div>
+        {/* Top bar with promo dates */}
+        {(() => {
+          const { start, end } = getPromoValidDates();
+          const fmt = (d: Date) => d.toLocaleDateString("fr-CA", { day: "numeric", month: "long" });
+          const promoCount = PROMO_SETS[getPromoSetIndex()].length;
+          return (
+            <div className="bg-black/30 py-1.5 px-4 text-center text-xs font-semibold tracking-widest uppercase flex items-center justify-center gap-3 flex-wrap">
+              <span>Valide du {fmt(start)} au {fmt(end)}</span>
+              <span className="bg-yellow-400 text-black px-2 py-0.5 rounded text-[10px] font-black">
+                {promoCount} ARTICLES EN SOLDE
+              </span>
+            </div>
+          );
+        })()}
 
         <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
           <div className="flex items-center justify-between gap-4 flex-wrap">
@@ -684,22 +789,30 @@ export default function Catalog() {
 
         {/* ── CATEGORY TABS ── */}
         <div className="bg-black/20">
-          <div className="max-w-7xl mx-auto px-4 flex gap-0">
-            {CATEGORIES.map(cat => (
-              <button
-                key={cat.id}
-                onClick={() => handleCategoryChange(cat.id)}
-                className={`px-6 py-3 font-black uppercase tracking-wide text-sm transition-all flex items-center gap-2 border-b-4 ${
-                  selectedCategory === cat.id
-                    ? "border-yellow-400 bg-white/20 text-white"
-                    : "border-transparent text-white/70 hover:text-white hover:bg-white/10"
-                }`}
-                data-testid={`button-category-${cat.id}`}
-              >
-                <span>{cat.icon}</span>
-                {cat.name}
-              </button>
-            ))}
+          <div className="max-w-7xl mx-auto px-4 flex gap-0 overflow-x-auto">
+            {CATEGORIES.map(cat => {
+              const saleCount = cat.id === "sale" ? allItems.filter(i => !!i.originalPrice).length : 0;
+              return (
+                <button
+                  key={cat.id}
+                  onClick={() => handleCategoryChange(cat.id)}
+                  className={`shrink-0 px-5 py-3 font-black uppercase tracking-wide text-sm transition-all flex items-center gap-2 border-b-4 ${
+                    selectedCategory === cat.id
+                      ? cat.id === "sale" ? "border-yellow-400 bg-yellow-500/20 text-white" : "border-yellow-400 bg-white/20 text-white"
+                      : "border-transparent text-white/70 hover:text-white hover:bg-white/10"
+                  }`}
+                  data-testid={`button-category-${cat.id}`}
+                >
+                  <span>{cat.icon}</span>
+                  {cat.name}
+                  {cat.id === "sale" && saleCount > 0 && (
+                    <span className="bg-yellow-400 text-black text-[10px] font-black rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+                      {saleCount}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -1018,14 +1131,15 @@ export default function Catalog() {
 
 // ── Product Grid Component ──
 function ProductGrid({ items, cart, addToCart }: {
-  items: CatalogItem[];
+  items: CatalogItemWithPromo[];
   cart: CartItem[];
-  addToCart: (item: CatalogItem) => void;
+  addToCart: (item: CatalogItemWithPromo) => void;
 }) {
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
       {items.map(item => {
         const cartItem = cart.find(c => c.item.id === item.id);
+        const isOnSale = !!item.originalPrice;
         const priceWithTax = item.isTaxable
           ? item.price * (1 + QUEBEC_TAX_RATE)
           : item.price;
@@ -1033,7 +1147,11 @@ function ProductGrid({ items, cart, addToCart }: {
         return (
           <div
             key={item.id}
-            className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col hover:border-red-400 dark:hover:border-red-600 transition-colors group relative"
+            className={`bg-white dark:bg-gray-900 rounded-lg overflow-hidden flex flex-col transition-colors group relative ${
+              isOnSale
+                ? "border-2 border-yellow-400 dark:border-yellow-500 hover:border-yellow-500 dark:hover:border-yellow-400 shadow-md"
+                : "border-2 border-gray-200 dark:border-gray-700 hover:border-red-400 dark:hover:border-red-600"
+            }`}
             data-testid={`card-product-${item.id}`}
           >
             {/* Quantity badge */}
@@ -1043,7 +1161,16 @@ function ProductGrid({ items, cart, addToCart }: {
               </div>
             )}
 
-            {/* Essential / Taxable badge top-right */}
+            {/* SPÉCIAL ribbon — top left when on sale */}
+            {isOnSale && !cartItem && (
+              <div className="absolute top-0 left-0 z-10">
+                <div className="bg-red-600 text-white text-[9px] font-black px-2 py-0.5 rounded-br-lg tracking-wider shadow">
+                  SPÉCIAL
+                </div>
+              </div>
+            )}
+
+            {/* Essential / Plaisir badge top-right */}
             <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 items-end">
               {item.isEssential ? (
                 <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-green-300 dark:border-green-700">
@@ -1059,7 +1186,7 @@ function ProductGrid({ items, cart, addToCart }: {
             </div>
 
             {/* Product emoji */}
-            <div className="pt-8 pb-2 flex items-center justify-center bg-gray-50 dark:bg-gray-800/50">
+            <div className={`pt-8 pb-2 flex items-center justify-center ${isOnSale ? "bg-yellow-50 dark:bg-yellow-900/10" : "bg-gray-50 dark:bg-gray-800/50"}`}>
               <span className="text-5xl group-hover:scale-110 transition-transform duration-200 block">
                 {getProductEmoji(item.name, item.category)}
               </span>
@@ -1072,27 +1199,44 @@ function ProductGrid({ items, cart, addToCart }: {
               </p>
 
               {/* Price tag */}
-              <div className="mt-2 flex items-end justify-between gap-1">
-                <div>
-                  <div className="text-red-600 dark:text-red-400 font-black text-xl leading-none">
-                    {item.price.toFixed(2)}<span className="text-sm font-bold"> $</span>
+              <div className="mt-1.5 space-y-0.5">
+                {isOnSale && item.originalPrice && (
+                  <div className="flex items-center gap-1.5 flex-wrap">
+                    <span className="text-muted-foreground text-xs line-through">
+                      {item.originalPrice.toFixed(2)} $
+                    </span>
+                    <span className="bg-red-600 text-white text-[9px] font-black px-1 py-0 rounded">
+                      -{item.discountPct}%
+                    </span>
                   </div>
-                  {item.isTaxable && (
-                    <p className="text-[10px] text-muted-foreground mt-0.5">
-                      {priceWithTax.toFixed(2)} $ avec taxes
-                    </p>
-                  )}
+                )}
+                <div className={`font-black text-xl leading-none ${isOnSale ? "text-red-700 dark:text-red-400" : "text-red-600 dark:text-red-400"}`}>
+                  {item.price.toFixed(2)}<span className="text-sm font-bold"> $</span>
                 </div>
+                {item.isTaxable && (
+                  <p className="text-[10px] text-muted-foreground">
+                    {priceWithTax.toFixed(2)} $ avec taxes
+                  </p>
+                )}
+                {isOnSale && item.originalPrice && (
+                  <p className="text-[10px] text-green-600 dark:text-green-400 font-bold">
+                    Économisez {(item.originalPrice - item.price).toFixed(2)} $
+                  </p>
+                )}
               </div>
 
               {/* Add to cart */}
               <button
                 onClick={() => addToCart(item)}
-                className="mt-2 w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-black py-2 rounded-md flex items-center justify-center gap-1 transition-colors"
+                className={`mt-2 w-full text-white text-xs font-black py-2 rounded-md flex items-center justify-center gap-1 transition-colors ${
+                  isOnSale
+                    ? "bg-red-700 hover:bg-red-800 active:bg-red-900"
+                    : "bg-red-600 hover:bg-red-700 active:bg-red-800"
+                }`}
                 data-testid={`button-add-${item.id}`}
               >
                 <Plus className="w-3.5 h-3.5" />
-                Ajouter
+                {isOnSale ? "Profiter du rabais" : "Ajouter"}
               </button>
             </div>
           </div>

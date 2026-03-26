@@ -205,7 +205,7 @@
       "classId": "e7b221ff-e67c-49d9-9479-8fde5cfaeb31",
       "budget": 1500,
       "id": "0e1924a4-a129-4e09-b88e-32166f480bd6",
-      "spent": 0,
+      "spent": 3.37,
       "savings": 1500,
       "createdAt": "2025-11-30T00:20:36.801Z",
       "budgetHistory": [
@@ -2655,6 +2655,17 @@
       "message": "Attention, ceci n'est pas un achat essentiel.",
       "id": "7df5df09-cff1-4b00-a153-2c49542d8262",
       "timestamp": "2026-03-26T03:42:13.645Z"
+    },
+    "0312c7aa-d1a9-4567-87f1-a80fb16419f6": {
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "itemId": "fa334c6f-d23b-4ce2-ae28-f436e244f38a",
+      "amount": 3.37,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "0312c7aa-d1a9-4567-87f1-a80fb16419f6",
+      "timestamp": "2026-03-26T17:43:16.057Z"
     }
   },
   "fixedExpenses": {

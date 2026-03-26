@@ -9,28 +9,28 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState, useEffect } from "react";
-import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, TrendingUp, Plus, Minus, Trash2, Receipt, X } from "lucide-react";
+import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, Plus, Minus, Trash2, Receipt, Leaf, Star, Tag } from "lucide-react";
 import type { CatalogItem, Student } from "@shared/schema";
 
-const QUEBEC_TAX_RATE = 0.14975; // TPS 5% + TVQ 9.975%
+const QUEBEC_TAX_RATE = 0.14975;
 
 const CATEGORIES = [
-  { id: "food", name: "Nourriture", icon: "🍎", color: "from-green-500 to-emerald-600" },
-  { id: "clothing", name: "Vêtements", icon: "👕", color: "from-blue-500 to-indigo-600" },
-  { id: "leisure", name: "Loisirs", icon: "🎮", color: "from-purple-500 to-violet-600" },
+  { id: "food", name: "Épicerie", icon: "🛒", color: "bg-red-700", accent: "bg-red-600" },
+  { id: "clothing", name: "Vêtements", icon: "👕", color: "bg-blue-700", accent: "bg-blue-600" },
+  { id: "leisure", name: "Loisirs", icon: "🎮", color: "bg-purple-700", accent: "bg-purple-600" },
 ];
 
 const FOOD_SUBCATEGORIES = [
-  { id: "Produits Laitiers", icon: "🥛", color: "bg-blue-100 dark:bg-blue-900/30" },
-  { id: "Viandes", icon: "🍗", color: "bg-red-100 dark:bg-red-900/30" },
-  { id: "Fruits & Légumes", icon: "🥬", color: "bg-green-100 dark:bg-green-900/30" },
-  { id: "Conserves", icon: "🥫", color: "bg-amber-100 dark:bg-amber-900/30" },
-  { id: "Boulangerie", icon: "🍞", color: "bg-orange-100 dark:bg-orange-900/30" },
-  { id: "Bonbons & Sucreries", icon: "🍬", color: "bg-pink-100 dark:bg-pink-900/30" },
-  { id: "Boissons", icon: "🥤", color: "bg-cyan-100 dark:bg-cyan-900/30" },
+  { id: "Produits Laitiers", icon: "🥛" },
+  { id: "Viandes", icon: "🍗" },
+  { id: "Fruits & Légumes", icon: "🥬" },
+  { id: "Conserves", icon: "🥫" },
+  { id: "Boulangerie", icon: "🍞" },
+  { id: "Bonbons & Sucreries", icon: "🍬" },
+  { id: "Boissons", icon: "🥤" },
 ];
 
-const ITEMS_PER_PAGE = 12;
+const ITEMS_PER_PAGE = 18;
 
 interface CartItem {
   item: CatalogItem;
@@ -39,7 +39,6 @@ interface CartItem {
 
 function getProductEmoji(name: string, category: string): string {
   const lower = name.toLowerCase();
-  
   if (category === "food") {
     if (lower.includes("lait")) return "🥛";
     if (lower.includes("pain")) return "🍞";
@@ -88,7 +87,6 @@ function getProductEmoji(name: string, category: string): string {
     if (lower.includes("barre")) return "🍫";
     return "🍽️";
   }
-  
   if (category === "clothing") {
     if (lower.includes("t-shirt")) return "👕";
     if (lower.includes("jeans")) return "👖";
@@ -99,7 +97,6 @@ function getProductEmoji(name: string, category: string): string {
     if (lower.includes("bermuda")) return "🩳";
     return "👕";
   }
-  
   if (category === "leisure") {
     if (lower.includes("cinéma")) return "🎬";
     if (lower.includes("jeu")) return "🎮";
@@ -109,8 +106,19 @@ function getProductEmoji(name: string, category: string): string {
     if (lower.includes("concert")) return "🎵";
     return "🎮";
   }
-  
   return "🛒";
+}
+
+function getWeekDates() {
+  const now = new Date();
+  const start = new Date(now);
+  const day = now.getDay();
+  const diff = now.getDate() - day + (day === 0 ? -6 : 1);
+  start.setDate(diff);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  const fmt = (d: Date) => d.toLocaleDateString("fr-CA", { day: "numeric", month: "long" });
+  return `${fmt(start)} au ${fmt(end)}`;
 }
 
 export default function Catalog() {
@@ -132,23 +140,17 @@ export default function Catalog() {
     }
   }, [location]);
 
-  const studentQuery = useQuery({
-    queryKey: ["/api/students", studentId],
-  });
-
-  const catalogQuery = useQuery({
-    queryKey: ["/api/catalog"],
-  });
+  const studentQuery = useQuery({ queryKey: ["/api/students", studentId] });
+  const catalogQuery = useQuery({ queryKey: ["/api/catalog"] });
 
   const addExpenseMutation = useMutation({
     mutationFn: async (cartItems: CartItem[]) => {
       const promises = cartItems.flatMap(cartItem => {
-        const priceWithTax = cartItem.item.isTaxable 
-          ? cartItem.item.price * (1 + QUEBEC_TAX_RATE) 
+        const priceWithTax = cartItem.item.isTaxable
+          ? cartItem.item.price * (1 + QUEBEC_TAX_RATE)
           : cartItem.item.price;
         const roundedPrice = Math.round(priceWithTax * 100) / 100;
-        
-        return Array.from({ length: cartItem.quantity }, () => 
+        return Array.from({ length: cartItem.quantity }, () =>
           apiRequest("POST", "/api/expenses", {
             studentId,
             itemId: cartItem.item.id,
@@ -172,25 +174,24 @@ export default function Catalog() {
   });
 
   const student = studentQuery.data as Student | undefined;
-  const allItems = catalogQuery.data as CatalogItem[] || [];
+  const allItems = (catalogQuery.data as CatalogItem[]) || [];
   let filteredItems = allItems.filter(item => item.category === selectedCategory);
-  
   if (selectedCategory === "food" && selectedSubcategory) {
     filteredItems = filteredItems.filter(item => item.subcategory === selectedSubcategory);
   }
-  
+
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const items = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  
+  const pageItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory);
-  
+
   const handleCategoryChange = (catId: string) => {
     setSelectedCategory(catId);
     setSelectedSubcategory(null);
     setCurrentPage(1);
   };
-  
+
   const handleSubcategoryChange = (subcat: string | null) => {
     setSelectedSubcategory(subcat);
     setCurrentPage(1);
@@ -200,9 +201,7 @@ export default function Catalog() {
     setCart(prev => {
       const existing = prev.find(c => c.item.id === item.id);
       if (existing) {
-        return prev.map(c => 
-          c.item.id === item.id ? { ...c, quantity: c.quantity + 1 } : c
-        );
+        return prev.map(c => c.item.id === item.id ? { ...c, quantity: c.quantity + 1 } : c);
       }
       return [...prev, { item, quantity: 1 }];
     });
@@ -213,31 +212,27 @@ export default function Catalog() {
   };
 
   const updateQuantity = (itemId: string, delta: number) => {
-    setCart(prev => prev.map(c => {
-      if (c.item.id === itemId) {
-        const newQty = c.quantity + delta;
-        return newQty > 0 ? { ...c, quantity: newQty } : c;
-      }
-      return c;
-    }).filter(c => c.quantity > 0));
+    setCart(prev =>
+      prev.map(c => {
+        if (c.item.id === itemId) {
+          const newQty = c.quantity + delta;
+          return newQty > 0 ? { ...c, quantity: newQty } : c;
+        }
+        return c;
+      }).filter(c => c.quantity > 0)
+    );
   };
 
-  // Calculate cart totals with Quebec taxes
   const calculateCartTotals = () => {
     let subtotal = 0;
     let taxableAmount = 0;
-    
     cart.forEach(cartItem => {
       const itemTotal = cartItem.item.price * cartItem.quantity;
       subtotal += itemTotal;
-      if (cartItem.item.isTaxable) {
-        taxableAmount += itemTotal;
-      }
+      if (cartItem.item.isTaxable) taxableAmount += itemTotal;
     });
-    
     const taxes = taxableAmount * QUEBEC_TAX_RATE;
     const total = subtotal + taxes;
-    
     return { subtotal, taxableAmount, taxes, total };
   };
 
@@ -245,414 +240,376 @@ export default function Catalog() {
   const cartItemCount = cart.reduce((sum, c) => sum + c.quantity, 0);
 
   if (!student) {
-    return <div className="p-8">Chargement...</div>;
+    return <div className="p-8 text-center text-muted-foreground">Chargement...</div>;
   }
 
   const remaining = student.budget - student.spent;
   const canAffordCart = remaining >= cartTotals.total;
 
+  // Group items by subcategory for food display
+  const groupedItems: { subcat: string | null; icon: string; items: CatalogItem[] }[] = [];
+  if (selectedCategory === "food" && !selectedSubcategory) {
+    const grouped: Record<string, CatalogItem[]> = {};
+    const noSubcat: CatalogItem[] = [];
+    pageItems.forEach(item => {
+      if (item.subcategory) {
+        if (!grouped[item.subcategory]) grouped[item.subcategory] = [];
+        grouped[item.subcategory].push(item);
+      } else {
+        noSubcat.push(item);
+      }
+    });
+    FOOD_SUBCATEGORIES.forEach(sc => {
+      if (grouped[sc.id] && grouped[sc.id].length > 0) {
+        groupedItems.push({ subcat: sc.id, icon: sc.icon, items: grouped[sc.id] });
+      }
+    });
+    if (noSubcat.length > 0) {
+      groupedItems.push({ subcat: null, icon: "🛒", items: noSubcat });
+    }
+  }
+
+  const useGrouped = selectedCategory === "food" && !selectedSubcategory && groupedItems.length > 0;
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-muted/50 to-background">
+    <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
       {/* Success Toast */}
       {purchaseSuccess && (
         <div className="fixed top-4 right-4 z-50 animate-in slide-in-from-top-2">
-          <div className="bg-green-500 text-white px-6 py-4 rounded-lg shadow-lg flex items-center gap-3">
-            <CheckCircle2 className="w-6 h-6" />
+          <div className="bg-green-600 text-white px-6 py-4 rounded-lg shadow-xl flex items-center gap-3 border-2 border-green-400">
+            <CheckCircle2 className="w-6 h-6 shrink-0" />
             <div>
-              <p className="font-bold">Achat complété!</p>
-              <p className="text-sm opacity-90">Votre panier a été validé</p>
+              <p className="font-black text-lg">Achat complété!</p>
+              <p className="text-sm opacity-90">Votre panier a été validé avec succès</p>
             </div>
           </div>
         </div>
       )}
 
-      {/* Hero Header */}
-      <div className={`bg-gradient-to-r ${currentCategory?.color} text-white p-6 md:p-8`}>
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center justify-between mb-4 gap-4 flex-wrap">
-            <div>
-              <h1 className="text-3xl md:text-5xl font-black mb-2">Circulaire Mon Budget en Or</h1>
-              <p className="text-white/90 text-base md:text-lg">Découvrez nos meilleures offres de la semaine!</p>
+      {/* ── CIRCULAIRE HEADER ── */}
+      <div className={`${currentCategory?.color} text-white`}>
+        {/* Top bar */}
+        <div className="bg-black/30 py-1 px-4 text-center text-xs font-semibold tracking-widest uppercase">
+          Valide: {getWeekDates()}
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 py-4 md:py-6">
+          <div className="flex items-center justify-between gap-4 flex-wrap">
+            {/* Logo / Title */}
+            <div className="flex items-center gap-4">
+              <Button
+                onClick={() => navigate(`/student/${studentId}`)}
+                variant="secondary"
+                size="sm"
+                className="shrink-0"
+                data-testid="button-back-dashboard"
+              >
+                <ArrowLeft className="w-4 h-4 mr-1" />
+                Retour
+              </Button>
+              <div>
+                <div className="flex items-baseline gap-3">
+                  <h1 className="text-2xl md:text-4xl font-black tracking-tight uppercase">
+                    CIRCULAIRE
+                  </h1>
+                  <span className="text-lg md:text-2xl font-light opacity-80">Mon Budget en Or</span>
+                </div>
+                <p className="text-white/80 text-sm mt-0.5">
+                  Les meilleurs prix cette semaine &mdash; {currentCategory?.name}
+                </p>
+              </div>
             </div>
-            <div className="flex items-center gap-3">
+
+            {/* Budget pill + Cart */}
+            <div className="flex items-center gap-3 flex-wrap">
+              <div className="bg-white/15 border border-white/30 rounded-lg px-4 py-2 text-center">
+                <p className="text-xs uppercase tracking-wide opacity-80">Budget disponible</p>
+                <p className={`text-xl font-black ${remaining < 0 ? "text-red-300" : "text-yellow-300"}`}>
+                  {remaining.toFixed(2)} $
+                </p>
+              </div>
+
               <Sheet open={isCartOpen} onOpenChange={setIsCartOpen}>
                 <SheetTrigger asChild>
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="relative flex items-center gap-2 font-bold"
+                    className="relative font-bold text-base px-5"
                     data-testid="button-open-cart"
                   >
-                    <ShoppingCart className="w-5 h-5" />
-                    <span className="hidden sm:inline">Panier</span>
+                    <ShoppingCart className="w-5 h-5 mr-2" />
+                    Mon panier
                     {cartItemCount > 0 && (
-                      <Badge className="absolute -top-2 -right-2 bg-red-500 text-white border-0 min-w-[24px] h-6 flex items-center justify-center">
+                      <span className="absolute -top-2 -right-2 bg-yellow-400 text-black text-xs font-black rounded-full min-w-[22px] h-[22px] flex items-center justify-center border-2 border-white">
                         {cartItemCount}
-                      </Badge>
+                      </span>
                     )}
                   </Button>
                 </SheetTrigger>
+
+                {/* ── CART SHEET ── */}
                 <SheetContent className="w-full sm:max-w-lg flex flex-col">
                   <SheetHeader>
                     <SheetTitle className="flex items-center gap-2 text-xl">
                       <ShoppingCart className="w-6 h-6" />
-                      Mon Panier ({cartItemCount} articles)
+                      Mon Panier ({cartItemCount} article{cartItemCount !== 1 ? "s" : ""})
                     </SheetTitle>
-                    <SheetDescription>
-                      Vérifiez vos achats avant de payer
-                    </SheetDescription>
+                    <SheetDescription>Vérifiez vos achats avant de payer</SheetDescription>
                   </SheetHeader>
-                  
+
                   {cart.length === 0 ? (
                     <div className="flex-1 flex items-center justify-center">
                       <div className="text-center text-muted-foreground">
-                        <ShoppingCart className="w-16 h-16 mx-auto mb-4 opacity-30" />
-                        <p className="text-lg font-medium">Votre panier est vide</p>
+                        <ShoppingCart className="w-16 h-16 mx-auto mb-4 opacity-20" />
+                        <p className="text-lg font-semibold">Votre panier est vide</p>
                         <p className="text-sm">Ajoutez des articles pour commencer</p>
                       </div>
                     </div>
                   ) : (
                     <>
                       <ScrollArea className="flex-1 -mx-6 px-6">
-                        <div className="space-y-3 py-4">
+                        <div className="space-y-2 py-4">
                           {cart.map(cartItem => (
-                            <Card key={cartItem.item.id} className="p-3">
-                              <div className="flex items-center gap-3">
-                                <div className="text-3xl">
-                                  {getProductEmoji(cartItem.item.name, cartItem.item.category)}
-                                </div>
-                                <div className="flex-1 min-w-0">
-                                  <p className="font-bold text-sm truncate">{cartItem.item.name}</p>
-                                  <div className="flex items-center gap-2 mt-1">
-                                    <span className="text-primary font-bold">
-                                      ${cartItem.item.price.toFixed(2)}
-                                    </span>
-                                    {cartItem.item.isTaxable && (
-                                      <Badge variant="outline" className="text-xs px-1 py-0">
-                                        +taxe
-                                      </Badge>
-                                    )}
-                                  </div>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => updateQuantity(cartItem.item.id, -1)}
-                                    data-testid={`button-decrease-${cartItem.item.id}`}
-                                  >
-                                    <Minus className="w-4 h-4" />
-                                  </Button>
-                                  <span className="w-8 text-center font-bold">{cartItem.quantity}</span>
-                                  <Button
-                                    variant="outline"
-                                    size="icon"
-                                    className="h-8 w-8"
-                                    onClick={() => updateQuantity(cartItem.item.id, 1)}
-                                    data-testid={`button-increase-${cartItem.item.id}`}
-                                  >
-                                    <Plus className="w-4 h-4" />
-                                  </Button>
-                                  <Button
-                                    variant="ghost"
-                                    size="icon"
-                                    className="h-8 w-8 text-destructive hover:text-destructive"
-                                    onClick={() => removeFromCart(cartItem.item.id)}
-                                    data-testid={`button-remove-${cartItem.item.id}`}
-                                  >
-                                    <Trash2 className="w-4 h-4" />
-                                  </Button>
+                            <div key={cartItem.item.id} className="flex items-center gap-3 p-2 rounded-lg border bg-card">
+                              <div className="text-3xl w-10 text-center shrink-0">
+                                {getProductEmoji(cartItem.item.name, cartItem.item.category)}
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <p className="font-bold text-sm truncate">{cartItem.item.name}</p>
+                                <div className="flex items-center gap-2 mt-0.5">
+                                  <span className="text-red-600 dark:text-red-400 font-black text-sm">
+                                    {cartItem.item.price.toFixed(2)} $
+                                  </span>
+                                  {cartItem.item.isTaxable && (
+                                    <Badge variant="outline" className="text-[10px] px-1 py-0">+tx</Badge>
+                                  )}
                                 </div>
                               </div>
-                            </Card>
+                              <div className="flex items-center gap-1 shrink-0">
+                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(cartItem.item.id, -1)} data-testid={`button-decrease-${cartItem.item.id}`}>
+                                  <Minus className="w-3 h-3" />
+                                </Button>
+                                <span className="w-7 text-center font-black text-sm">{cartItem.quantity}</span>
+                                <Button variant="outline" size="icon" className="h-7 w-7" onClick={() => updateQuantity(cartItem.item.id, 1)} data-testid={`button-increase-${cartItem.item.id}`}>
+                                  <Plus className="w-3 h-3" />
+                                </Button>
+                                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => removeFromCart(cartItem.item.id)} data-testid={`button-remove-${cartItem.item.id}`}>
+                                  <Trash2 className="w-3 h-3" />
+                                </Button>
+                              </div>
+                            </div>
                           ))}
                         </div>
                       </ScrollArea>
 
-                      {/* Cart Summary - Receipt Style */}
-                      <div className="border-t pt-4 mt-4 space-y-3">
-                        <div className="bg-muted/50 rounded-lg p-4 space-y-2 font-mono text-sm">
-                          <div className="text-center border-b pb-2 mb-2">
-                            <Receipt className="w-6 h-6 mx-auto mb-1" />
-                            <p className="font-bold text-base">REÇU DE CAISSE</p>
+                      {/* Receipt */}
+                      <div className="border-t pt-4 space-y-3">
+                        <div className="bg-muted/60 rounded-lg p-4 space-y-1.5 font-mono text-sm border">
+                          <div className="text-center border-b border-dashed pb-2 mb-2">
+                            <Receipt className="w-5 h-5 mx-auto mb-1" />
+                            <p className="font-bold">REÇU DE CAISSE</p>
                           </div>
-                          
-                          <div className="flex justify-between">
-                            <span>Sous-total:</span>
-                            <span>${cartTotals.subtotal.toFixed(2)}</span>
-                          </div>
-                          
+                          <div className="flex justify-between"><span>Sous-total:</span><span>{cartTotals.subtotal.toFixed(2)} $</span></div>
                           {cartTotals.taxableAmount > 0 && (
-                            <>
-                              <div className="flex justify-between text-muted-foreground text-xs">
-                                <span>Articles taxables:</span>
-                                <span>${cartTotals.taxableAmount.toFixed(2)}</span>
-                              </div>
-                              <div className="flex justify-between text-muted-foreground">
-                                <span>TPS + TVQ (14.975%):</span>
-                                <span>${cartTotals.taxes.toFixed(2)}</span>
-                              </div>
-                            </>
+                            <div className="flex justify-between text-muted-foreground text-xs">
+                              <span>TPS + TVQ (14,975%):</span>
+                              <span>{cartTotals.taxes.toFixed(2)} $</span>
+                            </div>
                           )}
-                          
                           <Separator />
-                          
-                          <div className="flex justify-between font-bold text-lg">
+                          <div className="flex justify-between font-black text-lg">
                             <span>TOTAL:</span>
-                            <span className="text-primary">${cartTotals.total.toFixed(2)}</span>
+                            <span className="text-red-600 dark:text-red-400">{cartTotals.total.toFixed(2)} $</span>
                           </div>
                         </div>
 
                         <div className="flex justify-between text-sm px-1">
-                          <span>Budget disponible:</span>
-                          <span className={`font-bold ${remaining < 0 ? "text-destructive" : "text-green-600"}`}>
-                            ${remaining.toFixed(2)}
+                          <span className="text-muted-foreground">Budget restant après l'achat:</span>
+                          <span className={`font-bold ${(remaining - cartTotals.total) < 0 ? "text-destructive" : "text-green-600"}`}>
+                            {(remaining - cartTotals.total).toFixed(2)} $
                           </span>
                         </div>
 
                         {!canAffordCart && (
                           <div className="flex items-center gap-2 p-3 bg-destructive/10 rounded-lg border border-destructive/30">
-                            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+                            <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
                             <p className="text-sm text-destructive font-semibold">
-                              Budget insuffisant! Il vous manque ${(cartTotals.total - remaining).toFixed(2)}
+                              Budget insuffisant! Manque: {(cartTotals.total - remaining).toFixed(2)} $
                             </p>
                           </div>
                         )}
                       </div>
 
-                      <SheetFooter className="mt-4">
+                      <SheetFooter className="mt-3">
                         <Button
-                          className="w-full font-bold text-lg py-6"
+                          className="w-full font-black text-lg py-6 bg-red-600 hover:bg-red-700"
                           size="lg"
                           disabled={!canAffordCart || addExpenseMutation.isPending || cart.length === 0}
                           onClick={() => setShowCheckoutConfirm(true)}
                           data-testid="button-checkout"
                         >
-                          {addExpenseMutation.isPending ? "Traitement..." : `Payer ${cartTotals.total.toFixed(2)}$`}
+                          {addExpenseMutation.isPending ? "Traitement..." : `Payer ${cartTotals.total.toFixed(2)} $`}
                         </Button>
                       </SheetFooter>
                     </>
                   )}
                 </SheetContent>
               </Sheet>
-
-              <Button
-                onClick={() => navigate(`/student/${studentId}`)}
-                variant="secondary"
-                className="flex items-center gap-2"
-                data-testid="button-back-dashboard"
-              >
-                <ArrowLeft className="w-5 h-5" />
-                <span className="hidden sm:inline">Retour</span>
-              </Button>
             </div>
           </div>
-          <div className="flex items-center gap-4 text-sm flex-wrap">
-            <div className="bg-white/20 px-4 py-2 rounded-full">
-              Budget restant: <strong className={`ml-1 ${remaining < 0 ? "text-red-300" : "text-green-100"}`}>${remaining.toFixed(2)}</strong>
-            </div>
-            {cartItemCount > 0 && (
-              <div className="bg-white/20 px-4 py-2 rounded-full">
-                Dans le panier: <strong className="ml-1">${cartTotals.total.toFixed(2)}</strong>
-              </div>
-            )}
+        </div>
+
+        {/* ── CATEGORY TABS ── */}
+        <div className="bg-black/20">
+          <div className="max-w-7xl mx-auto px-4 flex gap-0">
+            {CATEGORIES.map(cat => (
+              <button
+                key={cat.id}
+                onClick={() => handleCategoryChange(cat.id)}
+                className={`px-6 py-3 font-black uppercase tracking-wide text-sm transition-all flex items-center gap-2 border-b-4 ${
+                  selectedCategory === cat.id
+                    ? "border-yellow-400 bg-white/20 text-white"
+                    : "border-transparent text-white/70 hover:text-white hover:bg-white/10"
+                }`}
+                data-testid={`button-category-${cat.id}`}
+              >
+                <span>{cat.icon}</span>
+                {cat.name}
+              </button>
+            ))}
           </div>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 pb-12">
-        {/* Category Navigation */}
-        <div className="flex gap-3 my-8 justify-center flex-wrap">
-          {CATEGORIES.map(cat => (
-            <Button
-              key={cat.id}
-              variant={selectedCategory === cat.id ? "default" : "outline"}
-              onClick={() => handleCategoryChange(cat.id)}
-              className="px-6 md:px-8 py-6 text-base md:text-lg flex items-center gap-2 md:gap-3 font-semibold"
-              size="lg"
-              data-testid={`button-category-${cat.id}`}
+      {/* ── SUBCATEGORY FILTERS ── */}
+      {selectedCategory === "food" && (
+        <div className="bg-white dark:bg-gray-900 border-b shadow-sm sticky top-0 z-30">
+          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
+            <button
+              onClick={() => handleSubcategoryChange(null)}
+              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all ${
+                selectedSubcategory === null
+                  ? "bg-red-600 text-white border-red-600"
+                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground hover:border-red-400"
+              }`}
+              data-testid="button-subcategory-all"
             >
-              <span className="text-xl md:text-2xl">{cat.icon}</span>
-              {cat.name}
-            </Button>
-          ))}
-        </div>
-
-        {/* Subcategory Navigation for Food - Circular Style */}
-        {selectedCategory === "food" && (
-          <div className="mb-8">
-            <div className="flex gap-2 justify-center flex-wrap">
-              <Button
-                variant={selectedSubcategory === null ? "default" : "outline"}
-                onClick={() => handleSubcategoryChange(null)}
-                className="px-4 py-2"
-                data-testid="button-subcategory-all"
+              🛒 Tout
+            </button>
+            {FOOD_SUBCATEGORIES.map(subcat => (
+              <button
+                key={subcat.id}
+                onClick={() => handleSubcategoryChange(subcat.id)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all whitespace-nowrap ${
+                  selectedSubcategory === subcat.id
+                    ? "bg-red-600 text-white border-red-600"
+                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground hover:border-red-400"
+                }`}
+                data-testid={`button-subcategory-${subcat.id}`}
               >
-                🛒 Tous les produits
-              </Button>
-              {FOOD_SUBCATEGORIES.map(subcat => (
-                <Button
-                  key={subcat.id}
-                  variant={selectedSubcategory === subcat.id ? "default" : "outline"}
-                  onClick={() => handleSubcategoryChange(subcat.id)}
-                  className="px-4 py-2"
-                  data-testid={`button-subcategory-${subcat.id}`}
-                >
-                  <span className="mr-1">{subcat.icon}</span>
-                  {subcat.id}
-                </Button>
-              ))}
+                <span>{subcat.icon}</span> {subcat.id}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── MAIN CONTENT ── */}
+      <div className="max-w-7xl mx-auto px-3 md:px-4 py-6">
+
+        {/* Cart summary bar */}
+        {cartItemCount > 0 && (
+          <div className="mb-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 border-2 border-yellow-400 rounded-lg flex items-center justify-between gap-4 flex-wrap">
+            <div className="flex items-center gap-2 text-sm font-semibold">
+              <ShoppingCart className="w-4 h-4 text-yellow-600" />
+              <span>{cartItemCount} article{cartItemCount !== 1 ? "s" : ""} dans le panier</span>
+              <span className="text-muted-foreground">&mdash; Total: <strong className="text-red-600 dark:text-red-400">{cartTotals.total.toFixed(2)} $</strong></span>
             </div>
+            <Button size="sm" className="bg-red-600 hover:bg-red-700 font-bold" onClick={() => setIsCartOpen(true)} data-testid="button-view-cart-bar">
+              Voir le panier
+            </Button>
           </div>
         )}
 
-        {/* Products Grid - Flyer Style */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3 md:gap-4">
-          {items.map(item => {
-            const isEssential = item.isEssential;
-            const isTaxable = item.isTaxable;
-            const cartItem = cart.find(c => c.item.id === item.id);
-            
-            return (
-              <Card
-                key={item.id}
-                className="overflow-hidden border-2 hover:border-primary transition-all hover-elevate group relative"
-                data-testid={`card-product-${item.id}`}
-              >
-                {/* Tax indicator */}
-                {isTaxable && (
-                  <div className="absolute top-2 right-2 z-10">
-                    <Badge variant="destructive" className="text-[10px] px-1 py-0">
-                      +taxe
-                    </Badge>
+        {/* Products — grouped or flat */}
+        {useGrouped ? (
+          <div className="space-y-8">
+            {groupedItems.map(group => (
+              <div key={group.subcat ?? "other"}>
+                {/* Section header */}
+                <div className="flex items-center gap-3 mb-3">
+                  <div className="flex items-center gap-2 bg-red-700 text-white px-4 py-1.5 rounded-r-full -ml-3 md:-ml-4">
+                    <span className="text-xl">{group.icon}</span>
+                    <span className="font-black text-base uppercase tracking-wide">{group.subcat ?? "Autres"}</span>
                   </div>
-                )}
-
-                {/* Cart quantity indicator */}
-                {cartItem && (
-                  <div className="absolute top-2 left-2 z-10">
-                    <Badge className="bg-primary text-white border-0 min-w-[24px] h-6 flex items-center justify-center">
-                      {cartItem.quantity}
-                    </Badge>
-                  </div>
-                )}
-
-                {/* Product Image/Icon Area */}
-                <div className="h-20 md:h-24 bg-gradient-to-br from-white to-gray-50 dark:from-gray-900 dark:to-gray-950 flex items-center justify-center border-b">
-                  <div className="text-4xl md:text-5xl group-hover:scale-110 transition-transform">
-                    {getProductEmoji(item.name, item.category)}
-                  </div>
+                  <div className="flex-1 h-px bg-red-200 dark:bg-red-900" />
                 </div>
-
-                {/* Product Details */}
-                <div className="p-2 md:p-3">
-                  <h3 className="font-bold text-xs md:text-sm line-clamp-2 h-8 md:h-10 text-foreground">{item.name}</h3>
-                  
-                  {/* Essential/Non-essential badge */}
-                  <div className="mt-1 mb-2">
-                    <Badge 
-                      variant={isEssential ? "default" : "secondary"}
-                      className={`text-[10px] ${isEssential ? "bg-green-500 hover:bg-green-500" : "bg-amber-500 hover:bg-amber-500 text-white"}`}
-                    >
-                      {isEssential ? "Essentiel" : "Plaisir"}
-                    </Badge>
-                  </div>
-
-                  {/* Price */}
-                  <div className="flex items-baseline gap-1 mb-2">
-                    <span className="text-xl md:text-2xl font-black text-primary">${item.price.toFixed(2)}</span>
-                  </div>
-
-                  {/* Add to cart button */}
-                  <Button
-                    onClick={() => addToCart(item)}
-                    className="w-full font-bold text-xs md:text-sm py-2"
-                    size="sm"
-                    data-testid={`button-add-${item.id}`}
-                  >
-                    <Plus className="w-4 h-4 mr-1" />
-                    Ajouter
-                  </Button>
-                </div>
-              </Card>
-            );
-          })}
-        </div>
-
-        {items.length === 0 && (
-          <Card className="p-12 text-center border-2 border-dashed">
-            <p className="text-lg text-muted-foreground">Aucun article dans cette catégorie</p>
-          </Card>
+                <ProductGrid items={group.items} cart={cart} addToCart={addToCart} />
+              </div>
+            ))}
+          </div>
+        ) : (
+          <ProductGrid items={pageItems} cart={cart} addToCart={addToCart} />
         )}
 
-        {/* Pagination Controls */}
+        {pageItems.length === 0 && (
+          <div className="text-center py-16 text-muted-foreground">
+            <Tag className="w-12 h-12 mx-auto mb-3 opacity-30" />
+            <p className="text-lg font-semibold">Aucun article dans cette catégorie</p>
+          </div>
+        )}
+
+        {/* Pagination */}
         {totalPages > 1 && (
-          <div className="mt-8 flex items-center justify-center gap-2 md:gap-4 flex-wrap">
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
-              disabled={currentPage === 1}
-              data-testid="button-prev-page"
-            >
+          <div className="mt-8 flex items-center justify-center gap-2 flex-wrap">
+            <Button variant="outline" onClick={() => setCurrentPage(p => Math.max(1, p - 1))} disabled={currentPage === 1} data-testid="button-prev-page">
               Précédent
             </Button>
-            <div className="flex gap-1 md:gap-2">
+            <div className="flex gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <Button
                   key={page}
                   variant={currentPage === page ? "default" : "outline"}
-                  onClick={() => setCurrentPage(page)}
                   size="sm"
+                  onClick={() => setCurrentPage(page)}
                   data-testid={`button-page-${page}`}
                 >
                   {page}
                 </Button>
               ))}
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
-              disabled={currentPage === totalPages}
-              data-testid="button-next-page"
-            >
+            <Button variant="outline" onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))} disabled={currentPage === totalPages} data-testid="button-next-page">
               Suivant
             </Button>
-            <span className="text-muted-foreground text-sm">
-              Page {currentPage}/{totalPages}
-            </span>
           </div>
         )}
 
-        {/* Tax Info Banner */}
-        <Card className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800">
-          <div className="flex items-start gap-3">
-            <Receipt className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5" />
-            <div className="text-sm">
-              <p className="font-bold text-blue-800 dark:text-blue-200">Taxes du Québec (TPS + TVQ)</p>
-              <p className="text-blue-700 dark:text-blue-300 mt-1">
-                Les produits alimentaires de base (lait, pain, viandes, fruits, légumes) ne sont <strong>pas taxés</strong>.
-                Les bonbons, chips, sodas et autres produits non essentiels sont taxés à <strong>14.975%</strong>.
-              </p>
-            </div>
+        {/* Tax info footer */}
+        <div className="mt-8 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg text-sm flex items-start gap-3">
+          <Receipt className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold text-blue-800 dark:text-blue-200">Taxes du Québec (TPS + TVQ)</p>
+            <p className="text-blue-700 dark:text-blue-300 mt-1">
+              Les aliments de base (lait, pain, viandes, fruits, légumes) ne sont <strong>pas taxés</strong>.
+              Les bonbons, chips, boissons sucrées et articles non alimentaires sont taxés à <strong>14,975%</strong>.
+            </p>
           </div>
-        </Card>
+        </div>
       </div>
 
-      {/* Floating Cart Button for Mobile */}
+      {/* Floating cart (mobile) */}
       {cartItemCount > 0 && (
         <div className="fixed bottom-4 right-4 md:hidden z-40">
-          <Button
-            size="lg"
-            className="rounded-full w-16 h-16 shadow-lg"
+          <button
+            className="bg-red-600 text-white rounded-full w-16 h-16 shadow-xl flex items-center justify-center relative border-4 border-white"
             onClick={() => setIsCartOpen(true)}
             data-testid="button-floating-cart"
           >
             <ShoppingCart className="w-6 h-6" />
-            <Badge className="absolute -top-1 -right-1 bg-red-500 text-white border-0 min-w-[24px] h-6">
+            <span className="absolute -top-1 -right-1 bg-yellow-400 text-black text-xs font-black rounded-full min-w-[22px] h-[22px] flex items-center justify-center border-2 border-white">
               {cartItemCount}
-            </Badge>
-          </Button>
+            </span>
+          </button>
         </div>
       )}
 
@@ -664,65 +621,140 @@ export default function Catalog() {
               <Receipt className="w-6 h-6" />
               Confirmer l'achat
             </DialogTitle>
-            <DialogDescription>
-              Vérifiez votre commande avant de payer
-            </DialogDescription>
+            <DialogDescription>Vérifiez votre commande avant de payer</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4">
-            {/* Order Summary */}
-            <div className="bg-muted/50 rounded-lg p-4 space-y-2 font-mono text-sm max-h-48 overflow-auto">
+            <div className="bg-muted/50 rounded-lg p-4 space-y-1 font-mono text-sm max-h-48 overflow-auto border">
               {cart.map(cartItem => (
                 <div key={cartItem.item.id} className="flex justify-between text-xs">
                   <span className="truncate flex-1">{cartItem.quantity}x {cartItem.item.name}</span>
-                  <span className="ml-2">${(cartItem.item.price * cartItem.quantity).toFixed(2)}</span>
+                  <span className="ml-2 font-bold">{(cartItem.item.price * cartItem.quantity).toFixed(2)} $</span>
                 </div>
               ))}
             </div>
 
-            {/* Totals */}
             <div className="border rounded-lg p-4 space-y-2">
-              <div className="flex justify-between">
-                <span>Sous-total:</span>
-                <span>${cartTotals.subtotal.toFixed(2)}</span>
-              </div>
+              <div className="flex justify-between text-sm"><span>Sous-total:</span><span>{cartTotals.subtotal.toFixed(2)} $</span></div>
               {cartTotals.taxes > 0 && (
-                <div className="flex justify-between text-muted-foreground text-sm">
-                  <span>Taxes (TPS + TVQ):</span>
-                  <span>${cartTotals.taxes.toFixed(2)}</span>
-                </div>
+                <div className="flex justify-between text-muted-foreground text-xs"><span>Taxes (TPS + TVQ):</span><span>{cartTotals.taxes.toFixed(2)} $</span></div>
               )}
               <Separator />
-              <div className="flex justify-between font-bold text-lg">
+              <div className="flex justify-between font-black text-lg">
                 <span>Total à payer:</span>
-                <span className="text-primary">${cartTotals.total.toFixed(2)}</span>
+                <span className="text-red-600 dark:text-red-400">{cartTotals.total.toFixed(2)} $</span>
               </div>
             </div>
 
-            {/* Budget check */}
-            <div className="flex justify-between p-3 bg-muted rounded-lg">
-              <span>Après l'achat:</span>
+            <div className="flex justify-between p-3 bg-muted rounded-lg text-sm">
+              <span>Budget restant après l'achat:</span>
               <span className={`font-bold ${(remaining - cartTotals.total) < 0 ? "text-destructive" : "text-green-600"}`}>
-                ${(remaining - cartTotals.total).toFixed(2)}
+                {(remaining - cartTotals.total).toFixed(2)} $
               </span>
             </div>
           </div>
 
-          <DialogFooter className="gap-2">
-            <Button variant="outline" onClick={() => setShowCheckoutConfirm(false)}>
+          <DialogFooter className="gap-2 mt-2">
+            <Button variant="outline" onClick={() => setShowCheckoutConfirm(false)} data-testid="button-cancel-checkout">
               Annuler
             </Button>
             <Button
+              className="bg-red-600 hover:bg-red-700 font-black"
               onClick={() => addExpenseMutation.mutate(cart)}
-              disabled={!canAffordCart || addExpenseMutation.isPending}
-              className="bg-primary hover:bg-primary/90"
-              data-testid="button-confirm-purchase"
+              disabled={addExpenseMutation.isPending}
+              data-testid="button-confirm-checkout"
             >
-              {addExpenseMutation.isPending ? "Traitement..." : "Confirmer l'achat"}
+              {addExpenseMutation.isPending ? "Traitement..." : "Confirmer et payer"}
             </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+// ── Product Grid Component ──
+function ProductGrid({ items, cart, addToCart }: {
+  items: CatalogItem[];
+  cart: CartItem[];
+  addToCart: (item: CatalogItem) => void;
+}) {
+  return (
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
+      {items.map(item => {
+        const cartItem = cart.find(c => c.item.id === item.id);
+        const priceWithTax = item.isTaxable
+          ? item.price * (1 + QUEBEC_TAX_RATE)
+          : item.price;
+
+        return (
+          <div
+            key={item.id}
+            className="bg-white dark:bg-gray-900 border-2 border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden flex flex-col hover:border-red-400 dark:hover:border-red-600 transition-colors group relative"
+            data-testid={`card-product-${item.id}`}
+          >
+            {/* Quantity badge */}
+            {cartItem && (
+              <div className="absolute top-2 left-2 z-10 bg-red-600 text-white text-xs font-black rounded-full min-w-[22px] h-[22px] flex items-center justify-center shadow">
+                {cartItem.quantity}
+              </div>
+            )}
+
+            {/* Essential / Taxable badge top-right */}
+            <div className="absolute top-2 right-2 z-10 flex flex-col gap-1 items-end">
+              {item.isEssential ? (
+                <span className="bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-green-300 dark:border-green-700">
+                  <Leaf className="w-2.5 h-2.5" />
+                  Essentiel
+                </span>
+              ) : (
+                <span className="bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-400 text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 border border-amber-300 dark:border-amber-700">
+                  <Star className="w-2.5 h-2.5" />
+                  Plaisir
+                </span>
+              )}
+            </div>
+
+            {/* Product emoji */}
+            <div className="pt-8 pb-2 flex items-center justify-center bg-gray-50 dark:bg-gray-800/50">
+              <span className="text-5xl group-hover:scale-110 transition-transform duration-200 block">
+                {getProductEmoji(item.name, item.category)}
+              </span>
+            </div>
+
+            {/* Product info */}
+            <div className="flex flex-col flex-1 p-2">
+              <p className="font-bold text-xs leading-tight line-clamp-2 min-h-[2.5rem] text-foreground">
+                {item.name}
+              </p>
+
+              {/* Price tag */}
+              <div className="mt-2 flex items-end justify-between gap-1">
+                <div>
+                  <div className="text-red-600 dark:text-red-400 font-black text-xl leading-none">
+                    {item.price.toFixed(2)}<span className="text-sm font-bold"> $</span>
+                  </div>
+                  {item.isTaxable && (
+                    <p className="text-[10px] text-muted-foreground mt-0.5">
+                      {priceWithTax.toFixed(2)} $ avec taxes
+                    </p>
+                  )}
+                </div>
+              </div>
+
+              {/* Add to cart */}
+              <button
+                onClick={() => addToCart(item)}
+                className="mt-2 w-full bg-red-600 hover:bg-red-700 active:bg-red-800 text-white text-xs font-black py-2 rounded-md flex items-center justify-center gap-1 transition-colors"
+                data-testid={`button-add-${item.id}`}
+              >
+                <Plus className="w-3.5 h-3.5" />
+                Ajouter
+              </button>
+            </div>
+          </div>
+        );
+      })}
     </div>
   );
 }

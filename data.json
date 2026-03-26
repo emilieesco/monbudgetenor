@@ -380,15 +380,19 @@
     "a1b155f7-2b3c-4424-8245-27805e67a85f": {
       "name": "Emi",
       "classId": "3549b0c0-2a37-4489-9ede-2afdc9a2b174",
-      "budget": 128,
+      "budget": 2400,
       "id": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "spent": 60,
+      "spent": 105.93999999999997,
       "savings": 0,
       "createdAt": "2026-03-25T12:28:37.759Z",
       "budgetHistory": [
         {
           "budget": 128,
           "date": "2026-03-25T12:28:37.759Z"
+        },
+        {
+          "budget": 2400,
+          "date": "2026-03-26T02:22:22.504Z"
         }
       ]
     }
@@ -2272,6 +2276,72 @@
       "message": "Bon choix! C'est un achat essentiel.",
       "id": "447fbffc-1515-4519-90ad-2bd320140bef",
       "timestamp": "2025-12-01T19:07:52.708Z"
+    },
+    "8304a562-1b0f-49a9-a6bc-c8f63fcf622d": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "3e0788d9-7ccb-4d7e-a437-150c45e23b66",
+      "amount": 2.49,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "8304a562-1b0f-49a9-a6bc-c8f63fcf622d",
+      "timestamp": "2026-03-26T02:25:35.612Z"
+    },
+    "d5c470ab-77c0-4734-a565-bc0f3ad762cd": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "3e0788d9-7ccb-4d7e-a437-150c45e23b66",
+      "amount": 2.49,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "d5c470ab-77c0-4734-a565-bc0f3ad762cd",
+      "timestamp": "2026-03-26T02:25:35.725Z"
+    },
+    "70d36d92-4381-4114-bfdb-c27744ba53ca": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "29221270-b103-45e9-8908-ca641722649c",
+      "amount": 3.49,
+      "category": "food",
+      "isEssential": false,
+      "feedback": "warning",
+      "message": "Attention, ceci n'est pas un achat essentiel.",
+      "id": "70d36d92-4381-4114-bfdb-c27744ba53ca",
+      "timestamp": "2026-03-26T02:25:35.733Z"
+    },
+    "50e08ad8-3d53-4ded-8d10-303e88eb27e9": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "7e99fbb0-e82d-4c3e-9556-3c7e9c66b168",
+      "amount": 3.99,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "50e08ad8-3d53-4ded-8d10-303e88eb27e9",
+      "timestamp": "2026-03-26T02:25:35.739Z"
+    },
+    "d625f2b1-2eee-474d-8b1b-ddbf25829848": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "b3a0bf61-4a93-43b4-8f2c-86e2f4e653a2",
+      "amount": 4.49,
+      "category": "food",
+      "isEssential": false,
+      "feedback": "warning",
+      "message": "Attention, ceci n'est pas un achat essentiel.",
+      "id": "d625f2b1-2eee-474d-8b1b-ddbf25829848",
+      "timestamp": "2026-03-26T02:25:35.747Z"
+    },
+    "184eaecd-fa5c-4d8c-aa26-56bb96011543": {
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "itemId": "f54f86fc-6fc1-480c-830e-cb02a768cc57",
+      "amount": 3.99,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "184eaecd-fa5c-4d8c-aa26-56bb96011543",
+      "timestamp": "2026-03-26T02:25:35.753Z"
     }
   },
   "fixedExpenses": {
@@ -3643,149 +3713,77 @@
       "isPaid": false,
       "dueDate": "2025-12-02T01:28:51.502Z"
     },
-    "5dd1a7d1-94d3-4865-8f2e-5cf933c170ab": {
-      "id": "5dd1a7d1-94d3-4865-8f2e-5cf933c170ab",
+    "aac1baee-a463-43bd-9640-b740e7e90aaf": {
+      "id": "aac1baee-a463-43bd-9640-b740e7e90aaf",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Loyer",
       "amount": 15,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.532Z"
     },
-    "edc3ef9f-4f8a-4205-83c4-b568cbcd223a": {
-      "id": "edc3ef9f-4f8a-4205-83c4-b568cbcd223a",
+    "78c0e301-c0d3-4b0f-966f-e5cf09c58a76": {
+      "id": "78c0e301-c0d3-4b0f-966f-e5cf09c58a76",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Internet",
       "amount": 5,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.535Z"
     },
-    "a3333d4b-3ed1-40c9-9cdc-cd340d6472bd": {
-      "id": "a3333d4b-3ed1-40c9-9cdc-cd340d6472bd",
+    "2b927724-a4da-4550-91a5-4730e03f6bc0": {
+      "id": "2b927724-a4da-4550-91a5-4730e03f6bc0",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Téléphone",
       "amount": 3,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.538Z"
     },
-    "d1c9c4de-8d54-4f24-96d0-50dbcd2779d8": {
-      "id": "d1c9c4de-8d54-4f24-96d0-50dbcd2779d8",
+    "50a2349c-e72c-47d8-9c9c-45fbcb47f3e9": {
+      "id": "50a2349c-e72c-47d8-9c9c-45fbcb47f3e9",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Hydro",
       "amount": 8,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.540Z"
     },
-    "1d9f3696-1c61-4286-a6e6-803908111ac7": {
-      "id": "1d9f3696-1c61-4286-a6e6-803908111ac7",
+    "0e9e75d7-e577-4bc6-a223-dd287701596c": {
+      "id": "0e9e75d7-e577-4bc6-a223-dd287701596c",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Assurance Voiture",
       "amount": 10,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.543Z"
     },
-    "0d4b8a00-3c9c-4329-81ae-45a6292cd796": {
-      "id": "0d4b8a00-3c9c-4329-81ae-45a6292cd796",
+    "10ccfee0-d0a2-4132-81b6-c4efbdf201b1": {
+      "id": "10ccfee0-d0a2-4132-81b6-c4efbdf201b1",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Assurance Maison",
       "amount": 7,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.546Z"
     },
-    "58a55357-67ac-4604-9d5d-bad979a1204e": {
-      "id": "58a55357-67ac-4604-9d5d-bad979a1204e",
+    "0f7da821-e616-49ce-8264-539ff5c45e7f": {
+      "id": "0f7da821-e616-49ce-8264-539ff5c45e7f",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Essence",
       "amount": 12,
       "isPaid": true,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "dueDate": "2026-03-26T02:22:22.549Z"
     },
-    "ee6f2383-5793-41e2-a971-6cb461bca5ce": {
-      "id": "ee6f2383-5793-41e2-a971-6cb461bca5ce",
+    "385289c2-1507-4277-b0a1-dd94e1cc84cc": {
+      "id": "385289c2-1507-4277-b0a1-dd94e1cc84cc",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Nourriture",
       "amount": 20,
-      "isPaid": false,
-      "dueDate": "2026-04-24T12:28:37.759Z"
+      "isPaid": true,
+      "dueDate": "2026-03-26T02:22:22.553Z"
     },
-    "b25727cb-e853-4194-9501-c37706e04545": {
-      "id": "b25727cb-e853-4194-9501-c37706e04545",
+    "1c39df06-bda3-4e05-8257-c077e9ad6364": {
+      "id": "1c39df06-bda3-4e05-8257-c077e9ad6364",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Sortie",
       "amount": 5,
-      "isPaid": false,
-      "dueDate": "2026-04-24T12:28:37.759Z"
-    },
-    "844b5bcf-3eff-424b-84fc-065719e7f53c": {
-      "id": "844b5bcf-3eff-424b-84fc-065719e7f53c",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Loyer",
-      "amount": 15,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.782Z"
-    },
-    "186219e6-d0d4-4b23-82ea-16f01fe6593c": {
-      "id": "186219e6-d0d4-4b23-82ea-16f01fe6593c",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Internet",
-      "amount": 5,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.785Z"
-    },
-    "e6e1ac6f-4e8f-40b9-9c06-2e81f6011065": {
-      "id": "e6e1ac6f-4e8f-40b9-9c06-2e81f6011065",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Téléphone",
-      "amount": 3,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.788Z"
-    },
-    "28f33670-f114-457e-8277-5683a7067318": {
-      "id": "28f33670-f114-457e-8277-5683a7067318",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Hydro",
-      "amount": 8,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.790Z"
-    },
-    "b9061369-7677-4b64-bdd9-001a3c317741": {
-      "id": "b9061369-7677-4b64-bdd9-001a3c317741",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Assurance Voiture",
-      "amount": 10,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.793Z"
-    },
-    "07b99e00-2b1c-4ce2-b416-e1ca9fd05000": {
-      "id": "07b99e00-2b1c-4ce2-b416-e1ca9fd05000",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Assurance Maison",
-      "amount": 7,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.796Z"
-    },
-    "925d6523-614a-4c08-82e0-8de29d5a37b7": {
-      "id": "925d6523-614a-4c08-82e0-8de29d5a37b7",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Essence",
-      "amount": 12,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.798Z"
-    },
-    "d6550c4e-2b0f-4fdf-9c16-d90eb909f83c": {
-      "id": "d6550c4e-2b0f-4fdf-9c16-d90eb909f83c",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Nourriture",
-      "amount": 20,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.801Z"
-    },
-    "255e2bba-0ea1-4cbd-9e17-a9c5d33787cd": {
-      "id": "255e2bba-0ea1-4cbd-9e17-a9c5d33787cd",
-      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
-      "category": "Sortie",
-      "amount": 5,
-      "isPaid": false,
-      "dueDate": "2026-03-25T12:28:37.804Z"
+      "isPaid": true,
+      "dueDate": "2026-03-26T02:22:22.555Z"
     }
   },
   "bonusExpenses": {
@@ -4202,45 +4200,45 @@
       "completed": false,
       "createdAt": "2025-12-02T01:28:40.704Z"
     },
-    "863f00f3-ae36-4935-9cc1-8436f00599ca": {
-      "id": "863f00f3-ae36-4935-9cc1-8436f00599ca",
+    "dc5f8f10-ea3a-4824-be2c-d5a9aefc6e39": {
+      "id": "dc5f8f10-ea3a-4824-be2c-d5a9aefc6e39",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Économe",
       "description": "Dépense moins de 30% de ton budget",
       "type": "spending",
-      "targetValue": 38,
+      "targetValue": 720,
       "completed": false,
-      "createdAt": "2026-03-25T12:28:37.761Z"
+      "createdAt": "2026-03-26T02:22:22.518Z"
     },
-    "007e85f4-f95a-47d6-88fc-9b2d0d1f4758": {
-      "id": "007e85f4-f95a-47d6-88fc-9b2d0d1f4758",
+    "014ba764-95bc-44b4-a4d5-5a036cda1ab7": {
+      "id": "014ba764-95bc-44b4-a4d5-5a036cda1ab7",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Essentiel d'abord",
       "description": "Achète 3 articles essentiels",
       "type": "essential",
       "targetValue": 3,
       "completed": false,
-      "createdAt": "2026-03-25T12:28:37.772Z"
+      "createdAt": "2026-03-26T02:22:22.520Z"
     },
-    "e86eccab-eaa9-4457-aa0c-1b436e646420": {
-      "id": "e86eccab-eaa9-4457-aa0c-1b436e646420",
+    "d7c33c94-e5c5-489e-b0bd-d594c847a44c": {
+      "id": "d7c33c94-e5c5-489e-b0bd-d594c847a44c",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Responsable",
       "description": "Paye toutes tes dépenses fixes",
       "type": "fixed",
       "targetValue": 100,
       "completed": false,
-      "createdAt": "2026-03-25T12:28:37.775Z"
+      "createdAt": "2026-03-26T02:22:22.523Z"
     },
-    "0543cfa7-b071-4401-9d59-c14fc19c52c1": {
-      "id": "0543cfa7-b071-4401-9d59-c14fc19c52c1",
+    "7115446e-9f2f-4563-86a8-d3ca959398f5": {
+      "id": "7115446e-9f2f-4563-86a8-d3ca959398f5",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Sage",
       "description": "Économise 50% de ton budget",
       "type": "savings",
-      "targetValue": 64,
+      "targetValue": 1200,
       "completed": false,
-      "createdAt": "2026-03-25T12:28:37.779Z"
+      "createdAt": "2026-03-26T02:22:22.526Z"
     }
   },
   "customChallenges": {},
@@ -4424,6 +4422,34 @@
       "tier": "platinum",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "earnedAt": "2025-12-01T19:05:25.352Z"
+    },
+    "cf2c66bc-777d-4fd0-9333-a13e00cef809": {
+      "id": "cf2c66bc-777d-4fd0-9333-a13e00cef809",
+      "type": "first_purchase",
+      "tier": "bronze",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "earnedAt": "2026-03-26T02:26:07.113Z"
+    },
+    "9a3e7ab0-e541-4a2f-8b31-adfb12102481": {
+      "id": "9a3e7ab0-e541-4a2f-8b31-adfb12102481",
+      "type": "essential_master",
+      "tier": "bronze",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "earnedAt": "2026-03-26T02:26:07.117Z"
+    },
+    "e85cd1ad-2229-414f-95b8-2657fab63730": {
+      "id": "e85cd1ad-2229-414f-95b8-2657fab63730",
+      "type": "monthly_survivor",
+      "tier": "bronze",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "earnedAt": "2026-03-26T02:26:07.168Z"
+    },
+    "8d4fb2c9-2966-48f8-b802-df951656324b": {
+      "id": "8d4fb2c9-2966-48f8-b802-df951656324b",
+      "type": "budget_hero",
+      "tier": "platinum",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "earnedAt": "2026-03-26T02:26:07.171Z"
     }
   },
   "savingsGoals": {

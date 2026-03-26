@@ -1052,14 +1052,14 @@ import { FileStorage } from "./file-storage";
 export let storage: IStorage = new FileStorage();
 
 export async function initializeStorage(): Promise<void> {
-  const dbUrl = process.env.DATABASE_URL;
+  const dbUrl = process.env.RAILWAY_DATABASE_URL || process.env.DATABASE_URL;
   if (dbUrl) {
     try {
       const { DatabaseStorage } = await import("./db-storage");
       const dbStorage = new DatabaseStorage(dbUrl);
       await dbStorage.initialize();
       storage = dbStorage;
-      console.log("Using PostgreSQL storage");
+      console.log("Using PostgreSQL storage (Railway)");
     } catch (err) {
       console.error("Failed to initialize PostgreSQL, falling back to file storage:", err);
     }

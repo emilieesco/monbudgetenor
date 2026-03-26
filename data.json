@@ -197,6 +197,24 @@
         "Nourriture": 20,
         "Sortie": 5
       }
+    },
+    "1732d3f6-49b0-4c95-b3ee-3f160ff87c89": {
+      "id": "1732d3f6-49b0-4c95-b3ee-3f160ff87c89",
+      "code": "TEST2026",
+      "teacherName": "Mme Test",
+      "mode": "predefined",
+      "createdAt": "2026-03-26T18:04:40.460Z",
+      "expenseAmounts": {
+        "Loyer": 15,
+        "Internet": 5,
+        "Téléphone": 3,
+        "Hydro": 8,
+        "Assurance Voiture": 10,
+        "Assurance Maison": 7,
+        "Essence": 12,
+        "Nourriture": 20,
+        "Sortie": 5
+      }
     }
   },
   "students": {
@@ -205,7 +223,7 @@
       "classId": "e7b221ff-e67c-49d9-9479-8fde5cfaeb31",
       "budget": 1500,
       "id": "0e1924a4-a129-4e09-b88e-32166f480bd6",
-      "spent": 3.37,
+      "spent": 16.720000000000002,
       "savings": 1500,
       "createdAt": "2025-11-30T00:20:36.801Z",
       "budgetHistory": [
@@ -2666,6 +2684,39 @@
       "message": "Bon choix! C'est un achat essentiel.",
       "id": "0312c7aa-d1a9-4567-87f1-a80fb16419f6",
       "timestamp": "2026-03-26T17:43:16.057Z"
+    },
+    "05807250-2ae9-47c7-ab08-353247e41ddb": {
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "itemId": "a8e4bc86-2103-413c-9162-c11b3cbfc5d8",
+      "amount": 4.79,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "05807250-2ae9-47c7-ab08-353247e41ddb",
+      "timestamp": "2026-03-26T18:05:50.231Z"
+    },
+    "499d5dd8-0bb7-4059-aa7c-978b94a79beb": {
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "itemId": "fa334c6f-d23b-4ce2-ae28-f436e244f38a",
+      "amount": 3.37,
+      "category": "food",
+      "isEssential": true,
+      "feedback": "success",
+      "message": "Bon choix! C'est un achat essentiel.",
+      "id": "499d5dd8-0bb7-4059-aa7c-978b94a79beb",
+      "timestamp": "2026-03-26T18:05:50.249Z"
+    },
+    "4cff0d4b-2db0-4734-92c1-9034da432321": {
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "itemId": "ba1c095a-2975-4fcd-bf26-af38131133be",
+      "amount": 5.19,
+      "category": "food",
+      "isEssential": false,
+      "feedback": "warning",
+      "message": "Attention, ceci n'est pas un achat essentiel.",
+      "id": "4cff0d4b-2db0-4734-92c1-9034da432321",
+      "timestamp": "2026-03-26T18:05:50.258Z"
     }
   },
   "fixedExpenses": {
@@ -4757,6 +4808,13 @@
       "tier": "platinum",
       "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
       "earnedAt": "2026-03-26T03:42:58.404Z"
+    },
+    "ca463099-a395-4061-b4c0-9ad14510f910": {
+      "id": "ca463099-a395-4061-b4c0-9ad14510f910",
+      "type": "essential_master",
+      "tier": "bronze",
+      "studentId": "0e1924a4-a129-4e09-b88e-32166f480bd6",
+      "earnedAt": "2026-03-26T18:06:12.826Z"
     }
   },
   "savingsGoals": {

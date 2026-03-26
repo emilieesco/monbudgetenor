@@ -44,12 +44,20 @@ function getProductEmoji(name: string, category: string): string {
     // === Cas spéciaux (ordre important!) ===
     if (n.includes("beurre d'arachide")) return "🥜";
     if (n.includes("pain à l'ail")) return "🥖";
+    if (n.includes("eau de coco")) return "🥥";
+    if (n.includes("lait de soya")) return "🥛";
+    if (n.includes("sauce bbq")) return "🍖";
+    if (n.includes("sauce soya")) return "🫙";
+    if (n.includes("bouillon")) return "🍲";
+    if (n.includes("fèves au lard")) return "🫘";
 
     // === Produits Laitiers ===
     if (n.includes("lait au chocolat")) return "🍫";
     if (n.includes("lait")) return "🥛";
     if (n.includes("yogourt aux fruits")) return "🍓";
     if (n.includes("yogourt") || n.includes("yaourt")) return "🥣";
+    if (n.includes("kéfir")) return "🥛";
+    if (n.includes("ricotta")) return "🧀";
     if (n.includes("brie")) return "🧀";
     if (n.includes("parmesan")) return "🧀";
     if (n.includes("mozzarella")) return "🧀";
@@ -65,23 +73,31 @@ function getProductEmoji(name: string, category: string): string {
     // === Viandes & Protéines ===
     // IMPORTANT: vérifier "bœuf"/"boeuf" AVANT "œuf" pour éviter que "steak de bœuf" match "œuf"
     if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak")) return "🥩";
+    if (n.includes("veau")) return "🥩";
     if (n.includes("œuf") || n.includes("oeuf")) return "🥚";
     if (n.includes("bacon")) return "🥓";
     if (n.includes("saumon")) return "🐟";
     if (n.includes("tilapia")) return "🐟";
+    if (n.includes("pétoncle")) return "🦪";
+    if (n.includes("moule")) return "🦪";
     if (n.includes("crevette")) return "🦐";
     if (n.includes("dinde")) return "🦃";
-    if (n.includes("saucisse")) return "🌭";
+    if (n.includes("saucisse") || n.includes("saucisson")) return "🌭";
     if (n.includes("jambon")) return "🥩";
     if (n.includes("pepperoni")) return "🍕";
     if (n.includes("tofu")) return "🫘";
+    if (n.includes("poulet rôti")) return "🍗";
     if (n.includes("poulet")) return "🍗";
     if (n.includes("porc") || n.includes("côtelette")) return "🐷";
     if (n.includes("poitrines")) return "🍗";
 
     // === Fruits & Légumes ===
+    if (n.includes("ananas")) return "🍍";
+    if (n.includes("kiwi")) return "🥝";
+    if (n.includes("framboise")) return "🍓";
     if (n.includes("banane")) return "🍌";
-    if (n.includes("pomme de terre") || n.includes("patate")) return "🥔";
+    if (n.includes("pomme de terre") || n.includes("patate douce")) return "🥔";
+    if (n.includes("patate")) return "🥔";
     if (n.includes("pomme")) return "🍎";
     if (n.includes("orange")) return "🍊";
     if (n.includes("fraise")) return "🍓";
@@ -91,6 +107,8 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("pêche")) return "🍑";
     if (n.includes("avocat")) return "🥑";
     if (n.includes("citron")) return "🍋";
+    if (n.includes("asperge")) return "🌿";
+    if (n.includes("betterave")) return "🫐";
     if (n.includes("tomate")) return "🍅";
     if (n.includes("carotte")) return "🥕";
     if (n.includes("brocoli")) return "🥦";
@@ -99,6 +117,8 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("concombre") || n.includes("courgette")) return "🥒";
     if (n.includes("poivron")) return "🫑";
     if (n.includes("champignon")) return "🍄";
+    if (n.includes("maïs en épi")) return "🌽";
+    if (n.includes("pois vert") || n.includes("pois surgelé")) return "🫛";
     if (n.includes("ail")) return "🧄";
     if (n.includes("oignon")) return "🧅";
     if (n.includes("céleri")) return "🌿";
@@ -122,6 +142,9 @@ function getProductEmoji(name: string, category: string): string {
     // === Boulangerie ===
     if (n.includes("bagel")) return "🥯";
     if (n.includes("croissant")) return "🥐";
+    if (n.includes("brioche")) return "🥐";
+    if (n.includes("crêpe")) return "🥞";
+    if (n.includes("pita")) return "🫓";
     if (n.includes("tortilla")) return "🌮";
     if (n.includes("baguette") || n.includes("pain à l'ail")) return "🥖";
     if (n.includes("hot-dog") || n.includes("hamburger")) return "🍔";
@@ -132,12 +155,14 @@ function getProductEmoji(name: string, category: string): string {
     // === Bonbons & Sucreries ===
     if (n.includes("crème glacée")) return "🍦";
     if (n.includes("gâteau")) return "🎂";
+    if (n.includes("macaron")) return "🍪";
     if (n.includes("brownie")) return "🍫";
     if (n.includes("popcorn")) return "🍿";
     if (n.includes("chips ahoy") || n.includes("oreo")) return "🍪";
     if (n.includes("biscuit")) return "🍪";
     if (n.includes("craquelins") || n.includes("ritz")) return "🧂";
     if (n.includes("granola")) return "🌾";
+    if (n.includes("twix") || n.includes("reese") || n.includes("cadbury") || n.includes("mini-egg")) return "🍫";
     if (n.includes("lindt") || n.includes("kit kat") || n.includes("oh henry") ||
         n.includes("aero") || n.includes("caramilk") || n.includes("coffee crisp")) return "🍫";
     if (n.includes("chocolat")) return "🍫";
@@ -151,6 +176,10 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("chips")) return "🥔";
 
     // === Boissons ===
+    if (n.includes("gruau")) return "🥣";
+    if (n.includes("kombucha")) return "🍶";
+    if (n.includes("celsius")) return "🥤";
+    if (n.includes("kool-aid") || n.includes("punch")) return "🧃";
     if (n.includes("eau")) return "💧";
     if (n.includes("café") || n.includes("chocolat chaud")) return "☕";
     if (n.includes("thé glacé") || n.includes("nestea")) return "🧋";
@@ -167,22 +196,35 @@ function getProductEmoji(name: string, category: string): string {
 
   if (category === "clothing") {
     if (n.includes("t-shirt")) return "👕";
+    if (n.includes("pantalon de jogging") || n.includes("jogging")) return "🩳";
     if (n.includes("jeans") || n.includes("pantalon")) return "👖";
     if (n.includes("chaussette")) return "🧦";
+    if (n.includes("espadrille")) return "👟";
     if (n.includes("chaussure") || n.includes("sandales")) return "👟";
     if (n.includes("bottes")) return "👢";
     if (n.includes("casquette")) return "🧢";
     if (n.includes("tuque")) return "🎩";
     if (n.includes("gants")) return "🧤";
     if (n.includes("écharpe")) return "🧣";
+    if (n.includes("maillot de bain")) return "🩱";
+    if (n.includes("maillot")) return "🏊";
     if (n.includes("robe")) return "👗";
     if (n.includes("bermuda")) return "🩳";
+    if (n.includes("pyjama")) return "🌙";
     if (n.includes("sous-vêtement") || n.includes("sous-vetement")) return "🩲";
+    if (n.includes("capuche") || n.includes("chandail")) return "🧥";
     if (n.includes("manteau") || n.includes("veste") || n.includes("pull")) return "🧥";
     return "👕";
   }
 
   if (category === "leisure") {
+    if (n.includes("zoo")) return "🦒";
+    if (n.includes("natation") || n.includes("piscine")) return "🏊";
+    if (n.includes("guitare")) return "🎸";
+    if (n.includes("parc d'attractions") || n.includes("parc d")) return "🎡";
+    if (n.includes("musée")) return "🏛️";
+    if (n.includes("ski")) return "⛷️";
+    if (n.includes("youtube") || n.includes("abonnement")) return "📺";
     if (n.includes("cinéma") || n.includes("cinema")) return "🎬";
     if (n.includes("netflix")) return "📺";
     if (n.includes("spotify")) return "🎧";
@@ -190,8 +232,8 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("karaoké") || n.includes("karaoke")) return "🎤";
     if (n.includes("jeu vidéo") || n.includes("jeu video")) return "🎮";
     if (n.includes("bowling")) return "🎳";
-    if (n.includes("piscine")) return "🏊";
     if (n.includes("gym")) return "🏋️";
+    if (n.includes("cours")) return "📖";
     if (n.includes("livre")) return "📚";
     if (n.includes("pizza")) return "🍕";
     if (n.includes("mcdonald") || n.includes("repas")) return "🍔";

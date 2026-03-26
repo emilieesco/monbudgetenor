@@ -380,12 +380,35 @@
     "a1b155f7-2b3c-4424-8245-27805e67a85f": {
       "name": "Emi",
       "classId": "3549b0c0-2a37-4489-9ede-2afdc9a2b174",
-      "budget": 2400,
+      "budget": 1500,
       "id": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "spent": 0,
-      "savings": 0,
+      "savings": 3900,
       "createdAt": "2026-03-25T12:28:37.759Z",
-      "budgetHistory": []
+      "budgetHistory": [
+        {
+          "budget": 2400,
+          "date": "2026-03-26T02:50:55.016Z"
+        },
+        {
+          "budget": 1500,
+          "date": "2026-03-26T02:51:13.240Z"
+        },
+        {
+          "budget": 2400,
+          "date": "2026-03-26T02:51:40.747Z"
+        },
+        {
+          "budget": 2400,
+          "date": "2026-03-26T02:51:43.226Z"
+        },
+        {
+          "budget": 1500,
+          "date": "2026-03-26T02:51:49.124Z"
+        }
+      ],
+      "currentMonth": 5,
+      "monthlyBudget": 1500
     }
   },
   "catalogItems": {
@@ -1990,6 +2013,516 @@
       "isEssential": false,
       "isTaxable": true,
       "id": "1a3261b6-bcb9-49d4-96e9-9fa64db29124"
+    },
+    "d5ab8b45-269b-461c-9904-43ebac6259b4": {
+      "name": "Kéfir nature 750ml",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Boisson lactée fermentée nature",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "d5ab8b45-269b-461c-9904-43ebac6259b4"
+    },
+    "f53229d5-56da-4358-a472-bc53d2205bbf": {
+      "name": "Fromage ricotta 475g",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage frais italien",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "f53229d5-56da-4358-a472-bc53d2205bbf"
+    },
+    "889ce191-09e7-462d-aa5f-5e9a56d26b5f": {
+      "name": "Lait sans lactose 2L",
+      "price": 5.29,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Lait sans lactose format familial",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "889ce191-09e7-462d-aa5f-5e9a56d26b5f"
+    },
+    "77cb514b-96eb-407c-b4a2-b3b45005c141": {
+      "name": "Fromage feta 200g",
+      "price": 4.79,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage grec salé",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "77cb514b-96eb-407c-b4a2-b3b45005c141"
+    },
+    "282a2ad8-c47a-412a-99f2-2924573b97e4": {
+      "name": "Fromage suisse 400g",
+      "price": 6.49,
+      "category": "food",
+      "subcategory": "Produits Laitiers",
+      "description": "Fromage à pâte ferme",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "282a2ad8-c47a-412a-99f2-2924573b97e4"
+    },
+    "e4841675-fdae-49a3-a99b-179d34c03f24": {
+      "name": "Veau haché 450g",
+      "price": 9.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Viande hachée de veau",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "e4841675-fdae-49a3-a99b-179d34c03f24"
+    },
+    "0801a7e4-b0b2-482c-abb1-49f5bd061557": {
+      "name": "Pétoncles 300g",
+      "price": 12.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Fruits de mer du Québec",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "0801a7e4-b0b2-482c-abb1-49f5bd061557"
+    },
+    "a864df7a-9f7b-4996-a118-571ed6bea44d": {
+      "name": "Moules 907g",
+      "price": 8.49,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Moules fraîches de l'Atlantique",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "a864df7a-9f7b-4996-a118-571ed6bea44d"
+    },
+    "4311a540-065b-4639-b47e-8897a01ec8d5": {
+      "name": "Saucissons Schneiders 6",
+      "price": 5.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Saucissons classiques",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "4311a540-065b-4639-b47e-8897a01ec8d5"
+    },
+    "1d0299ce-b98b-4756-a047-e9bc4c170a5c": {
+      "name": "Poulet rôti BBQ",
+      "price": 11.99,
+      "category": "food",
+      "subcategory": "Viandes",
+      "description": "Poulet rôti entier BBQ",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "1d0299ce-b98b-4756-a047-e9bc4c170a5c"
+    },
+    "bc215194-c3ac-4178-968f-7e5ae529fc51": {
+      "name": "Kiwi 6",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Kiwis verts frais",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "bc215194-c3ac-4178-968f-7e5ae529fc51"
+    },
+    "a50078bc-1ab4-4a7c-b933-d107bd7772e0": {
+      "name": "Framboises 170g",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Framboises fraîches",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "a50078bc-1ab4-4a7c-b933-d107bd7772e0"
+    },
+    "77dc2398-b8e4-4cf8-a13b-898d27aa3cee": {
+      "name": "Asperges 454g",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Asperges vertes fraîches",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "77dc2398-b8e4-4cf8-a13b-898d27aa3cee"
+    },
+    "e0ca8ffe-53fa-4eac-9181-beec589abaa5": {
+      "name": "Patates douces 2lb",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Patates douces biologiques",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "e0ca8ffe-53fa-4eac-9181-beec589abaa5"
+    },
+    "c551a016-279f-447f-a85f-966445a45175": {
+      "name": "Maïs en épi 4",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Maïs sucré en épi",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "c551a016-279f-447f-a85f-966445a45175"
+    },
+    "a5bf2def-ab90-4f59-b7de-68a777cc3f33": {
+      "name": "Pois verts surgelés 750g",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Pois verts congelés",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "a5bf2def-ab90-4f59-b7de-68a777cc3f33"
+    },
+    "aef04bf6-eaa0-41d1-bf0b-9dd26c2e292b": {
+      "name": "Ananas entier",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Ananas tropical entier",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "aef04bf6-eaa0-41d1-bf0b-9dd26c2e292b"
+    },
+    "905fc6e6-c2c2-420e-9085-0a4fa678dd3d": {
+      "name": "Betteraves 454g",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Fruits & Légumes",
+      "description": "Betteraves fraîches",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "905fc6e6-c2c2-420e-9085-0a4fa678dd3d"
+    },
+    "2272d121-0688-4afb-b09e-1da980b639b7": {
+      "name": "Fèves au lard 840ml",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Fèves au lard style québécois",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "2272d121-0688-4afb-b09e-1da980b639b7"
+    },
+    "91773609-26bb-4500-b5a9-75bfedb7b491": {
+      "name": "Bouillon de poulet 946ml",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Bouillon de poulet naturel",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "91773609-26bb-4500-b5a9-75bfedb7b491"
+    },
+    "fea69b8d-929e-47b7-aa21-c1cfb98bc2f9": {
+      "name": "Sauce BBQ 470ml",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Sauce BBQ fumée",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "fea69b8d-929e-47b7-aa21-c1cfb98bc2f9"
+    },
+    "9573e2b2-cab4-406e-b141-9ad56bc0dc7e": {
+      "name": "Sauce soya 250ml",
+      "price": 3.29,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Sauce soya légère",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "9573e2b2-cab4-406e-b141-9ad56bc0dc7e"
+    },
+    "9dc05515-d684-4860-9d3d-c5af11d00c07": {
+      "name": "Mélasse 675ml",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Mélasse dorée",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "9dc05515-d684-4860-9d3d-c5af11d00c07"
+    },
+    "cdd29a8c-5305-490f-99a1-04fb868c50ee": {
+      "name": "Céréales Shreddies 500g",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Céréales de blé entier",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "cdd29a8c-5305-490f-99a1-04fb868c50ee"
+    },
+    "4a0648a7-a8c8-403a-92f5-9adb986b9c05": {
+      "name": "Gruau instantané 10",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Conserves",
+      "description": "Sachets de gruau instantané",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "4a0648a7-a8c8-403a-92f5-9adb986b9c05"
+    },
+    "0a5a913f-b45a-423a-90bc-7f119992fc28": {
+      "name": "Pita 6",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Pains pita nature",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "0a5a913f-b45a-423a-90bc-7f119992fc28"
+    },
+    "11f84209-43d2-453a-a881-007fee18c351": {
+      "name": "Brioche 6",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Brioches moelleuses",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "11f84209-43d2-453a-a881-007fee18c351"
+    },
+    "88b7ae6f-d9b5-471a-9043-2a4cbfb85e45": {
+      "name": "Crêpes 12",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boulangerie",
+      "description": "Crêpes prêtes à manger",
+      "isEssential": false,
+      "isTaxable": false,
+      "id": "88b7ae6f-d9b5-471a-9043-2a4cbfb85e45"
+    },
+    "cff9752d-16a0-49f3-b001-d414e0844cbd": {
+      "name": "Twix 4 barres",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres chocolatées caramel",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "cff9752d-16a0-49f3-b001-d414e0844cbd"
+    },
+    "e4bfebb7-83ec-46d9-82cd-fd6744ee1aee": {
+      "name": "Reeses 4 barres",
+      "price": 4.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Barres chocolat-beurre d'arachide",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "e4bfebb7-83ec-46d9-82cd-fd6744ee1aee"
+    },
+    "46821f4b-e59f-4d88-bfbf-fc9db86c5df4": {
+      "name": "Mini-Eggs Cadbury 200g",
+      "price": 5.49,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Petits oeufs en chocolat",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "46821f4b-e59f-4d88-bfbf-fc9db86c5df4"
+    },
+    "e470751e-3cc6-4f09-8394-601aa8f72d2e": {
+      "name": "Crème glacée Häagen-Dazs 500ml",
+      "price": 7.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Crème glacée premium",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "e470751e-3cc6-4f09-8394-601aa8f72d2e"
+    },
+    "1be15f5e-9179-47f9-a7ea-fad6662f1d7e": {
+      "name": "Macarons 12",
+      "price": 8.99,
+      "category": "food",
+      "subcategory": "Bonbons & Sucreries",
+      "description": "Macarons français assortis",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1be15f5e-9179-47f9-a7ea-fad6662f1d7e"
+    },
+    "6e2ae0fd-a8b4-4225-bebc-a6129e1dc88f": {
+      "name": "Kombucha 473ml",
+      "price": 3.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson fermentée probiotique",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "6e2ae0fd-a8b4-4225-bebc-a6129e1dc88f"
+    },
+    "c505ec90-7851-4a9a-9b4a-2aec21db8aba": {
+      "name": "Boisson Celsius 355ml",
+      "price": 3.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson énergisante santé",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "c505ec90-7851-4a9a-9b4a-2aec21db8aba"
+    },
+    "7e014d65-9df9-4e1d-a983-5bce4de71910": {
+      "name": "Lait de soya 1.89L",
+      "price": 4.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson de soya nature",
+      "isEssential": true,
+      "isTaxable": false,
+      "id": "7e014d65-9df9-4e1d-a983-5bce4de71910"
+    },
+    "98048b2b-84da-4b1e-98ec-f83e52b3623c": {
+      "name": "Punch Kool-Aid 2L",
+      "price": 2.49,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Boisson sucrée aux fruits",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "98048b2b-84da-4b1e-98ec-f83e52b3623c"
+    },
+    "40902e2f-44af-4255-907e-96893067eb9a": {
+      "name": "Eau de coco 330ml",
+      "price": 2.99,
+      "category": "food",
+      "subcategory": "Boissons",
+      "description": "Eau de coco naturelle",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "40902e2f-44af-4255-907e-96893067eb9a"
+    },
+    "f6f21d0c-e173-4213-b786-13adcc875ec6": {
+      "name": "Pyjama",
+      "price": 24.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Ensemble pyjama confortable",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "f6f21d0c-e173-4213-b786-13adcc875ec6"
+    },
+    "43ef0c41-8f2f-4987-8caf-0769d69edb1f": {
+      "name": "Maillot de bain",
+      "price": 29.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Maillot de bain une pièce ou deux pièces",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "43ef0c41-8f2f-4987-8caf-0769d69edb1f"
+    },
+    "5248e2b7-7503-4b5c-9d11-4c7b346b906f": {
+      "name": "Pantalon de jogging",
+      "price": 34.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Pantalon de sport décontracté",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "5248e2b7-7503-4b5c-9d11-4c7b346b906f"
+    },
+    "d7e609e6-8e9e-4afa-8203-05dcb4d38c45": {
+      "name": "Chandail à capuche",
+      "price": 44.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Hoodie coton ouaté",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "d7e609e6-8e9e-4afa-8203-05dcb4d38c45"
+    },
+    "f2fd57b7-3a96-4a62-8383-57cc092d94c1": {
+      "name": "Robe casual",
+      "price": 39.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Robe décontractée tendance",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "f2fd57b7-3a96-4a62-8383-57cc092d94c1"
+    },
+    "7af22369-5303-4c89-a112-5daded38a546": {
+      "name": "Espadrilles",
+      "price": 49.99,
+      "category": "clothing",
+      "subcategory": "",
+      "description": "Chaussures sport casual",
+      "isEssential": true,
+      "isTaxable": true,
+      "id": "7af22369-5303-4c89-a112-5daded38a546"
+    },
+    "26367c6a-fc90-4b31-b7e4-a3fe71332edd": {
+      "name": "Zoo de Granby (entrée)",
+      "price": 34.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Entrée au Zoo de Granby",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "26367c6a-fc90-4b31-b7e4-a3fe71332edd"
+    },
+    "1dc4732f-da07-4003-a5eb-9156ab42d81f": {
+      "name": "Cours de natation (mois)",
+      "price": 49.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Un mois de cours de natation",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "1dc4732f-da07-4003-a5eb-9156ab42d81f"
+    },
+    "88a7b07d-6b79-4633-9a42-7ff676d7fa05": {
+      "name": "Cours de guitare (cours)",
+      "price": 35,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Un cours de guitare individuel",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "88a7b07d-6b79-4633-9a42-7ff676d7fa05"
+    },
+    "7b185246-7aef-4b28-b320-2af6db4d4f10": {
+      "name": "Parc d'attractions",
+      "price": 44.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Journée au parc d'attractions",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "7b185246-7aef-4b28-b320-2af6db4d4f10"
+    },
+    "5373b30c-55e4-4df7-9dfb-23ea308837ac": {
+      "name": "Musée des beaux-arts",
+      "price": 14.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Entrée au musée",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "5373b30c-55e4-4df7-9dfb-23ea308837ac"
+    },
+    "ae6de56f-7054-40d2-8da7-b0a50befe6b3": {
+      "name": "Ski de fond (journée)",
+      "price": 19.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Journée de ski de fond",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "ae6de56f-7054-40d2-8da7-b0a50befe6b3"
+    },
+    "f8d8db18-4034-4638-b42c-4ccad0e7abfa": {
+      "name": "Abonnement YouTube Premium",
+      "price": 13.99,
+      "category": "leisure",
+      "subcategory": "",
+      "description": "Accès sans pub YouTube",
+      "isEssential": false,
+      "isTaxable": true,
+      "id": "f8d8db18-4034-4638-b42c-4ccad0e7abfa"
     }
   },
   "expenses": {
@@ -3704,77 +4237,77 @@
       "isPaid": false,
       "dueDate": "2025-12-02T01:28:51.502Z"
     },
-    "c472d36b-328b-461c-8eab-885888351667": {
-      "id": "c472d36b-328b-461c-8eab-885888351667",
+    "38e90926-125c-4358-a2cf-d2edc55421be": {
+      "id": "38e90926-125c-4358-a2cf-d2edc55421be",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Loyer",
       "amount": 15,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.192Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "22725f42-6eb5-4d97-a810-3e05da2207e7": {
-      "id": "22725f42-6eb5-4d97-a810-3e05da2207e7",
+    "d82edd63-9092-4bd4-8f67-95f8871b89cf": {
+      "id": "d82edd63-9092-4bd4-8f67-95f8871b89cf",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Internet",
       "amount": 5,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.196Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "fcfd39ef-52d5-4360-90bc-40b418a8984b": {
-      "id": "fcfd39ef-52d5-4360-90bc-40b418a8984b",
+    "527d7bbd-909c-49bb-9a91-584611fc6b05": {
+      "id": "527d7bbd-909c-49bb-9a91-584611fc6b05",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Téléphone",
       "amount": 3,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.199Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "b2c7a33d-6d03-440f-86c7-9eab1900dcb5": {
-      "id": "b2c7a33d-6d03-440f-86c7-9eab1900dcb5",
+    "b420d2af-13fe-4702-9878-bc6adf90cc6b": {
+      "id": "b420d2af-13fe-4702-9878-bc6adf90cc6b",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Hydro",
       "amount": 8,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.202Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "00041d17-4dd6-46c6-a0d5-c830ef4cf4b6": {
-      "id": "00041d17-4dd6-46c6-a0d5-c830ef4cf4b6",
+    "53ae1578-c1eb-4d61-92c0-555e492d6fcb": {
+      "id": "53ae1578-c1eb-4d61-92c0-555e492d6fcb",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Assurance Voiture",
       "amount": 10,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.206Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "12c742b3-3fe1-439c-8064-dd735e75100a": {
-      "id": "12c742b3-3fe1-439c-8064-dd735e75100a",
+    "18541d4c-5a8d-4036-9395-9ec05fceacf2": {
+      "id": "18541d4c-5a8d-4036-9395-9ec05fceacf2",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Assurance Maison",
       "amount": 7,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.209Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "310950d6-568b-476a-9270-d58184644ec4": {
-      "id": "310950d6-568b-476a-9270-d58184644ec4",
+    "19df24a2-2ba4-439c-8325-2b6305c5aa6c": {
+      "id": "19df24a2-2ba4-439c-8325-2b6305c5aa6c",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Essence",
       "amount": 12,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.212Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "67eb2655-8f2c-4db2-a1a7-d63f8db96c87": {
-      "id": "67eb2655-8f2c-4db2-a1a7-d63f8db96c87",
+    "34c143db-b3a8-4e9d-b0ed-b8230a401efe": {
+      "id": "34c143db-b3a8-4e9d-b0ed-b8230a401efe",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Nourriture",
       "amount": 20,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.215Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     },
-    "a8abb443-a7ee-422d-8250-0533847dd8bd": {
-      "id": "a8abb443-a7ee-422d-8250-0533847dd8bd",
+    "71accda5-c136-40a8-823d-c2e42bffa66e": {
+      "id": "71accda5-c136-40a8-823d-c2e42bffa66e",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "category": "Sortie",
       "amount": 5,
       "isPaid": false,
-      "dueDate": "2026-03-26T02:39:45.218Z"
+      "dueDate": "2026-03-26T02:51:49.124Z"
     }
   },
   "bonusExpenses": {
@@ -4191,45 +4724,45 @@
       "completed": false,
       "createdAt": "2025-12-02T01:28:40.704Z"
     },
-    "fe165a0e-9718-4460-bb82-92d3ff725de3": {
-      "id": "fe165a0e-9718-4460-bb82-92d3ff725de3",
+    "37be95fc-f09b-4d19-9e9f-01500cfe2616": {
+      "id": "37be95fc-f09b-4d19-9e9f-01500cfe2616",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Économe",
       "description": "Dépense moins de 30% de ton budget",
       "type": "spending",
       "targetValue": 720,
       "completed": false,
-      "createdAt": "2026-03-26T02:39:45.175Z"
+      "createdAt": "2026-03-26T02:51:40.764Z"
     },
-    "8c2adc5c-e0a2-42bb-98ec-6f3cdd869069": {
-      "id": "8c2adc5c-e0a2-42bb-98ec-6f3cdd869069",
+    "6efeda96-67fe-4b4e-8e1a-bcbb1f58e810": {
+      "id": "6efeda96-67fe-4b4e-8e1a-bcbb1f58e810",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Essentiel d'abord",
       "description": "Achète 3 articles essentiels",
       "type": "essential",
       "targetValue": 3,
       "completed": false,
-      "createdAt": "2026-03-26T02:39:45.178Z"
+      "createdAt": "2026-03-26T02:51:40.767Z"
     },
-    "75be81aa-1db3-4dd2-82a9-dc4fed2a3585": {
-      "id": "75be81aa-1db3-4dd2-82a9-dc4fed2a3585",
+    "e248c415-802d-490c-8269-a8e97b298c19": {
+      "id": "e248c415-802d-490c-8269-a8e97b298c19",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Responsable",
       "description": "Paye toutes tes dépenses fixes",
       "type": "fixed",
       "targetValue": 100,
       "completed": false,
-      "createdAt": "2026-03-26T02:39:45.182Z"
+      "createdAt": "2026-03-26T02:51:40.770Z"
     },
-    "62e70fec-b978-46b6-94bf-c521f22d67e6": {
-      "id": "62e70fec-b978-46b6-94bf-c521f22d67e6",
+    "d9da01e6-77e8-45e7-bb75-06e2186ec00e": {
+      "id": "d9da01e6-77e8-45e7-bb75-06e2186ec00e",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "title": "Sage",
       "description": "Économise 50% de ton budget",
       "type": "savings",
       "targetValue": 1200,
       "completed": false,
-      "createdAt": "2026-03-26T02:39:45.185Z"
+      "createdAt": "2026-03-26T02:51:40.773Z"
     }
   },
   "customChallenges": {},
@@ -4441,6 +4974,13 @@
       "tier": "platinum",
       "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
       "earnedAt": "2026-03-26T02:26:07.171Z"
+    },
+    "3e01e1f5-0309-44a6-9bb0-4eca97376c7a": {
+      "id": "3e01e1f5-0309-44a6-9bb0-4eca97376c7a",
+      "type": "saver",
+      "tier": "platinum",
+      "studentId": "a1b155f7-2b3c-4424-8245-27805e67a85f",
+      "earnedAt": "2026-03-26T02:50:55.146Z"
     }
   },
   "savingsGoals": {

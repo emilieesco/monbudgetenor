@@ -310,6 +310,8 @@ export class MemStorage implements IStorage {
       spent: 0,
       savings: 0,
       createdAt: new Date(),
+      // Ensure monthlyBudget is always saved so new months use correct amount
+      monthlyBudget: input.monthlyBudget || input.budget,
     };
     this.students.set(id, student);
 
@@ -357,7 +359,7 @@ export class MemStorage implements IStorage {
     if (!student) return undefined;
     const budgetHistory = student.budgetHistory || [];
     budgetHistory.push({ budget, date: new Date() });
-    const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory };
+    const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory, monthlyBudget: budget };
     this.students.set(id, updated);
     return updated;
   }
@@ -822,9 +824,9 @@ export class MemStorage implements IStorage {
     if (!student) return undefined;
 
     const classData = await this.getClass(student.classId);
+    // Use the student's own monthly budget first, then their current budget (their scenario/setup amount), then class default
     const classDefaultBudget = classData?.predefinedBudget || 1500;
-    
-    const monthlyBudget = student.monthlyBudget || classDefaultBudget;
+    const monthlyBudget = student.monthlyBudget || student.budget || classDefaultBudget;
     const previousMonth = student.currentMonth || 1;
     const newMonth = previousMonth + 1;
     

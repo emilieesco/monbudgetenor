@@ -427,7 +427,7 @@ export class FileStorage implements IStorage {
 
   async createStudent(input: InsertStudent): Promise<Student> {
     const id = randomUUID();
-    const student: Student = { ...input, id, spent: 0, savings: 0, createdAt: new Date(), budgetHistory: [{ budget: input.budget, date: new Date() }], scenario: input.scenario, customExpenses: input.customExpenses };
+    const student: Student = { ...input, id, spent: 0, savings: 0, createdAt: new Date(), budgetHistory: [{ budget: input.budget, date: new Date() }], scenario: input.scenario, customExpenses: input.customExpenses, monthlyBudget: input.monthlyBudget || input.budget };
     this.students.set(id, student);
 
     const classData = await this.getClass(input.classId);
@@ -480,7 +480,7 @@ export class FileStorage implements IStorage {
     if (!student) return undefined;
     const budgetHistory = student.budgetHistory || [];
     budgetHistory.push({ budget, date: new Date() });
-    const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory };
+    const updated = { ...student, budget, spent: 0, savings: 0, budgetHistory, monthlyBudget: budget };
     this.students.set(id, updated);
     this.save();
     return updated;
@@ -954,8 +954,7 @@ export class FileStorage implements IStorage {
 
     const classData = await this.getClass(student.classId);
     const classDefaultBudget = classData?.predefinedBudget || 1500;
-    
-    const monthlyBudget = student.monthlyBudget || classDefaultBudget;
+    const monthlyBudget = student.monthlyBudget || student.budget || classDefaultBudget;
     const previousMonth = student.currentMonth || 1;
     const newMonth = previousMonth + 1;
     

@@ -510,6 +510,43 @@ export class FileStorage implements IStorage {
     return updated;
   }
 
+  async fullResetStudent(id: string): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const originalBudget = student.monthlyBudget || student.budget;
+    const updated: Student = {
+      ...student,
+      budget: originalBudget,
+      spent: 0,
+      savings: 0,
+      currentMonth: 1,
+      monthlyBudget: originalBudget,
+      budgetHistory: [{ budget: originalBudget, date: new Date() }],
+    };
+    this.students.set(id, updated);
+    // Delete all catalog purchases
+    for (const [expId, exp] of this.expenses.entries()) {
+      if ((exp as any).studentId === id) this.expenses.delete(expId);
+    }
+    // Delete and recreate fixed expenses
+    const classData = await this.getClass(student.classId);
+    const amounts = student.customExpenses || classData?.expenseAmounts || this.getDefaultAmounts();
+    for (const [fxId, fx] of this.fixedExpenses.entries()) {
+      if ((fx as any).studentId === id) this.fixedExpenses.delete(fxId);
+    }
+    for (const [category, amount] of Object.entries(amounts)) {
+      await this.createFixedExpense(id, category, amount as number);
+    }
+    // Delete badges so they can be re-earned from scratch
+    if (this.badges) {
+      for (const [bId, b] of this.badges.entries()) {
+        if ((b as any).studentId === id) this.badges.delete(bId);
+      }
+    }
+    this.save();
+    return updated;
+  }
+
   async updateStudentBudgetAndSpent(id: string, budget: number, spent: number): Promise<Student | undefined> {
     const student = this.students.get(id);
     if (!student) return undefined;

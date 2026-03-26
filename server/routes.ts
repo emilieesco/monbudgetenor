@@ -257,6 +257,20 @@ export async function registerRoutes(
     }
   });
 
+  // Full reset: month 1, original budget, no purchases, fixed expenses recreated, badges cleared
+  app.post("/api/students/:id/full-reset", async (req, res) => {
+    try {
+      const student = await storage.fullResetStudent(req.params.id);
+      if (!student) {
+        return res.status(404).json({ error: "Étudiant introuvable" });
+      }
+      res.json(student);
+    } catch (error) {
+      console.error("Full reset error:", error);
+      res.status(500).json({ error: "Erreur lors de la réinitialisation" });
+    }
+  });
+
   app.post("/api/students/:id/new-month", async (req, res) => {
     try {
       const student = await storage.startNewMonth(req.params.id);

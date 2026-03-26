@@ -59,6 +59,8 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("crème")) return "🥛";
 
     // === Viandes & Protéines ===
+    // IMPORTANT: vérifier "bœuf"/"boeuf" AVANT "œuf" pour éviter que "steak de bœuf" match "œuf"
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak")) return "🥩";
     if (n.includes("œuf") || n.includes("oeuf")) return "🥚";
     if (n.includes("bacon")) return "🥓";
     if (n.includes("saumon")) return "🐟";
@@ -70,8 +72,7 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("pepperoni")) return "🍕";
     if (n.includes("tofu")) return "🫘";
     if (n.includes("poulet")) return "🍗";
-    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak")) return "🥩";
-    if (n.includes("porc") || n.includes("côtelette")) return "🥩";
+    if (n.includes("porc") || n.includes("côtelette")) return "🐷";
     if (n.includes("poitrines")) return "🍗";
 
     // === Fruits & Légumes ===

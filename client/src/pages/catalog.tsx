@@ -41,6 +41,10 @@ function getProductEmoji(name: string, category: string): string {
   const n = name.toLowerCase();
 
   if (category === "food") {
+    // === Cas spéciaux (ordre important!) ===
+    if (n.includes("beurre d'arachide")) return "🥜";
+    if (n.includes("pain à l'ail")) return "🥖";
+
     // === Produits Laitiers ===
     if (n.includes("lait au chocolat")) return "🍫";
     if (n.includes("lait")) return "🥛";
@@ -130,16 +134,21 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("gâteau")) return "🎂";
     if (n.includes("brownie")) return "🍫";
     if (n.includes("popcorn")) return "🍿";
-    if (n.includes("biscuit") || n.includes("oreo") || n.includes("chips ahoy")) return "🍪";
-    if (n.includes("craquelins") || n.includes("ritz")) return "🍘";
+    if (n.includes("chips ahoy") || n.includes("oreo")) return "🍪";
+    if (n.includes("biscuit")) return "🍪";
+    if (n.includes("craquelins") || n.includes("ritz")) return "🧂";
     if (n.includes("granola")) return "🌾";
-    if (n.includes("chocolat") || n.includes("lindt") || n.includes("kit kat") ||
-        n.includes("oh henry") || n.includes("aero") || n.includes("caramilk") ||
-        n.includes("coffee crisp") || n.includes("barre")) return "🍫";
+    if (n.includes("lindt") || n.includes("kit kat") || n.includes("oh henry") ||
+        n.includes("aero") || n.includes("caramilk") || n.includes("coffee crisp")) return "🍫";
+    if (n.includes("chocolat")) return "🍫";
     if (n.includes("bonbon") || n.includes("gélifié") || n.includes("réglisse") ||
-        n.includes("skittles") || n.includes("m&m") || n.includes("smartie")) return "🍬";
-    if (n.includes("chips") || n.includes("lays") || n.includes("doritos") ||
-        n.includes("ruffles") || n.includes("pringles") || n.includes("cheetos")) return "🍟";
+        n.includes("skittles") || n.includes("smartie")) return "🍬";
+    if (n.includes("m&m")) return "🍬";
+    if (n.includes("doritos")) return "🌮";
+    if (n.includes("cheetos")) return "🧀";
+    if (n.includes("pringles")) return "🫙";
+    if (n.includes("lays") || n.includes("ruffles")) return "🥔";
+    if (n.includes("chips")) return "🥔";
 
     // === Boissons ===
     if (n.includes("eau")) return "💧";

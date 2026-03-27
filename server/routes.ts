@@ -1102,5 +1102,83 @@ export async function registerRoutes(
     }
   });
 
+  // Admin middleware helper
+  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
+  function checkAdminPassword(req: any, res: any): boolean {
+    const pwd = req.body?.adminPassword || req.query?.adminPassword;
+    if (pwd !== ADMIN_PASSWORD) {
+      res.status(401).json({ error: "Mot de passe administrateur invalide" });
+      return false;
+    }
+    return true;
+  }
+
+  // Admin: verify password
+  app.post("/api/admin/verify", (req, res) => {
+    if (checkAdminPassword(req, res)) {
+      res.json({ ok: true });
+    }
+  });
+
+  // Admin: list all teacher invite codes
+  app.get("/api/admin/teacher-invites", async (req, res) => {
+    if (!checkAdminPassword(req, res)) return;
+    try {
+      const invites = await storage.getTeacherInvites();
+      res.json(invites);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Admin: create a new invite code
+  app.post("/api/admin/teacher-invites", async (req, res) => {
+    if (!checkAdminPassword(req, res)) return;
+    try {
+      const { note } = req.body;
+      const invite = await storage.createTeacherInvite(note);
+      res.json(invite);
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Admin: delete an invite code
+  app.delete("/api/admin/teacher-invites/:id", async (req, res) => {
+    if (!checkAdminPassword(req, res)) return;
+    try {
+      const deleted = await storage.deleteTeacherInvite(req.params.id);
+      res.json({ deleted });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Public: validate a teacher invite code (does not consume it)
+  app.post("/api/teacher-invites/validate", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) return res.status(400).json({ error: "Code requis" });
+      const invite = await storage.validateTeacherInvite(code.trim().toUpperCase());
+      if (!invite) return res.status(404).json({ error: "Code invalide ou déjà utilisé" });
+      res.json({ valid: true, invite });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
+  // Public: consume invite code (when creating a class)
+  app.post("/api/teacher-invites/use", async (req, res) => {
+    try {
+      const { code } = req.body;
+      if (!code) return res.status(400).json({ error: "Code requis" });
+      const ok = await storage.useTeacherInvite(code.trim().toUpperCase());
+      if (!ok) return res.status(404).json({ error: "Code invalide ou déjà utilisé" });
+      res.json({ used: true });
+    } catch (error) {
+      res.status(500).json({ error: "Erreur serveur" });
+    }
+  });
+
   return httpServer;
 }

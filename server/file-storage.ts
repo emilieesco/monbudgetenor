@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type Badge, type SavingsGoal, type CreateSavingsGoal, type ClassChallenge, type CreateClassChallenge } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type Badge, type SavingsGoal, type CreateSavingsGoal, type ClassChallenge, type CreateClassChallenge, type TeacherInvite } from "@shared/schema";
 import { randomUUID } from "crypto";
 import { readFileSync, writeFileSync, existsSync } from "fs";
 import { join } from "path";
@@ -19,6 +19,7 @@ interface StorageData {
   badges: Record<string, Badge>;
   savingsGoals: Record<string, SavingsGoal>;
   classChallenges: Record<string, ClassChallenge>;
+  teacherInvites: Record<string, TeacherInvite>;
 }
 
 export class FileStorage implements IStorage {
@@ -37,6 +38,7 @@ export class FileStorage implements IStorage {
   private badges: Map<string, Badge> = new Map();
   private savingsGoals: Map<string, SavingsGoal> = new Map();
   private classChallenges: Map<string, ClassChallenge> = new Map();
+  private teacherInvites: Map<string, TeacherInvite> = new Map();
 
   constructor() {
     this.dataFile = join(process.cwd(), "data.json");
@@ -127,6 +129,11 @@ export class FileStorage implements IStorage {
             });
           }
         }
+        if (data.teacherInvites) {
+          for (const [key, value] of Object.entries(data.teacherInvites)) {
+            this.teacherInvites.set(key, { ...value, createdAt: new Date(value.createdAt), usedAt: value.usedAt ? new Date(value.usedAt) : undefined });
+          }
+        }
         console.log("Data loaded from file");
       }
     } catch (error) {
@@ -151,6 +158,7 @@ export class FileStorage implements IStorage {
         badges: Object.fromEntries(this.badges),
         savingsGoals: Object.fromEntries(this.savingsGoals),
         classChallenges: Object.fromEntries(this.classChallenges),
+        teacherInvites: Object.fromEntries(this.teacherInvites),
       };
       writeFileSync(this.dataFile, JSON.stringify(data, null, 2));
     } catch (error) {
@@ -1186,5 +1194,32 @@ export class FileStorage implements IStorage {
       if (b.badgeCount !== a.badgeCount) return b.badgeCount - a.badgeCount;
       return b.challengesCompleted - a.challengesCompleted;
     });
+  }
+
+  async createTeacherInvite(note?: string): Promise<TeacherInvite> {
+    const id = randomUUID();
+    const code = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const invite: TeacherInvite = { id, code, note, createdAt: new Date(), used: false };
+    this.teacherInvites.set(id, invite);
+    this.save();
+    return invite;
+  }
+  async getTeacherInvites(): Promise<TeacherInvite[]> {
+    return Array.from(this.teacherInvites.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  async validateTeacherInvite(code: string): Promise<TeacherInvite | null> {
+    return Array.from(this.teacherInvites.values()).find(i => i.code === code && !i.used) ?? null;
+  }
+  async useTeacherInvite(code: string): Promise<boolean> {
+    const invite = Array.from(this.teacherInvites.values()).find(i => i.code === code && !i.used);
+    if (!invite) return false;
+    this.teacherInvites.set(invite.id, { ...invite, used: true, usedAt: new Date() });
+    this.save();
+    return true;
+  }
+  async deleteTeacherInvite(id: string): Promise<boolean> {
+    const deleted = this.teacherInvites.delete(id);
+    if (deleted) this.save();
+    return deleted;
   }
 }

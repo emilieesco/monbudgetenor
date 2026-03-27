@@ -330,3 +330,18 @@ export const createClassChallengeSchema = z.object({
 
 export type CreateSavingsGoal = z.infer<typeof createSavingsGoalSchema>;
 export type CreateClassChallenge = z.infer<typeof createClassChallengeSchema>;
+
+// Teacher Invite Codes
+export interface TeacherInvite {
+  id: string;
+  code: string;
+  note?: string;
+  createdAt: Date;
+  used: boolean;
+  usedAt?: Date;
+}
+
+export const createTeacherInviteSchema = z.object({
+  note: z.string().optional(),
+});
+export type CreateTeacherInvite = z.infer<typeof createTeacherInviteSchema>;

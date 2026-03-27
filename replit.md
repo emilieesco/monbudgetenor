@@ -63,6 +63,31 @@ This abstraction allows future migration to database storage (Drizzle ORM is con
 8. **Badge**: Tiered achievement badges (bronze/silver/gold/platinum) awarded automatically based on performance
 9. **SavingsGoal**: Student-defined savings targets with progress tracking
 
+### Admin & Teacher Invite System
+
+**Admin Panel** at `/admin-panel`:
+- Protected by password (`ADMIN_PASSWORD` env var, default: `MonBudgetAdmin2025`)
+- Generate unique one-time invite codes (format: `XXXX-XXXX`) with optional notes
+- View all codes with used/available status
+- Delete codes
+- Counters for available/used codes
+
+**Teacher Invite Codes**:
+- Teachers must enter a valid invite code before creating a class (`/teacher-setup` → Créer une Classe)
+- Code is validated (POST `/api/teacher-invites/validate`) before class setup form appears
+- Code is consumed (POST `/api/teacher-invites/use`) atomically when the class is created
+- Rejoindre (connect to existing class) requires no invite code
+
+**API Routes**:
+- `POST /api/admin/verify` — verify admin password
+- `GET /api/admin/teacher-invites?adminPassword=...` — list all codes
+- `POST /api/admin/teacher-invites` — create new code
+- `DELETE /api/admin/teacher-invites/:id?adminPassword=...` — delete code
+- `POST /api/teacher-invites/validate` — validate without consuming
+- `POST /api/teacher-invites/use` — consume code
+
+**Storage**: `teacher_invites` table in PostgreSQL; `TeacherInvite` in MemStorage and FileStorage
+
 ### Gamification System
 
 **Badge Types & Tier Thresholds**:

@@ -6,21 +6,27 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { ArrowLeft, Plus, LogIn, Home as HomeIcon } from "lucide-react";
+import { ArrowLeft, Plus, LogIn, Home as HomeIcon, KeyRound, CheckCircle } from "lucide-react";
+
+type Mode = "choice" | "invite" | "create" | "connect";
 
 export default function TeacherSetup() {
   const [_location, navigate] = useLocation();
-  const [mode, setMode] = useState<"choice" | "create" | "connect">("choice");
+  const [mode, setMode] = useState<Mode>("choice");
   const [teacherName, setTeacherName] = useState("");
   const [classCode, setClassCode] = useState("");
   const [error, setError] = useState("");
 
+  // Invite code state
+  const [inviteCode, setInviteCode] = useState("");
+  const [inviteValid, setInviteValid] = useState(false);
+  const [validatingInvite, setValidatingInvite] = useState(false);
+
   const createClassMutation = useMutation({
     mutationFn: async () => {
-      const res = await apiRequest("POST", "/api/classes", {
-        teacherName,
-        code: classCode,
-      });
+      // First consume the invite code, then create the class
+      await apiRequest("POST", "/api/teacher-invites/use", { code: inviteCode });
+      const res = await apiRequest("POST", "/api/classes", { teacherName, code: classCode });
       return res.json();
     },
     onSuccess: (data) => {
@@ -28,7 +34,7 @@ export default function TeacherSetup() {
       navigate(`/teacher/${data.id}`);
     },
     onError: () => {
-      setError("Erreur: le code existe peut-être déjà. Essaie un autre.");
+      setError("Erreur lors de la création. Le code de classe existe peut-être déjà.");
     },
   });
 
@@ -46,7 +52,30 @@ export default function TeacherSetup() {
     },
   });
 
-  const handleCreate = async () => {
+  async function validateInviteCode() {
+    if (!inviteCode.trim()) {
+      setError("Entre un code d'invitation.");
+      return;
+    }
+    setError("");
+    setValidatingInvite(true);
+    try {
+      const res = await apiRequest("POST", "/api/teacher-invites/validate", { code: inviteCode.trim() });
+      if (res.ok) {
+        setInviteValid(true);
+        setMode("create");
+      } else {
+        const data = await res.json();
+        setError(data.error || "Code invalide ou déjà utilisé.");
+      }
+    } catch {
+      setError("Code invalide ou déjà utilisé.");
+    } finally {
+      setValidatingInvite(false);
+    }
+  }
+
+  const handleCreate = () => {
     if (!teacherName || !classCode) {
       setError("Tous les champs sont requis");
       return;
@@ -59,13 +88,22 @@ export default function TeacherSetup() {
     createClassMutation.mutate();
   };
 
-  const handleConnect = async () => {
+  const handleConnect = () => {
     if (!classCode) {
       setError("Le code est requis");
       return;
     }
     setError("");
     connectClassMutation.mutate();
+  };
+
+  const reset = (nextMode: Mode) => {
+    setMode(nextMode);
+    setError("");
+    setTeacherName("");
+    setClassCode("");
+    setInviteCode("");
+    setInviteValid(false);
   };
 
   return (
@@ -75,12 +113,7 @@ export default function TeacherSetup() {
         <div className="mb-8 flex gap-2">
           {mode !== "choice" && (
             <Button
-              onClick={() => {
-                setMode("choice");
-                setError("");
-                setTeacherName("");
-                setClassCode("");
-              }}
+              onClick={() => reset("choice")}
               variant="outline"
               size="sm"
               className="flex items-center gap-2"
@@ -94,6 +127,7 @@ export default function TeacherSetup() {
             variant="outline"
             size="sm"
             className="flex items-center gap-2"
+            data-testid="button-home"
           >
             <HomeIcon className="w-4 h-4" />
             Accueil
@@ -111,10 +145,8 @@ export default function TeacherSetup() {
             <div className="space-y-4">
               <Card
                 className="p-6 cursor-pointer hover-elevate transition-all border-2"
-                onClick={() => {
-                  setMode("create");
-                  setError("");
-                }}
+                onClick={() => { setMode("invite"); setError(""); }}
+                data-testid="card-create-class"
               >
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-primary/10 rounded-lg">
@@ -123,7 +155,7 @@ export default function TeacherSetup() {
                   <div>
                     <h3 className="font-bold text-lg mb-1">Créer une Classe</h3>
                     <p className="text-sm text-muted-foreground">
-                      Démarre une nouvelle classe avec un code unique
+                      Démarre une nouvelle classe avec un code d'invitation
                     </p>
                   </div>
                 </div>
@@ -131,10 +163,8 @@ export default function TeacherSetup() {
 
               <Card
                 className="p-6 cursor-pointer hover-elevate transition-all border-2"
-                onClick={() => {
-                  setMode("connect");
-                  setError("");
-                }}
+                onClick={() => { setMode("connect"); setError(""); }}
+                data-testid="card-connect-class"
               >
                 <div className="flex items-start gap-4">
                   <div className="p-3 bg-primary/10 rounded-lg">
@@ -152,13 +182,75 @@ export default function TeacherSetup() {
           </>
         )}
 
-        {/* Create Mode */}
+        {/* Invite Code Mode */}
+        {mode === "invite" && (
+          <>
+            <h1 className="text-3xl font-bold text-primary">Code d'invitation</h1>
+            <p className="text-muted-foreground mt-2 mb-8">
+              Entre le code qui t'a été fourni par l'administrateur
+            </p>
+
+            <Card className="p-8">
+              <div className="space-y-6">
+                <div className="flex justify-center">
+                  <div className="p-4 bg-primary/10 rounded-full">
+                    <KeyRound className="w-10 h-10 text-primary" />
+                  </div>
+                </div>
+
+                <div>
+                  <Label htmlFor="invite-code">Code d'invitation</Label>
+                  <Input
+                    id="invite-code"
+                    placeholder="Ex: AB12-CD34"
+                    value={inviteCode}
+                    onChange={(e) => { setInviteCode(e.target.value.toUpperCase()); setError(""); }}
+                    onKeyDown={(e) => e.key === "Enter" && validateInviteCode()}
+                    className="font-mono text-lg tracking-wider text-center"
+                    data-testid="input-invite-code"
+                  />
+                </div>
+
+                {error && (
+                  <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                    <p className="text-sm text-destructive">{error}</p>
+                  </div>
+                )}
+
+                <Button
+                  onClick={validateInviteCode}
+                  disabled={validatingInvite || !inviteCode.trim()}
+                  className="w-full"
+                  size="lg"
+                  data-testid="button-validate-invite"
+                >
+                  {validatingInvite ? "Vérification..." : "Valider le code"}
+                </Button>
+              </div>
+            </Card>
+
+            <Card className="p-6 mt-4 bg-muted/50">
+              <p className="text-sm text-muted-foreground">
+                Les codes d'invitation sont générés par l'administrateur et sont à usage unique.
+              </p>
+            </Card>
+          </>
+        )}
+
+        {/* Create Mode (after invite validated) */}
         {mode === "create" && (
           <>
             <h1 className="text-3xl font-bold text-primary">Créer une Classe</h1>
             <p className="text-muted-foreground mt-2 mb-8">
               Configure ta nouvelle classe
             </p>
+
+            {inviteValid && (
+              <div className="flex items-center gap-2 mb-4 text-green-600 text-sm">
+                <CheckCircle className="w-4 h-4" />
+                Code d'invitation validé : <code className="font-mono font-bold">{inviteCode}</code>
+              </div>
+            )}
 
             <Card className="p-8">
               <div className="space-y-6">
@@ -168,10 +260,7 @@ export default function TeacherSetup() {
                     id="teacher"
                     placeholder="Ex: Madame Dupont"
                     value={teacherName}
-                    onChange={(e) => {
-                      setTeacherName(e.target.value);
-                      setError("");
-                    }}
+                    onChange={(e) => { setTeacherName(e.target.value); setError(""); }}
                     data-testid="input-teacher-name"
                   />
                 </div>
@@ -182,11 +271,8 @@ export default function TeacherSetup() {
                     id="code"
                     placeholder="Ex: MATH2024"
                     value={classCode}
-                    onChange={(e) => {
-                      setClassCode(e.target.value.toUpperCase());
-                      setError("");
-                    }}
-                    maxLength="10"
+                    onChange={(e) => { setClassCode(e.target.value.toUpperCase()); setError(""); }}
+                    maxLength={10}
                     data-testid="input-new-class-code"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
@@ -203,19 +289,13 @@ export default function TeacherSetup() {
                 <Button
                   onClick={handleCreate}
                   disabled={createClassMutation.isPending || !teacherName || !classCode}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full"
                   size="lg"
                   data-testid="button-create-class"
                 >
                   {createClassMutation.isPending ? "Création..." : "Créer la Classe"}
                 </Button>
               </div>
-            </Card>
-
-            <Card className="p-6 mt-8 bg-muted/50">
-              <p className="text-sm text-muted-foreground">
-                Le code sera partagé avec tes élèves pour qu'ils puissent rejoindre ta classe.
-              </p>
             </Card>
           </>
         )}
@@ -236,10 +316,7 @@ export default function TeacherSetup() {
                     id="connect-code"
                     placeholder="Ex: MATH2024"
                     value={classCode}
-                    onChange={(e) => {
-                      setClassCode(e.target.value.toUpperCase());
-                      setError("");
-                    }}
+                    onChange={(e) => { setClassCode(e.target.value.toUpperCase()); setError(""); }}
                     data-testid="input-class-code-connect"
                   />
                   <p className="text-xs text-muted-foreground mt-2">
@@ -256,7 +333,7 @@ export default function TeacherSetup() {
                 <Button
                   onClick={handleConnect}
                   disabled={connectClassMutation.isPending || !classCode}
-                  className="w-full bg-primary hover:bg-primary/90"
+                  className="w-full"
                   size="lg"
                   data-testid="button-connect-class"
                 >

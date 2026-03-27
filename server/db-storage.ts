@@ -6,7 +6,8 @@ import type {
   InsertExpense, Class, CreateClass, BonusExpense, CreateBonusExpense, Challenge,
   CreateChallenge, CustomChallenge, CreateCustomChallenge, TeacherMessage,
   CreateTeacherMessage, SurpriseEvent, CreateSurpriseEvent, BudgetSnapshot,
-  Badge, SavingsGoal, CreateSavingsGoal, ClassChallenge, CreateClassChallenge
+  Badge, SavingsGoal, CreateSavingsGoal, ClassChallenge, CreateClassChallenge,
+  TeacherInvite
 } from "@shared/schema";
 
 const DEFAULT_EXPENSE_AMOUNTS: Record<string, number> = {
@@ -393,6 +394,16 @@ export class DatabaseStorage implements IStorage {
         deadline TIMESTAMPTZ,
         created_at TIMESTAMPTZ DEFAULT NOW(),
         completed_by JSONB DEFAULT '[]'
+      )
+    `;
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS teacher_invites (
+        id TEXT PRIMARY KEY,
+        code TEXT NOT NULL UNIQUE,
+        note TEXT,
+        created_at TIMESTAMPTZ DEFAULT NOW(),
+        used BOOLEAN DEFAULT FALSE,
+        used_at TIMESTAMPTZ
       )
     `;
   }
@@ -1268,5 +1279,36 @@ export class DatabaseStorage implements IStorage {
       if (b.badgeCount !== a.badgeCount) return b.badgeCount - a.badgeCount;
       return b.challengesCompleted - a.challengesCompleted;
     });
+  }
+
+  async createTeacherInvite(note?: string): Promise<TeacherInvite> {
+    const id = randomUUID();
+    const code = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const [row] = await this.sql`
+      INSERT INTO teacher_invites (id, code, note, used) VALUES (${id}, ${code}, ${note ?? null}, false) RETURNING *
+    `;
+    return { id: row.id, code: row.code, note: row.note ?? undefined, createdAt: new Date(row.created_at), used: row.used };
+  }
+
+  async getTeacherInvites(): Promise<TeacherInvite[]> {
+    const rows = await this.sql`SELECT * FROM teacher_invites ORDER BY created_at DESC`;
+    return rows.map(r => ({ id: r.id, code: r.code, note: r.note ?? undefined, createdAt: new Date(r.created_at), used: r.used, usedAt: r.used_at ? new Date(r.used_at) : undefined }));
+  }
+
+  async validateTeacherInvite(code: string): Promise<TeacherInvite | null> {
+    const rows = await this.sql`SELECT * FROM teacher_invites WHERE code = ${code} AND used = false`;
+    if (!rows[0]) return null;
+    const r = rows[0];
+    return { id: r.id, code: r.code, note: r.note ?? undefined, createdAt: new Date(r.created_at), used: r.used };
+  }
+
+  async useTeacherInvite(code: string): Promise<boolean> {
+    const result = await this.sql`UPDATE teacher_invites SET used = true, used_at = NOW() WHERE code = ${code} AND used = false`;
+    return (result.count ?? 0) > 0;
+  }
+
+  async deleteTeacherInvite(id: string): Promise<boolean> {
+    const result = await this.sql`DELETE FROM teacher_invites WHERE id = ${id}`;
+    return (result.count ?? 0) > 0;
   }
 }

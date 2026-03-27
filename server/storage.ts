@@ -1,4 +1,4 @@
-import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type CreateSnapshot, type Badge, type SavingsGoal, type CreateSavingsGoal, type ClassChallenge, type CreateClassChallenge } from "@shared/schema";
+import { type Student, type CatalogItem, type Expense, type FixedExpense, type InsertStudent, type InsertCatalogItem, type InsertExpense, type Class, type CreateClass, type BonusExpense, type CreateBonusExpense, type Challenge, type CreateChallenge, type CustomChallenge, type CreateCustomChallenge, type TeacherMessage, type CreateTeacherMessage, type SurpriseEvent, type CreateSurpriseEvent, type BudgetSnapshot, type CreateSnapshot, type Badge, type SavingsGoal, type CreateSavingsGoal, type ClassChallenge, type CreateClassChallenge, type TeacherInvite } from "@shared/schema";
 import { randomUUID } from "crypto";
 
 export interface IStorage {
@@ -83,6 +83,13 @@ export interface IStorage {
   
   // Leaderboard
   getClassLeaderboard(classId: string): Promise<Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}>>;
+
+  // Teacher Invites
+  createTeacherInvite(note?: string): Promise<TeacherInvite>;
+  getTeacherInvites(): Promise<TeacherInvite[]>;
+  validateTeacherInvite(code: string): Promise<TeacherInvite | null>;
+  useTeacherInvite(code: string): Promise<boolean>;
+  deleteTeacherInvite(id: string): Promise<boolean>;
 }
 
 export class MemStorage implements IStorage {
@@ -102,6 +109,7 @@ export class MemStorage implements IStorage {
   private badges: Map<string, Badge> = new Map();
   private savingsGoals: Map<string, SavingsGoal> = new Map();
   private classChallenges: Map<string, ClassChallenge> = new Map();
+  private teacherInvites: Map<string, TeacherInvite> = new Map();
 
   constructor() {
     this.students = new Map();
@@ -1046,6 +1054,29 @@ export class MemStorage implements IStorage {
       if (b.badgeCount !== a.badgeCount) return b.badgeCount - a.badgeCount;
       return b.challengesCompleted - a.challengesCompleted;
     });
+  }
+
+  async createTeacherInvite(note?: string): Promise<TeacherInvite> {
+    const code = Math.random().toString(36).substring(2, 6).toUpperCase() + "-" + Math.random().toString(36).substring(2, 6).toUpperCase();
+    const invite: TeacherInvite = { id: randomUUID(), code, note, createdAt: new Date(), used: false };
+    this.teacherInvites.set(invite.id, invite);
+    return invite;
+  }
+  async getTeacherInvites(): Promise<TeacherInvite[]> {
+    return Array.from(this.teacherInvites.values()).sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+  }
+  async validateTeacherInvite(code: string): Promise<TeacherInvite | null> {
+    const invite = Array.from(this.teacherInvites.values()).find(i => i.code === code && !i.used);
+    return invite ?? null;
+  }
+  async useTeacherInvite(code: string): Promise<boolean> {
+    const invite = Array.from(this.teacherInvites.values()).find(i => i.code === code && !i.used);
+    if (!invite) return false;
+    this.teacherInvites.set(invite.id, { ...invite, used: true, usedAt: new Date() });
+    return true;
+  }
+  async deleteTeacherInvite(id: string): Promise<boolean> {
+    return this.teacherInvites.delete(id);
   }
 }
 

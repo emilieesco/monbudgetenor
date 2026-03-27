@@ -30,6 +30,8 @@ export interface IStorage {
   deleteStudentExpenses(studentId: string): Promise<void>;
   getFixedExpenses(studentId: string): Promise<FixedExpense[]>;
   createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense>;
+  createCustomFixedExpense(studentId: string, name: string, amount: number): Promise<FixedExpense>;
+  deleteFixedExpense(id: string): Promise<boolean>;
   deleteStudentFixedExpenses(studentId: string): Promise<void>;
   payFixedExpense(id: string): Promise<FixedExpense | undefined>;
   updateFixedExpenseAmount(expenseId: string, amount: number): Promise<FixedExpense | undefined>;
@@ -554,15 +556,26 @@ export class MemStorage implements IStorage {
   async createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense> {
     const id = randomUUID();
     const expense: FixedExpense = {
-      id,
-      studentId,
-      category,
-      amount,
-      isPaid: false,
-      dueDate: new Date(),
+      id, studentId, category, amount, isPaid: false, dueDate: new Date(), isCustom: false,
     };
     this.fixedExpenses.set(id, expense);
     return expense;
+  }
+
+  async createCustomFixedExpense(studentId: string, name: string, amount: number): Promise<FixedExpense> {
+    const id = randomUUID();
+    const expense: FixedExpense = {
+      id, studentId, category: name, amount, isPaid: false, dueDate: new Date(), isCustom: true,
+    };
+    this.fixedExpenses.set(id, expense);
+    return expense;
+  }
+
+  async deleteFixedExpense(id: string): Promise<boolean> {
+    const expense = this.fixedExpenses.get(id);
+    if (!expense || !expense.isCustom) return false;
+    this.fixedExpenses.delete(id);
+    return true;
   }
 
   async deleteStudentFixedExpenses(studentId: string): Promise<void> {

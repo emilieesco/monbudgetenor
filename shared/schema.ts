@@ -57,6 +57,7 @@ export interface FixedExpense {
   amount: number;
   isPaid: boolean;
   dueDate: Date;
+  isCustom: boolean;
 }
 
 export interface BonusExpense {

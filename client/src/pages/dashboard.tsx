@@ -26,7 +26,7 @@ import { Label } from "@/components/ui/label";
 import { useState, useEffect } from "react";
 import { useToast } from "@/hooks/use-toast";
 import jsPDF from "jspdf";
-import type { Student, Expense, BonusExpense, Challenge, BudgetSnapshot, Badge as BadgeType, ClassChallenge, SavingsGoal, BADGE_DEFINITIONS } from "@shared/schema";
+import type { Student, Expense, FixedExpense, BonusExpense, Challenge, BudgetSnapshot, Badge as BadgeType, ClassChallenge, SavingsGoal, BADGE_DEFINITIONS } from "@shared/schema";
 
 export default function Dashboard() {
   const { studentId } = useParams();
@@ -44,6 +44,8 @@ export default function Dashboard() {
   const [manualExpenseAmount, setManualExpenseAmount] = useState("");
   const [manualExpenseCategory, setManualExpenseCategory] = useState<"food" | "clothing" | "leisure">("food");
   const [showMonthSummary, setShowMonthSummary] = useState(false);
+  const [customExpenseName, setCustomExpenseName] = useState("");
+  const [customExpenseAmount, setCustomExpenseAmount] = useState("");
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
@@ -299,6 +301,33 @@ export default function Dashboard() {
     },
   });
 
+  const addCustomFixedExpenseMutation = useMutation({
+    mutationFn: async (data: { name: string; amount: number }) => {
+      const res = await apiRequest("POST", `/api/fixed-expenses/${studentId}/custom`, data);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fixed-expenses", studentId] });
+      setCustomExpenseName("");
+      setCustomExpenseAmount("");
+      toast({ title: "Dépense ajoutée", description: "Ta dépense personnelle a été créée" });
+    },
+    onError: () => {
+      toast({ title: "Erreur", description: "Impossible d'ajouter la dépense", variant: "destructive" });
+    },
+  });
+
+  const deleteCustomFixedExpenseMutation = useMutation({
+    mutationFn: async (expenseId: string) => {
+      const res = await apiRequest("DELETE", `/api/fixed-expenses/${expenseId}/custom`);
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/fixed-expenses", studentId] });
+      toast({ title: "Dépense supprimée" });
+    },
+  });
+
   const applyBonusMutation = useMutation({
     mutationFn: async (bonusId: string) => {
       const res = await apiRequest("PATCH", `/api/bonus-expenses/${bonusId}/pay`);
@@ -361,7 +390,7 @@ export default function Dashboard() {
 
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
-  const fixedExpenses = fixedExpensesQuery.data || [];
+  const fixedExpenses = (fixedExpensesQuery.data as FixedExpense[] | undefined) || [];
   const bonusExpenses = (bonusExpensesQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; isPaid: boolean; createdAt: string }>;
   const appliedEvents = (appliedEventsQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; type: string; appliedAt: string }>;
   const challenges = challengesQuery.data as Challenge[] || [];
@@ -1057,49 +1086,166 @@ export default function Dashboard() {
           {/* Fixed Expenses */}
           <Card className="lg:col-span-2 p-6">
             <h2 className="text-xl font-semibold mb-4">Dépenses Fixes à Payer</h2>
-            <div className="space-y-2 max-h-96 overflow-y-auto">
-              {fixedExpenses.length === 0 ? (
-                <p className="text-muted-foreground text-center py-8">Aucune dépense</p>
-              ) : (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                  {fixedExpenses.map(expense => (
-                    <div
-                      key={expense.id}
-                      className={`flex items-center justify-between p-4 rounded-lg border ${
-                        expense.isPaid
-                          ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
-                          : "bg-muted border-border hover-elevate"
-                      }`}
-                    >
-                      <div className="flex-1">
-                        <p className="font-semibold">{expense.category}</p>
-                        <p className={`text-sm font-bold ${expense.isPaid ? "text-green-700 dark:text-green-300" : "text-foreground"}`}>
-                          ${expense.amount.toFixed(2)}
-                        </p>
-                      </div>
-                      {!expense.isPaid ? (
-                        <Button
-                          size="sm"
-                          onClick={() => payRentMutation.mutate(expense.id)}
-                          disabled={payRentMutation.isPending}
-                        >
-                          Payer
-                        </Button>
-                      ) : (
-                        <Badge variant="outline" className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300">
-                          ✓ Payé
-                        </Badge>
-                      )}
+
+            {/* Teacher-defined expenses */}
+            {fixedExpenses.filter(e => !e.isCustom).length === 0 ? (
+              <p className="text-muted-foreground text-center py-4">Aucune dépense de la classe</p>
+            ) : (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-4">
+                {fixedExpenses.filter(e => !e.isCustom).map(expense => (
+                  <div
+                    key={expense.id}
+                    className={`flex items-center justify-between p-4 rounded-lg border ${
+                      expense.isPaid
+                        ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
+                        : "bg-muted border-border hover-elevate"
+                    }`}
+                  >
+                    <div className="flex-1">
+                      <p className="font-semibold">{expense.category}</p>
+                      <p className={`text-sm font-bold ${expense.isPaid ? "text-green-700 dark:text-green-300" : "text-foreground"}`}>
+                        ${expense.amount.toFixed(2)}
+                      </p>
                     </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    {!expense.isPaid ? (
+                      <Button size="sm" onClick={() => payRentMutation.mutate(expense.id)} disabled={payRentMutation.isPending}>
+                        Payer
+                      </Button>
+                    ) : (
+                      <Badge variant="outline" className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300">
+                        ✓ Payé
+                      </Badge>
+                    )}
+                  </div>
+                ))}
+              </div>
+            )}
+
             {totalFixedDue > 0 && (
-              <div className="mt-4 p-4 bg-destructive/10 rounded-lg border border-destructive/30">
+              <div className="mb-4 p-3 bg-destructive/10 rounded-lg border border-destructive/30">
                 <p className="text-sm font-semibold text-destructive">
                   Total à payer: ${totalFixedDue.toFixed(2)}
                 </p>
+              </div>
+            )}
+
+            {/* Custom personal expenses */}
+            <Separator className="my-4" />
+            <div className="flex items-center gap-2 mb-3">
+              <Wallet className="w-5 h-5 text-primary" />
+              <h3 className="text-base font-semibold">Mes Dépenses Personnelles</h3>
+            </div>
+            <p className="text-xs text-muted-foreground mb-3">
+              Ajoute tes dépenses personnelles mensuelles (carte de crédit, forfait téléphone, abonnements…)
+            </p>
+
+            {/* Quick suggestion pills */}
+            <div className="flex flex-wrap gap-2 mb-3">
+              {["Carte de crédit", "Forfait téléphone", "Internet", "Gym", "Netflix", "Assurance auto", "Remboursement voiture", "Spotify"].map(suggestion => (
+                <button
+                  key={suggestion}
+                  type="button"
+                  onClick={() => setCustomExpenseName(suggestion)}
+                  className={`px-3 py-1 rounded-full text-xs border transition-colors ${
+                    customExpenseName === suggestion
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "bg-muted border-border hover:bg-accent"
+                  }`}
+                  data-testid={`suggestion-${suggestion.toLowerCase().replace(/\s+/g, "-")}`}
+                >
+                  {suggestion}
+                </button>
+              ))}
+            </div>
+
+            {/* Add custom expense form */}
+            <div className="flex flex-wrap gap-3 mb-4">
+              <div className="flex-1 min-w-[140px] space-y-1">
+                <Label className="text-xs">Description</Label>
+                <Input
+                  placeholder="Ex: Carte de crédit"
+                  value={customExpenseName}
+                  onChange={e => setCustomExpenseName(e.target.value)}
+                  data-testid="input-custom-expense-name"
+                />
+              </div>
+              <div className="w-28 space-y-1">
+                <Label className="text-xs">Montant ($)</Label>
+                <Input
+                  type="number"
+                  placeholder="0.00"
+                  min="0.01"
+                  step="0.01"
+                  value={customExpenseAmount}
+                  onChange={e => setCustomExpenseAmount(e.target.value)}
+                  data-testid="input-custom-expense-amount"
+                />
+              </div>
+              <div className="flex items-end">
+                <Button
+                  size="sm"
+                  onClick={() => {
+                    const amount = parseFloat(customExpenseAmount);
+                    if (customExpenseName.trim() && amount > 0) {
+                      addCustomFixedExpenseMutation.mutate({ name: customExpenseName.trim(), amount });
+                    }
+                  }}
+                  disabled={addCustomFixedExpenseMutation.isPending || !customExpenseName.trim() || !customExpenseAmount}
+                  data-testid="button-add-custom-expense"
+                >
+                  <Plus className="w-4 h-4 mr-1" />
+                  Ajouter
+                </Button>
+              </div>
+            </div>
+
+            {/* List of custom expenses */}
+            {fixedExpenses.filter(e => e.isCustom).length > 0 && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {fixedExpenses.filter(e => e.isCustom).map(expense => (
+                  <div
+                    key={expense.id}
+                    className={`flex items-center justify-between p-3 rounded-lg border ${
+                      expense.isPaid
+                        ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
+                        : "bg-blue-50 dark:bg-blue-950/30 border-blue-200 dark:border-blue-800"
+                    }`}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="font-semibold text-sm truncate">{expense.category}</p>
+                      <p className={`text-sm font-bold ${expense.isPaid ? "text-green-700 dark:text-green-300" : "text-blue-700 dark:text-blue-300"}`}>
+                        ${expense.amount.toFixed(2)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-2 ml-2">
+                      {!expense.isPaid && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => payRentMutation.mutate(expense.id)}
+                          disabled={payRentMutation.isPending}
+                          data-testid={`button-pay-custom-expense-${expense.id}`}
+                        >
+                          Payer
+                        </Button>
+                      )}
+                      {expense.isPaid && (
+                        <Badge variant="outline" className="bg-green-50 dark:bg-green-950 text-green-700 dark:text-green-300 text-xs">
+                          ✓ Payé
+                        </Badge>
+                      )}
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => deleteCustomFixedExpenseMutation.mutate(expense.id)}
+                        disabled={deleteCustomFixedExpenseMutation.isPending}
+                        data-testid={`button-delete-custom-expense-${expense.id}`}
+                      >
+                        <Trash2 className="w-3 h-3 text-muted-foreground" />
+                      </Button>
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
           </Card>

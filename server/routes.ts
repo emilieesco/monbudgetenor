@@ -534,6 +534,29 @@ export async function registerRoutes(
     }
   });
 
+  app.post("/api/fixed-expenses/:studentId/custom", async (req, res) => {
+    try {
+      const { name, amount } = req.body;
+      if (!name || !amount || amount <= 0) {
+        return res.status(400).json({ error: "name et amount requis" });
+      }
+      const expense = await storage.createCustomFixedExpense(req.params.studentId, name, Number(amount));
+      res.json(expense);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to create custom expense" });
+    }
+  });
+
+  app.delete("/api/fixed-expenses/:id/custom", async (req, res) => {
+    try {
+      const ok = await storage.deleteFixedExpense(req.params.id);
+      if (!ok) return res.status(404).json({ error: "Expense not found or not custom" });
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to delete custom expense" });
+    }
+  });
+
   // Challenge endpoints
   app.post("/api/challenges", async (req, res) => {
     try {

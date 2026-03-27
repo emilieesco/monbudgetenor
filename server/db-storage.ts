@@ -88,6 +88,7 @@ function toFixedExpense(row: any): FixedExpense {
     amount: Number(row.amount),
     isPaid: row.is_paid,
     dueDate: new Date(row.due_date),
+    isCustom: row.is_custom ?? false,
   };
 }
 
@@ -283,9 +284,11 @@ export class DatabaseStorage implements IStorage {
         category TEXT NOT NULL,
         amount NUMERIC NOT NULL,
         is_paid BOOLEAN DEFAULT FALSE,
-        due_date TIMESTAMPTZ DEFAULT NOW()
+        due_date TIMESTAMPTZ DEFAULT NOW(),
+        is_custom BOOLEAN DEFAULT FALSE
       )
     `;
+    await this.sql`ALTER TABLE fixed_expenses ADD COLUMN IF NOT EXISTS is_custom BOOLEAN DEFAULT FALSE`;
     await this.sql`
       CREATE TABLE IF NOT EXISTS bonus_expenses (
         id TEXT PRIMARY KEY,
@@ -834,11 +837,26 @@ export class DatabaseStorage implements IStorage {
   async createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense> {
     const id = randomUUID();
     const rows = await this.sql`
-      INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date)
-      VALUES (${id}, ${studentId}, ${category}, ${amount}, false, NOW())
+      INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date, is_custom)
+      VALUES (${id}, ${studentId}, ${category}, ${amount}, false, NOW(), false)
       RETURNING *
     `;
     return toFixedExpense(rows[0]);
+  }
+
+  async createCustomFixedExpense(studentId: string, name: string, amount: number): Promise<FixedExpense> {
+    const id = randomUUID();
+    const rows = await this.sql`
+      INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date, is_custom)
+      VALUES (${id}, ${studentId}, ${name}, ${amount}, false, NOW(), true)
+      RETURNING *
+    `;
+    return toFixedExpense(rows[0]);
+  }
+
+  async deleteFixedExpense(id: string): Promise<boolean> {
+    const rows = await this.sql`DELETE FROM fixed_expenses WHERE id = ${id} AND is_custom = true RETURNING id`;
+    return rows.length > 0;
   }
 
   async deleteStudentFixedExpenses(studentId: string): Promise<void> {

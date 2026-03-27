@@ -675,10 +675,26 @@ export class FileStorage implements IStorage {
 
   async createFixedExpense(studentId: string, category: string, amount: number): Promise<FixedExpense> {
     const id = randomUUID();
-    const expense: FixedExpense = { id, studentId, category, amount, isPaid: false, dueDate: new Date() };
+    const expense: FixedExpense = { id, studentId, category, amount, isPaid: false, dueDate: new Date(), isCustom: false };
     this.fixedExpenses.set(id, expense);
     this.save();
     return expense;
+  }
+
+  async createCustomFixedExpense(studentId: string, name: string, amount: number): Promise<FixedExpense> {
+    const id = randomUUID();
+    const expense: FixedExpense = { id, studentId, category: name, amount, isPaid: false, dueDate: new Date(), isCustom: true };
+    this.fixedExpenses.set(id, expense);
+    this.save();
+    return expense;
+  }
+
+  async deleteFixedExpense(id: string): Promise<boolean> {
+    const expense = this.fixedExpenses.get(id);
+    if (!expense || !expense.isCustom) return false;
+    this.fixedExpenses.delete(id);
+    this.save();
+    return true;
   }
 
   async deleteStudentFixedExpenses(studentId: string): Promise<void> {

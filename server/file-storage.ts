@@ -847,8 +847,10 @@ export class FileStorage implements IStorage {
     return Array.from(this.teacherMessages.values()).filter(m => m.classId === classId);
   }
 
-  async getStudentMessages(studentId: string): Promise<TeacherMessage[]> {
-    return Array.from(this.teacherMessages.values()).filter(m => !m.studentId || m.studentId === studentId);
+  async getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]> {
+    return Array.from(this.teacherMessages.values()).filter(m =>
+      m.classId === classId && (!m.studentId || m.studentId === studentId)
+    );
   }
 
   async createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent> {

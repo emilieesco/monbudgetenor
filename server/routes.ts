@@ -649,7 +649,9 @@ export async function registerRoutes(
 
   app.get("/api/messages/student/:studentId", async (req, res) => {
     try {
-      const messages = await storage.getStudentMessages(req.params.studentId);
+      const student = await storage.getStudent(req.params.studentId);
+      if (!student) return res.status(404).json({ error: "Student not found" });
+      const messages = await storage.getStudentMessages(req.params.studentId, student.classId);
       res.json(messages);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch messages" });

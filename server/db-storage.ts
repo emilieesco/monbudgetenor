@@ -15,13 +15,21 @@ const DEFAULT_EXPENSE_AMOUNTS: Record<string, number> = {
   "Nourriture": 20, "Sortie": 5,
 };
 
+function parseJson<T>(val: any, fallback: T): T {
+  if (val === null || val === undefined) return fallback;
+  if (typeof val === 'string') {
+    try { return JSON.parse(val); } catch { return fallback; }
+  }
+  return val as T;
+}
+
 function toClass(row: any): Class {
   return {
     id: row.id,
     code: row.code,
     teacherName: row.teacher_name,
     createdAt: new Date(row.created_at),
-    expenseAmounts: row.expense_amounts ?? {},
+    expenseAmounts: parseJson(row.expense_amounts, {}),
     mode: row.mode ?? "predefined",
     predefinedBudget: row.predefined_budget != null ? Number(row.predefined_budget) : undefined,
   };
@@ -36,9 +44,9 @@ function toStudent(row: any): Student {
     spent: Number(row.spent),
     savings: Number(row.savings),
     createdAt: new Date(row.created_at),
-    customExpenses: row.custom_expenses ?? undefined,
+    customExpenses: row.custom_expenses ? parseJson(row.custom_expenses, undefined) : undefined,
     scenario: row.scenario ?? undefined,
-    budgetHistory: row.budget_history ?? [],
+    budgetHistory: parseJson(row.budget_history, []),
     currentMonth: row.current_month ?? 1,
     monthlyBudget: row.monthly_budget != null ? Number(row.monthly_budget) : undefined,
   };
@@ -119,7 +127,7 @@ function toCustomChallenge(row: any): CustomChallenge {
     type: row.type,
     targetValue: Number(row.target_value),
     createdAt: new Date(row.created_at),
-    completedBy: row.completed_by ?? [],
+    completedBy: parseJson(row.completed_by, []),
   };
 }
 
@@ -155,11 +163,11 @@ function toSnapshot(row: any): BudgetSnapshot {
     studentId: row.student_id,
     label: row.label,
     createdAt: new Date(row.created_at),
-    studentState: row.student_state,
-    expenses: row.expenses ?? [],
-    fixedExpenses: row.fixed_expenses ?? [],
-    bonusExpenses: row.bonus_expenses ?? [],
-    challenges: row.challenges ?? [],
+    studentState: parseJson(row.student_state, {}),
+    expenses: parseJson(row.expenses, []),
+    fixedExpenses: parseJson(row.fixed_expenses, []),
+    bonusExpenses: parseJson(row.bonus_expenses, []),
+    challenges: parseJson(row.challenges, []),
   };
 }
 

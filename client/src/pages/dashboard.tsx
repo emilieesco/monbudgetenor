@@ -800,7 +800,7 @@ export default function Dashboard() {
               Cet historique montre tes différentes tentatives de configuration du budget. Tu peux l'effacer pour repartir proprement.
             </p>
             <div className="space-y-2 max-h-64 overflow-y-auto">
-              {student.budgetHistory.map((h, i) => {
+              {(Array.isArray(student.budgetHistory) ? student.budgetHistory : []).map((h, i) => {
                 const date = typeof h.date === 'string' ? new Date(h.date) : h.date;
                 return (
                   <div key={i} className="flex items-center justify-between p-3 bg-muted rounded-lg">

@@ -61,6 +61,15 @@ export default function Dashboard() {
     queryKey: ["/api/bonus-expenses", studentId],
   });
 
+  const messagesQuery = useQuery({
+    queryKey: ["/api/messages/student", studentId],
+    queryFn: async () => {
+      const res = await fetch(`/api/messages/student/${studentId}`);
+      if (!res.ok) throw new Error("Erreur");
+      return res.json();
+    },
+  });
+
   const challengesQuery = useQuery({
     queryKey: ["/api/challenges", studentId],
   });
@@ -278,6 +287,21 @@ export default function Dashboard() {
     },
   });
 
+  const applyBonusMutation = useMutation({
+    mutationFn: async (bonusId: string) => {
+      const res = await apiRequest("PATCH", `/api/bonus-expenses/${bonusId}/pay`);
+      return res.json();
+    },
+    onSuccess: (bonus) => {
+      queryClient.invalidateQueries({ queryKey: ["/api/students", studentId] });
+      queryClient.invalidateQueries({ queryKey: ["/api/bonus-expenses", studentId] });
+      toast({
+        title: "Bonus reçu !",
+        description: `Ton enseignant t'a accordé un bonus de $${bonus.amount?.toFixed(2) || ""}. Il a été ajouté à ton budget !`,
+      });
+    },
+  });
+
   const checkBadgesMutation = useMutation({
     mutationFn: async () => {
       const res = await apiRequest("POST", `/api/students/${studentId}/check-badges`);
@@ -326,11 +350,12 @@ export default function Dashboard() {
   const student = studentQuery.data as Student | undefined;
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
-  const bonusExpenses = bonusExpensesQuery.data || [];
+  const bonusExpenses = (bonusExpensesQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; isPaid: boolean; createdAt: string }>;
   const challenges = challengesQuery.data as Challenge[] || [];
   const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
   const badges = badgesQuery.data as Array<BadgeType & { name: string; icon: string; tier: string }> || [];
   const savingsGoals = savingsGoalsQuery.data as SavingsGoal[] || [];
+  const messages = (messagesQuery.data || []) as Array<{ id: string; content: string; type: "congratulations" | "warning" | "info"; timestamp: string }>;
 
   // Offline support - cache data
   useEffect(() => {
@@ -371,6 +396,14 @@ export default function Dashboard() {
       }
     });
   }, [challenges, notifiedChallenges, toast]);
+
+  // Auto-apply unpaid bonus expenses from teacher
+  useEffect(() => {
+    const unpaidBonuses = bonusExpenses.filter(b => !b.isPaid);
+    unpaidBonuses.forEach(bonus => {
+      applyBonusMutation.mutate(bonus.id);
+    });
+  }, [bonusExpenses.length]);
 
   // Check for new badges periodically
   useEffect(() => {
@@ -925,23 +958,60 @@ export default function Dashboard() {
           )}
         </Card>
 
-        {/* Bonus Expenses Alert */}
-        {bonusExpenses.length > 0 && (
-          <Card className="p-6 mb-8 border-destructive/50 bg-destructive/5">
-            <div className="flex gap-4">
-              <AlertCircle className="w-6 h-6 text-destructive flex-shrink-0 mt-1" />
-              <div className="flex-1">
-                <h3 className="font-semibold text-destructive mb-2">Dépenses Surprises!</h3>
-                <div className="space-y-2">
-                  {bonusExpenses.map((bonus) => (
-                    <div key={bonus.id} className="text-sm">
-                      <p className="font-medium">{bonus.title}</p>
-                      <p className="text-muted-foreground text-xs">{bonus.description}</p>
-                      <p className="font-bold text-destructive">-${bonus.amount.toFixed(2)}</p>
-                    </div>
-                  ))}
+        {/* Teacher Messages */}
+        {messages.length > 0 && (
+          <Card className="p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertCircle className="w-5 h-5 text-primary" />
+              <h3 className="font-semibold text-lg">Messages de ton enseignant</h3>
+              <Badge variant="secondary">{messages.length}</Badge>
+            </div>
+            <div className="space-y-3">
+              {messages.map((msg) => (
+                <div
+                  key={msg.id}
+                  className={`p-4 rounded-lg border text-sm ${
+                    msg.type === "congratulations"
+                      ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
+                      : msg.type === "warning"
+                      ? "bg-amber-50 dark:bg-amber-950 border-amber-200 dark:border-amber-800"
+                      : "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
+                  }`}
+                >
+                  <p className={`font-medium ${
+                    msg.type === "congratulations" ? "text-green-800 dark:text-green-200"
+                    : msg.type === "warning" ? "text-amber-800 dark:text-amber-200"
+                    : "text-blue-800 dark:text-blue-200"
+                  }`}>
+                    {msg.type === "congratulations" ? "Félicitations" : msg.type === "warning" ? "Avertissement" : "Info"}
+                  </p>
+                  <p className="text-foreground mt-1">{msg.content}</p>
+                  <p className="text-muted-foreground text-xs mt-1">
+                    {new Date(msg.timestamp).toLocaleDateString("fr-CA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}
+                  </p>
                 </div>
-              </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Applied Bonuses History */}
+        {bonusExpenses.filter(b => b.isPaid).length > 0 && (
+          <Card className="p-6 mb-8 border-green-200 dark:border-green-800 bg-green-50 dark:bg-green-950">
+            <div className="flex items-center gap-2 mb-3">
+              <DollarSign className="w-5 h-5 text-green-700 dark:text-green-300" />
+              <h3 className="font-semibold text-green-800 dark:text-green-200">Bonus reçus de l'enseignant</h3>
+            </div>
+            <div className="space-y-2">
+              {bonusExpenses.filter(b => b.isPaid).map((bonus) => (
+                <div key={bonus.id} className="flex justify-between items-center text-sm">
+                  <div>
+                    <p className="font-medium text-green-900 dark:text-green-100">{bonus.title}</p>
+                    <p className="text-green-700 dark:text-green-300 text-xs">{bonus.description}</p>
+                  </div>
+                  <span className="font-bold text-green-700 dark:text-green-300">+${bonus.amount.toFixed(2)}</span>
+                </div>
+              ))}
             </div>
           </Card>
         )}

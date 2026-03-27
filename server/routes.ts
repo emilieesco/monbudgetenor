@@ -448,13 +448,11 @@ export async function registerRoutes(
         return res.status(404).json({ error: "Bonus not found" });
       }
       
-      // Only add to spent - do NOT reduce budget (that would double-count)
-      // Budget stays fixed, spent increases, remaining = budget - spent
+      // Add bonus amount directly to student's budget
       const student = await storage.getStudent(bonus.studentId);
       if (student) {
-        const newSpent = student.spent + bonus.amount;
-        // Keep budget the same - only update spent
-        await storage.updateStudentBudgetAndSpent(bonus.studentId, student.budget, newSpent);
+        const newBudget = student.budget + bonus.amount;
+        await storage.updateStudentBudget(bonus.studentId, newBudget);
       }
       
       res.json(bonus);

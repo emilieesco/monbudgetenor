@@ -7,7 +7,8 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2 } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2, TrendingDown, TrendingUp, PiggyBank } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent, ClassChallenge, BonusExpense, Expense } from "@shared/schema";
 
@@ -585,48 +586,110 @@ export default function TeacherDashboard() {
               </Card>
             ) : (
               <div className="grid gap-4">
-                {students.map(student => (
-                  <Card key={student.id} className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex-1">
-                        <h3 className="text-lg font-semibold mb-2">{student.name}</h3>
-                        <div className="grid grid-cols-3 gap-4 text-sm">
-                          <div>
-                            <p className="text-muted-foreground">Budget Actuel</p>
-                            <p className="font-bold">${student.budget}</p>
+                {students.map(student => {
+                  const budget = student.budget || 1;
+                  const spent = student.spent || 0;
+                  const savings = student.savings || 0;
+                  const remaining = budget - spent;
+                  const spentPct = Math.min(100, Math.round((spent / budget) * 100));
+                  const remainingPct = Math.max(0, 100 - spentPct);
+                  const lbEntry = leaderboard.find(e => e.studentId === student.id);
+                  const badgeCount = lbEntry?.badgeCount ?? 0;
+
+                  const statusColor =
+                    remainingPct > 50 ? "text-green-600 dark:text-green-400" :
+                    remainingPct > 20 ? "text-yellow-600 dark:text-yellow-400" :
+                    "text-destructive";
+                  const progressColor =
+                    remainingPct > 50 ? "bg-green-500" :
+                    remainingPct > 20 ? "bg-yellow-500" :
+                    "bg-red-500";
+
+                  return (
+                    <Card key={student.id} className="p-5" data-testid={`card-student-${student.id}`}>
+                      {/* Header row : nom + badge % restant */}
+                      <div className="flex items-start justify-between gap-2 mb-3">
+                        <div>
+                          <h3 className="text-base font-semibold leading-tight">{student.name}</h3>
+                          {badgeCount > 0 && (
+                            <span className="inline-flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
+                              <Award className="w-3 h-3" />
+                              {badgeCount} badge{badgeCount > 1 ? "s" : ""}
+                            </span>
+                          )}
+                        </div>
+                        <Badge
+                          variant={remainingPct > 50 ? "default" : remainingPct > 20 ? "secondary" : "destructive"}
+                          data-testid={`badge-remaining-${student.id}`}
+                        >
+                          {remainingPct}% restant
+                        </Badge>
+                      </div>
+
+                      {/* Barre de progression */}
+                      <div className="mb-3">
+                        <div className="flex justify-between text-xs text-muted-foreground mb-1">
+                          <span>Budget utilisé</span>
+                          <span className={statusColor}>${remaining.toFixed(2)} / ${budget.toFixed(2)}</span>
+                        </div>
+                        <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
+                          <div
+                            className={`h-full rounded-full transition-all ${progressColor}`}
+                            style={{ width: `${spentPct}%` }}
+                            data-testid={`progress-budget-${student.id}`}
+                          />
+                        </div>
+                      </div>
+
+                      {/* Statistiques */}
+                      <div className="grid grid-cols-3 gap-3 text-sm">
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-md bg-muted">
+                            <DollarSign className="w-3.5 h-3.5 text-muted-foreground" />
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Dépensé</p>
-                            <p className="font-bold text-destructive">${student.spent}</p>
+                            <p className="text-xs text-muted-foreground leading-none mb-0.5">Budget</p>
+                            <p className="font-semibold text-sm leading-none">${budget.toFixed(2)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-md bg-muted">
+                            <TrendingDown className="w-3.5 h-3.5 text-destructive" />
                           </div>
                           <div>
-                            <p className="text-muted-foreground">Épargne</p>
-                            <p className="font-bold text-purple-600">${student.savings}</p>
+                            <p className="text-xs text-muted-foreground leading-none mb-0.5">Dépensé</p>
+                            <p className="font-semibold text-sm text-destructive leading-none">${spent.toFixed(2)}</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <div className="p-1.5 rounded-md bg-muted">
+                            <PiggyBank className="w-3.5 h-3.5 text-purple-500" />
+                          </div>
+                          <div>
+                            <p className="text-xs text-muted-foreground leading-none mb-0.5">Épargne</p>
+                            <p className="font-semibold text-sm text-purple-600 dark:text-purple-400 leading-none">${savings.toFixed(2)}</p>
                           </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <Badge variant="default">{Math.round(100 - (student.spent / student.budget * 100))}% restant</Badge>
-                      </div>
-                    </div>
-                    {student.budgetHistory && student.budgetHistory.length > 1 && (
-                      <div className="border-t pt-4">
-                        <p className="text-xs font-semibold text-muted-foreground mb-2">Historique des Budgets ({student.budgetHistory.length})</p>
-                        <div className="space-y-1">
-                          {student.budgetHistory.map((h, i) => {
-                            const date = typeof h.date === 'string' ? new Date(h.date) : h.date;
-                            return (
-                              <div key={i} className="text-xs flex justify-between p-1.5 bg-muted rounded">
-                                <span>Essai {student.budgetHistory!.length - i}</span>
-                                <span className="font-semibold">${h.budget}</span>
-                              </div>
-                            );
-                          })}
+
+                      {/* Historique des budgets (mois précédents) */}
+                      {student.budgetHistory && student.budgetHistory.length > 1 && (
+                        <div className="border-t mt-4 pt-3">
+                          <p className="text-xs font-semibold text-muted-foreground mb-2">
+                            Historique — {student.budgetHistory.length} mois
+                          </p>
+                          <div className="flex flex-wrap gap-1.5">
+                            {student.budgetHistory.map((h, i) => (
+                              <span key={i} className="text-xs px-2 py-0.5 bg-muted rounded text-muted-foreground">
+                                M{i + 1} : ${typeof h.budget === 'number' ? h.budget.toFixed(2) : h.budget}
+                              </span>
+                            ))}
+                          </div>
                         </div>
-                      </div>
-                    )}
-                  </Card>
-                ))}
+                      )}
+                    </Card>
+                  );
+                })}
               </div>
             )}
           </div>

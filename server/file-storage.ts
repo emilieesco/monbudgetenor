@@ -890,6 +890,10 @@ export class FileStorage implements IStorage {
     return updated;
   }
 
+  async getStudentAppliedEvents(studentId: string): Promise<SurpriseEvent[]> {
+    return Array.from(this.surpriseEvents.values()).filter(e => e.studentId === studentId && e.appliedAt != null);
+  }
+
   async createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot> {
     const student = await this.getStudent(studentId);
     if (!student) throw new Error("Étudiant non trouvé");

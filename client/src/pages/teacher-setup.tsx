@@ -24,9 +24,12 @@ export default function TeacherSetup() {
 
   const createClassMutation = useMutation({
     mutationFn: async () => {
-      // First consume the invite code, then create the class
-      await apiRequest("POST", "/api/teacher-invites/use", { code: inviteCode });
-      const res = await apiRequest("POST", "/api/classes", { teacherName, code: classCode });
+      // Pass inviteCode to the server — it validates and consumes atomically
+      const res = await apiRequest("POST", "/api/classes", {
+        teacherName,
+        code: classCode,
+        inviteCode: inviteCode.trim(),
+      });
       return res.json();
     },
     onSuccess: (data) => {
@@ -34,7 +37,7 @@ export default function TeacherSetup() {
       navigate(`/teacher/${data.id}`);
     },
     onError: () => {
-      setError("Erreur lors de la création. Le code de classe existe peut-être déjà.");
+      setError("Erreur lors de la création. Le code de classe existe peut-être déjà, ou le code d'invitation est invalide.");
     },
   });
 

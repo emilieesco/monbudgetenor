@@ -59,6 +59,17 @@ export default function Dashboard() {
 
   const bonusExpensesQuery = useQuery({
     queryKey: ["/api/bonus-expenses", studentId],
+    staleTime: 0, // Always re-fetch to catch new teacher bonuses
+  });
+
+  const appliedEventsQuery = useQuery({
+    queryKey: ["/api/students", studentId, "applied-events"],
+    queryFn: async () => {
+      const res = await fetch(`/api/students/${studentId}/applied-events`);
+      if (!res.ok) throw new Error("Erreur");
+      return res.json();
+    },
+    staleTime: 0,
   });
 
   const messagesQuery = useQuery({
@@ -68,6 +79,7 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Erreur");
       return res.json();
     },
+    staleTime: 0, // Always re-fetch to catch new teacher messages
   });
 
   const challengesQuery = useQuery({
@@ -351,6 +363,7 @@ export default function Dashboard() {
   const expenses = expensesQuery.data as Expense[] || [];
   const fixedExpenses = fixedExpensesQuery.data || [];
   const bonusExpenses = (bonusExpensesQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; isPaid: boolean; createdAt: string }>;
+  const appliedEvents = (appliedEventsQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; type: string; appliedAt: string }>;
   const challenges = challengesQuery.data as Challenge[] || [];
   const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
   const badges = badgesQuery.data as Array<BadgeType & { name: string; icon: string; tier: string }> || [];
@@ -1010,6 +1023,29 @@ export default function Dashboard() {
                     <p className="text-green-700 dark:text-green-300 text-xs">{bonus.description}</p>
                   </div>
                   <span className="font-bold text-green-700 dark:text-green-300">+${bonus.amount.toFixed(2)}</span>
+                </div>
+              ))}
+            </div>
+          </Card>
+        )}
+
+        {/* Applied Surprise Events from Teacher */}
+        {appliedEvents.length > 0 && (
+          <Card className="p-6 mb-8 border-orange-200 dark:border-orange-800 bg-orange-50 dark:bg-orange-950">
+            <div className="flex items-center gap-2 mb-3">
+              <AlertCircle className="w-5 h-5 text-orange-700 dark:text-orange-300" />
+              <h3 className="font-semibold text-orange-800 dark:text-orange-200">Événements de l'enseignant</h3>
+            </div>
+            <div className="space-y-2">
+              {appliedEvents.map((event) => (
+                <div key={event.id} className="flex justify-between items-center text-sm">
+                  <div>
+                    <p className="font-medium text-orange-900 dark:text-orange-100">{event.title}</p>
+                    <p className="text-orange-700 dark:text-orange-300 text-xs">{event.description}</p>
+                  </div>
+                  <span className={`font-bold ${event.type === "bonus_salary" ? "text-green-700 dark:text-green-300" : "text-red-700 dark:text-red-300"}`}>
+                    {event.type === "bonus_salary" ? "+" : "-"}${Number(event.amount).toFixed(2)}
+                  </span>
                 </div>
               ))}
             </div>

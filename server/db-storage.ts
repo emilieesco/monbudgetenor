@@ -1022,6 +1022,13 @@ export class DatabaseStorage implements IStorage {
     return rows[0] ? toSurpriseEvent(rows[0]) : undefined;
   }
 
+  async getStudentAppliedEvents(studentId: string): Promise<SurpriseEvent[]> {
+    const rows = await this.sql`
+      SELECT * FROM surprise_events WHERE student_id = ${studentId} AND applied_at IS NOT NULL ORDER BY applied_at DESC
+    `;
+    return rows.map(toSurpriseEvent);
+  }
+
   // ── Snapshots ─────────────────────────────────────────────────────
   async createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot> {
     const student = await this.getStudent(studentId);

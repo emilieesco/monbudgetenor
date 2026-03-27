@@ -88,6 +88,19 @@ This abstraction allows future migration to database storage (Drizzle ORM is con
 
 **Storage**: `teacher_invites` table in PostgreSQL; `TeacherInvite` in MemStorage and FileStorage
 
+### Surprise Events on Student Dashboard
+
+- `getStudentAppliedEvents(studentId)` method added to `IStorage`, `MemStorage`, `FileStorage`, and `DatabaseStorage`
+- Route: `GET /api/students/:studentId/applied-events`
+- Student dashboard shows applied surprise events in an orange card ("Événements de l'enseignant") with +/- formatting based on event type (`bonus_salary` = green +, others = red -)
+- Query uses `staleTime: 0` so events appear immediately on dashboard load/navigation
+
+### Data Freshness Fixes
+
+- `bonusExpensesQuery`: `staleTime: 0` — teacher bonuses appear immediately on student dashboard reload
+- `messagesQuery`: `staleTime: 0` — teacher messages appear immediately
+- `appliedEventsQuery`: `staleTime: 0` — teacher-applied surprise events appear immediately
+
 ### Gamification System
 
 **Badge Types & Tier Thresholds**:

@@ -17,7 +17,22 @@ export async function registerRoutes(
   // Class endpoints
   app.post("/api/classes", async (req, res) => {
     try {
-      const data = createClassSchema.parse(req.body);
+      const { inviteCode, ...rest } = req.body;
+      // If an invite code is provided, validate and consume it atomically
+      if (inviteCode) {
+        const invite = await storage.validateTeacherInvite(String(inviteCode).trim().toUpperCase());
+        if (!invite) {
+          return res.status(403).json({ error: "Code d'invitation invalide ou déjà utilisé" });
+        }
+        // Create the class first
+        const data = createClassSchema.parse(rest);
+        const classData = await storage.createClass(data);
+        // Only consume the invite after successful class creation
+        await storage.useTeacherInvite(invite.code);
+        return res.json(classData);
+      }
+      // No invite code — check if invites feature is disabled (for backward compat)
+      const data = createClassSchema.parse(rest);
       const classData = await storage.createClass(data);
       res.json(classData);
     } catch (error) {
@@ -675,6 +690,15 @@ export async function registerRoutes(
       res.json(events);
     } catch (error) {
       res.status(500).json({ error: "Failed to fetch events" });
+    }
+  });
+
+  app.get("/api/students/:studentId/applied-events", async (req, res) => {
+    try {
+      const events = await storage.getStudentAppliedEvents(req.params.studentId);
+      res.json(events);
+    } catch (error) {
+      res.status(500).json({ error: "Failed to fetch applied events" });
     }
   });
 

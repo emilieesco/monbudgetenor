@@ -55,6 +55,7 @@ export interface IStorage {
   getSurpriseEvent(eventId: string): Promise<SurpriseEvent | undefined>;
   getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]>;
   applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined>;
+  getStudentAppliedEvents(studentId: string): Promise<SurpriseEvent[]>;
   createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot>;
   getStudentSnapshots(studentId: string): Promise<BudgetSnapshot[]>;
   restoreSnapshot(snapshotId: string): Promise<Student | undefined>;
@@ -764,6 +765,10 @@ export class MemStorage implements IStorage {
     const updated = { ...event, appliedAt: new Date(), studentId };
     this.surpriseEvents.set(eventId, updated);
     return updated;
+  }
+
+  async getStudentAppliedEvents(studentId: string): Promise<SurpriseEvent[]> {
+    return Array.from(this.surpriseEvents.values()).filter(e => e.studentId === studentId && e.appliedAt != null);
   }
 
   async createSnapshot(studentId: string, label: string): Promise<BudgetSnapshot> {

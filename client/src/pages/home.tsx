@@ -64,7 +64,7 @@ export default function Home() {
         {/* Header with Home Button */}
         <div className="mb-8 flex items-center justify-between">
           <Button
-            onClick={() => navigate("/landing")}
+            onClick={() => navigate("/")}
             variant="outline"
             className="flex items-center gap-2"
           >

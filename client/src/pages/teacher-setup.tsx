@@ -90,7 +90,7 @@ export default function TeacherSetup() {
             </Button>
           )}
           <Button
-            onClick={() => navigate("/landing")}
+            onClick={() => navigate("/")}
             variant="outline"
             size="sm"
             className="flex items-center gap-2"

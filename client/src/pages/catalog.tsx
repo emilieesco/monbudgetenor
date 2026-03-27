@@ -12,6 +12,27 @@ import { useState, useEffect } from "react";
 import { ShoppingCart, AlertCircle, CheckCircle2, ArrowLeft, Plus, Minus, Trash2, Receipt, Leaf, Star, Tag, ThumbsUp, AlertTriangle, TrendingUp, Lightbulb, Heart } from "lucide-react";
 import type { CatalogItem, Student } from "@shared/schema";
 
+import imgLait from "@assets/catalog/lait.png";
+import imgFromage from "@assets/catalog/fromage.png";
+import imgYogourt from "@assets/catalog/yogourt.png";
+import imgBeurre from "@assets/catalog/beurre.png";
+import imgPoulet from "@assets/catalog/poulet.png";
+import imgBoeuf from "@assets/catalog/boeuf.png";
+import imgBananes from "@assets/catalog/bananes.png";
+import imgPommes from "@assets/catalog/pommes.png";
+import imgPain from "@assets/catalog/pain.png";
+import imgJusOrange from "@assets/catalog/jus-orange.png";
+import imgCarottes from "@assets/catalog/carottes.png";
+import imgBrocoli from "@assets/catalog/brocoli.png";
+import imgTomates from "@assets/catalog/tomates.png";
+import imgPommesDeterre from "@assets/catalog/pommes-de-terre.png";
+import imgChocolat from "@assets/catalog/chocolat.png";
+import imgChips from "@assets/catalog/chips.png";
+import imgTshirt from "@assets/catalog/tshirt.png";
+import imgJeans from "@assets/catalog/jeans.png";
+import imgEspadrilles from "@assets/catalog/espadrilles.png";
+import imgCinema from "@assets/catalog/cinema.png";
+
 const QUEBEC_TAX_RATE = 0.14975;
 
 const CATEGORIES = [
@@ -256,6 +277,41 @@ function getProductEmoji(name: string, category: string): string {
   }
 
   return "🛒";
+}
+
+function getProductImage(name: string, category: string): string | null {
+  const n = name.toLowerCase();
+
+  if (category === "food") {
+    if (n.includes("lait") && !n.includes("chocolat") && !n.includes("amande") && !n.includes("soya") && !n.includes("coco")) return imgLait;
+    if (n.includes("fromage") || n.includes("cheddar") || n.includes("mozzarella") || n.includes("ricotta") || n.includes("brie") || n.includes("parmesan") || n.includes("cottage")) return imgFromage;
+    if (n.includes("yogourt") || n.includes("yaourt") || n.includes("kéfir")) return imgYogourt;
+    if (n.includes("beurre") && !n.includes("arachide")) return imgBeurre;
+    if (n.includes("poulet") || n.includes("dinde") || n.includes("poitrines")) return imgPoulet;
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette")) return imgBoeuf;
+    if (n.includes("banane")) return imgBananes;
+    if (n.includes("pomme") && !n.includes("de terre") && !n.includes("patate") && !n.includes("jus")) return imgPommes;
+    if (n.includes("pomme de terre") || n.includes("patate") || n.includes("russet")) return imgPommesDeterre;
+    if (n.includes("carotte")) return imgCarottes;
+    if (n.includes("brocoli") || n.includes("chou-fleur")) return imgBrocoli;
+    if (n.includes("tomate")) return imgTomates;
+    if (n.includes("pain") && !n.includes("pizza")) return imgPain;
+    if (n.includes("jus")) return imgJusOrange;
+    if (n.includes("chocolat") || n.includes("twix") || n.includes("reese") || n.includes("cadbury") || n.includes("kit kat") || n.includes("oh henry") || n.includes("aero") || n.includes("caramilk") || n.includes("coffee crisp") || n.includes("lindt")) return imgChocolat;
+    if (n.includes("chips") || n.includes("lays") || n.includes("ruffles") || n.includes("doritos") || n.includes("pringles") || n.includes("cheetos")) return imgChips;
+  }
+
+  if (category === "clothing") {
+    if (n.includes("t-shirt") || n.includes("chandail") || n.includes("pull") || n.includes("capuche")) return imgTshirt;
+    if (n.includes("jeans") || n.includes("pantalon") || n.includes("jogging") || n.includes("bermuda")) return imgJeans;
+    if (n.includes("espadrille") || n.includes("chaussure") || n.includes("sandales") || n.includes("bottes")) return imgEspadrilles;
+  }
+
+  if (category === "leisure") {
+    if (n.includes("cinéma") || n.includes("cinema") || n.includes("film")) return imgCinema;
+  }
+
+  return null;
 }
 
 type PromoEntry = { name: string; discountPct: number };
@@ -1185,12 +1241,25 @@ function ProductGrid({ items, cart, addToCart }: {
               )}
             </div>
 
-            {/* Product emoji */}
-            <div className={`pt-8 pb-2 flex items-center justify-center ${isOnSale ? "bg-yellow-50 dark:bg-yellow-900/10" : "bg-gray-50 dark:bg-gray-800/50"}`}>
-              <span className="text-5xl group-hover:scale-110 transition-transform duration-200 block">
-                {getProductEmoji(item.name, item.category)}
-              </span>
-            </div>
+            {/* Product image */}
+            {(() => {
+              const img = getProductImage(item.name, item.category);
+              return (
+                <div className={`relative pt-2 pb-1 flex items-center justify-center h-28 overflow-hidden ${isOnSale ? "bg-yellow-50 dark:bg-yellow-900/10" : "bg-gray-50 dark:bg-gray-800/30"}`}>
+                  {img ? (
+                    <img
+                      src={img}
+                      alt={item.name}
+                      className="h-24 w-24 object-contain group-hover:scale-110 transition-transform duration-200 drop-shadow-md"
+                    />
+                  ) : (
+                    <span className="text-5xl group-hover:scale-110 transition-transform duration-200 block drop-shadow-sm">
+                      {getProductEmoji(item.name, item.category)}
+                    </span>
+                  )}
+                </div>
+              );
+            })()}
 
             {/* Product info */}
             <div className="flex flex-col flex-1 p-2">

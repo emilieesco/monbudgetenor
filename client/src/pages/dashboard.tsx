@@ -475,13 +475,75 @@ export default function Dashboard() {
     return matchesSearch && matchesCategory;
   });
 
-  // Expense breakdown by category
+  // Expense breakdown by category (catalog purchases only)
   const categoryBreakdown = ["food", "clothing", "leisure", "rent"].map(category => ({
     name: category === "food" ? "Nourriture" : category === "clothing" ? "Vêtements" : category === "leisure" ? "Loisirs" : "Loyer",
     value: expenses
       .filter(e => e.category === category)
       .reduce((sum, e) => sum + e.amount, 0),
   }));
+
+  // Full breakdown including paid fixed expenses
+  const fixedPaidTotal = fixedExpenses.filter(fe => fe.isPaid).reduce((sum, fe) => sum + fe.amount, 0);
+  const fullCategoryBreakdown = [
+    ...categoryBreakdown,
+    { name: "Dépenses Fixes", value: parseFloat(fixedPaidTotal.toFixed(2)) },
+  ].filter(c => c.value > 0);
+
+  // Essential vs Non-essential (fixed expenses are always essential)
+  const essentialBreakdown = [
+    {
+      name: "Essentiel",
+      value: parseFloat((
+        expenses.filter(e => e.isEssential).reduce((s, e) => s + e.amount, 0) + fixedPaidTotal
+      ).toFixed(2)),
+    },
+    {
+      name: "Non-essentiel",
+      value: parseFloat(expenses.filter(e => !e.isEssential).reduce((s, e) => s + e.amount, 0).toFixed(2)),
+    },
+  ].filter(c => c.value > 0);
+
+  // CSV download — all expenses for the month
+  const downloadCSV = () => {
+    const monthNum = student.currentMonth || 1;
+    const BOM = "\uFEFF"; // UTF-8 BOM for Excel
+    const header = ["Date", "Description", "Catégorie", "Montant ($)", "Type", "Essentiel"];
+    const fixedRows = fixedExpenses.filter(fe => fe.isPaid).map(fe => [
+      new Date().toLocaleDateString("fr-CA"),
+      fe.name,
+      "Dépense fixe",
+      fe.amount.toFixed(2),
+      "Fixe",
+      "Oui",
+    ]);
+    const catalogRows = expenses.map(e => [
+      new Date(e.timestamp).toLocaleDateString("fr-CA"),
+      e.message,
+      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category,
+      e.amount.toFixed(2),
+      "Variable",
+      e.isEssential ? "Oui" : "Non",
+    ]);
+    const summaryRows = [
+      [],
+      ["=== RÉSUMÉ ==="],
+      ["Budget mensuel", `$${student.monthlyBudget?.toFixed(2) ?? student.budget.toFixed(2)}`],
+      ["Budget actuel", `$${student.budget.toFixed(2)}`],
+      ["Total dépensé", `$${student.spent.toFixed(2)}`],
+      ["Épargne", `$${student.savings.toFixed(2)}`],
+      ["Restant", `$${(student.budget - student.spent).toFixed(2)}`],
+    ];
+    const rows = [header, ...fixedRows, ...catalogRows, ...summaryRows];
+    const csv = BOM + rows.map(r => r.map(v => `"${String(v).replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bilan_${student.name}_mois${monthNum}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const successCount = expenses.filter(e => e.feedback === "success").length;
   const warningCount = expenses.filter(e => e.feedback === "warning").length;
@@ -1290,42 +1352,49 @@ export default function Dashboard() {
         </div>
 
         {/* Charts */}
-        {categoryBreakdown.some(c => c.value > 0) && (
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            {/* Expense Breakdown */}
+        {fullCategoryBreakdown.length > 0 && (
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+            {/* Full breakdown bar chart */}
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Répartition des Dépenses</h2>
-              <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={categoryBreakdown}>
+              <h2 className="text-xl font-semibold mb-1">Répartition des Dépenses</h2>
+              <p className="text-sm text-muted-foreground mb-4">Achats + dépenses fixes payées</p>
+              <ResponsiveContainer width="100%" height={280}>
+                <BarChart data={fullCategoryBreakdown} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Bar dataKey="value" fill="hsl(var(--primary))" />
+                  <XAxis dataKey="name" tick={{ fontSize: 12 }} />
+                  <YAxis tick={{ fontSize: 12 }} tickFormatter={v => `$${v}`} />
+                  <Tooltip formatter={(v: number) => [`$${v.toFixed(2)}`, "Montant"]} />
+                  <Bar dataKey="value" radius={[4, 4, 0, 0]}>
+                    {fullCategoryBreakdown.map((_, index) => (
+                      <Cell key={`bar-${index}`} fill={`hsl(var(--chart-${(index % 5) + 1}))`} />
+                    ))}
+                  </Bar>
                 </BarChart>
               </ResponsiveContainer>
             </Card>
 
-            {/* Pie Chart */}
+            {/* Essentiel vs Non-essentiel pie */}
             <Card className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Distribution</h2>
-              <ResponsiveContainer width="100%" height={300}>
+              <h2 className="text-xl font-semibold mb-1">Essentiel vs Non-essentiel</h2>
+              <p className="text-sm text-muted-foreground mb-4">Les dépenses fixes comptent comme essentielles</p>
+              <ResponsiveContainer width="100%" height={280}>
                 <PieChart>
                   <Pie
-                    data={categoryBreakdown.filter(c => c.value > 0)}
+                    data={essentialBreakdown}
                     cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, value }) => `${name}: $${value}`}
-                    outerRadius={80}
-                    fill="#8884d8"
+                    cy="45%"
+                    labelLine={true}
+                    label={({ name, value, percent }) =>
+                      `${name}: $${Number(value).toFixed(2)} (${(percent * 100).toFixed(0)}%)`
+                    }
+                    outerRadius={90}
                     dataKey="value"
                   >
-                    {categoryBreakdown.map((_, index) => (
-                      <Cell key={`cell-${index}`} fill={`hsl(var(--chart-${(index % 5) + 1}))`} />
-                    ))}
+                    <Cell fill="hsl(var(--chart-1))" />
+                    <Cell fill="hsl(var(--chart-4))" />
                   </Pie>
-                  <Tooltip />
+                  <Tooltip formatter={(v: number) => [`$${v.toFixed(2)}`, "Montant"]} />
+                  <Legend />
                 </PieChart>
               </ResponsiveContainer>
             </Card>
@@ -1382,38 +1451,50 @@ export default function Dashboard() {
 
         {/* Decision History with Filters */}
         <Card className="p-6">
-          <div className="flex items-center justify-between mb-4">
+          <div className="flex items-center justify-between flex-wrap gap-2 mb-4">
             <h2 className="text-xl font-semibold">Historique Détaillé</h2>
-            <Button
-              onClick={() => {
-                const doc = new jsPDF();
-                doc.setFontSize(16);
-                doc.text("Rapport Budgétaire", 10, 10);
-                doc.setFontSize(10);
-                doc.text(`Étudiant: ${student.name}`, 10, 20);
-                doc.text(`Budget: $${student.budget.toFixed(2)} | Dépensé: $${student.spent.toFixed(2)} | Épargne: $${student.savings.toFixed(2)}`, 10, 30);
-                doc.text(`Restant: $${remaining.toFixed(2)} (${Math.round(spentPercentage)}% utilisé)`, 10, 40);
-                doc.text("", 10, 50);
-                doc.text("Dépenses:", 10, 60);
-                let y = 70;
-                filteredExpenses.forEach(exp => {
-                  if (y > 280) {
-                    doc.addPage();
-                    y = 10;
-                  }
-                  doc.text(`${exp.message} - $${exp.amount.toFixed(2)}`, 15, y);
-                  y += 5;
-                });
-                doc.save(`rapport_${student.name}.pdf`);
-              }}
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-2"
-              data-testid="button-export-pdf"
-            >
-              <Download className="w-4 h-4" />
-              Télécharger
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                onClick={downloadCSV}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-export-csv"
+              >
+                <Download className="w-4 h-4" />
+                Bilan CSV
+              </Button>
+              <Button
+                onClick={() => {
+                  const doc = new jsPDF();
+                  doc.setFontSize(16);
+                  doc.text("Rapport Budgétaire", 10, 10);
+                  doc.setFontSize(10);
+                  doc.text(`Étudiant: ${student.name}`, 10, 20);
+                  doc.text(`Budget: $${student.budget.toFixed(2)} | Dépensé: $${student.spent.toFixed(2)} | Épargne: $${student.savings.toFixed(2)}`, 10, 30);
+                  doc.text(`Restant: $${remaining.toFixed(2)} (${Math.round(spentPercentage)}% utilisé)`, 10, 40);
+                  doc.text("", 10, 50);
+                  doc.text("Dépenses:", 10, 60);
+                  let y = 70;
+                  filteredExpenses.forEach(exp => {
+                    if (y > 280) {
+                      doc.addPage();
+                      y = 10;
+                    }
+                    doc.text(`${exp.message} - $${exp.amount.toFixed(2)}`, 15, y);
+                    y += 5;
+                  });
+                  doc.save(`rapport_${student.name}.pdf`);
+                }}
+                variant="outline"
+                size="sm"
+                className="flex items-center gap-2"
+                data-testid="button-export-pdf"
+              >
+                <Download className="w-4 h-4" />
+                Rapport PDF
+              </Button>
+            </div>
           </div>
 
           {/* Search and Filter */}

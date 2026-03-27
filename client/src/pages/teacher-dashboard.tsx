@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
 import { apiRequest, queryClient } from "@/lib/queryClient";
 import { useState } from "react";
-import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2, TrendingDown, TrendingUp, PiggyBank } from "lucide-react";
+import { Home, Plus, Send, Gift, Target, Users, Settings, Calendar, ArrowRight, DollarSign, Trophy, Medal, Award, Star, Trash2, TrendingDown, TrendingUp, PiggyBank, Download } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { useToast } from "@/hooks/use-toast";
 import type { Student, Class, CustomChallenge, TeacherMessage, SurpriseEvent, ClassChallenge, BonusExpense, Expense } from "@shared/schema";
@@ -376,6 +376,74 @@ export default function TeacherDashboard() {
   const leaderboard = leaderboardQuery.data as Array<{studentId: string; name: string; savings: number; badgeCount: number; challengesCompleted: number}> || [];
   const classBonusExpenses = classBonusExpensesQuery.data as Array<BonusExpense & { studentName: string }> || [];
   const classExpenses = classExpensesQuery.data as Array<Expense & { studentName: string }> || [];
+
+  // CSV export — full class monthly report
+  const downloadClassCSV = () => {
+    const BOM = "\uFEFF";
+    const date = new Date().toLocaleDateString("fr-CA");
+
+    // Sheet 1: Summary per student
+    const summaryHeader = ["Élève", "Budget ($)", "Dépensé ($)", "Épargne ($)", "Restant ($)", "% restant", "Badges"];
+    const summaryRows = students.map(s => {
+      const lbEntry = leaderboard.find(e => e.studentId === s.id);
+      const remaining = (s.budget || 0) - (s.spent || 0);
+      const pct = s.budget > 0 ? Math.round((remaining / s.budget) * 100) : 0;
+      return [
+        s.name,
+        (s.budget || 0).toFixed(2),
+        (s.spent || 0).toFixed(2),
+        (s.savings || 0).toFixed(2),
+        remaining.toFixed(2),
+        `${pct}%`,
+        String(lbEntry?.badgeCount ?? 0),
+      ];
+    });
+
+    // Sheet 2: All purchases
+    const purchaseHeader = ["Date", "Élève", "Description", "Catégorie", "Montant ($)", "Essentiel"];
+    const purchaseRows = classExpenses.map(e => [
+      new Date(e.timestamp).toLocaleDateString("fr-CA"),
+      e.studentName,
+      e.message,
+      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category,
+      e.amount.toFixed(2),
+      e.isEssential ? "Oui" : "Non",
+    ]);
+
+    // Sheet 3: Teacher bonus expenses
+    const bonusHeader = ["Date", "Élève", "Description", "Montant ($)"];
+    const bonusRows = classBonusExpenses.map(e => [
+      new Date(e.createdAt).toLocaleDateString("fr-CA"),
+      e.studentName,
+      e.title,
+      e.amount.toFixed(2),
+    ]);
+
+    const sections = [
+      [`=== BILAN DE LA CLASSE — ${date} ===`],
+      [],
+      ["--- Résumé par élève ---"],
+      summaryHeader,
+      ...summaryRows,
+      [],
+      ["--- Achats des élèves (Catalogue) ---"],
+      purchaseHeader,
+      ...purchaseRows,
+      [],
+      ["--- Dépenses ajoutées par l'enseignant ---"],
+      bonusHeader,
+      ...bonusRows,
+    ];
+
+    const csv = BOM + sections.map(r => r.map(v => `"${String(v ?? "").replace(/"/g, '""')}"`).join(",")).join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `bilan_classe_${classData?.code ?? "classe"}_${date}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   if (!classData) {
     return <div className="p-8">Chargement...</div>;
@@ -1167,6 +1235,19 @@ export default function TeacherDashboard() {
         {/* Historique Tab */}
         {activeTab === "historique" && (
           <div className="space-y-8">
+            {/* Export button */}
+            <div className="flex justify-end">
+              <Button
+                onClick={downloadClassCSV}
+                variant="outline"
+                disabled={students.length === 0}
+                data-testid="button-export-class-csv"
+              >
+                <Download className="w-4 h-4 mr-2" />
+                Télécharger le bilan de la classe (CSV)
+              </Button>
+            </div>
+
             {/* Bonus Expenses (Teacher-added) */}
             <Card className="p-6">
               <div className="flex items-center gap-2 mb-6">

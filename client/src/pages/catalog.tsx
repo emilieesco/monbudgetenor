@@ -32,6 +32,26 @@ import imgTshirt from "@assets/catalog/tshirt.png";
 import imgJeans from "@assets/catalog/jeans.png";
 import imgEspadrilles from "@assets/catalog/espadrilles.png";
 import imgCinema from "@assets/catalog/cinema.png";
+import imgOeufs from "@assets/catalog/oeufs.png";
+import imgBacon from "@assets/catalog/bacon.png";
+import imgSaumon from "@assets/catalog/saumon.png";
+import imgCrevettes from "@assets/catalog/crevettes.png";
+import imgPates from "@assets/catalog/pates.png";
+import imgRiz from "@assets/catalog/riz.png";
+import imgBeurreArachide from "@assets/catalog/beurre-arachide.png";
+import imgThon from "@assets/catalog/thon.png";
+import imgSauceTomate from "@assets/catalog/sauce-tomate.png";
+import imgGruau from "@assets/catalog/gruau.png";
+import imgOranges from "@assets/catalog/oranges.png";
+import imgFraises from "@assets/catalog/fraises.png";
+import imgLaitue from "@assets/catalog/laitue.png";
+import imgOignons from "@assets/catalog/oignons.png";
+import imgPoivrons from "@assets/catalog/poivrons.png";
+import imgMangues from "@assets/catalog/mangues.png";
+import imgBagels from "@assets/catalog/bagels.png";
+import imgCroissants from "@assets/catalog/croissants.png";
+import imgCremeGlacee from "@assets/catalog/creme-glacee.png";
+import imgCafe from "@assets/catalog/cafe.png";
 
 const QUEBEC_TAX_RATE = 0.14975;
 
@@ -283,20 +303,48 @@ function getProductImage(name: string, category: string): string | null {
   const n = name.toLowerCase();
 
   if (category === "food") {
+    // Produits laitiers
     if (n.includes("lait") && !n.includes("chocolat") && !n.includes("amande") && !n.includes("soya") && !n.includes("coco")) return imgLait;
     if (n.includes("fromage") || n.includes("cheddar") || n.includes("mozzarella") || n.includes("ricotta") || n.includes("brie") || n.includes("parmesan") || n.includes("cottage")) return imgFromage;
     if (n.includes("yogourt") || n.includes("yaourt") || n.includes("kéfir")) return imgYogourt;
     if (n.includes("beurre") && !n.includes("arachide")) return imgBeurre;
+    // Viandes & protéines
+    if (n.includes("oeuf") || n.includes("œuf")) return imgOeufs;
+    if (n.includes("bacon")) return imgBacon;
+    if (n.includes("saumon")) return imgSaumon;
+    if (n.includes("crevette")) return imgCrevettes;
+    if (n.includes("thon")) return imgThon;
     if (n.includes("poulet") || n.includes("dinde") || n.includes("poitrines")) return imgPoulet;
-    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette")) return imgBoeuf;
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette") || n.includes("cotelette")) return imgBoeuf;
+    // Fruits
     if (n.includes("banane")) return imgBananes;
-    if (n.includes("pomme") && !n.includes("de terre") && !n.includes("patate") && !n.includes("jus")) return imgPommes;
+    if (n.includes("fraise")) return imgFraises;
+    if (n.includes("orange")) return imgOranges;
+    if (n.includes("mangue")) return imgMangues;
+    if (n.includes("pomme") && !n.includes("de terre") && !n.includes("patate") && !n.includes("jus") && !n.includes("arachide")) return imgPommes;
+    // Légumes
     if (n.includes("pomme de terre") || n.includes("patate") || n.includes("russet")) return imgPommesDeterre;
     if (n.includes("carotte")) return imgCarottes;
     if (n.includes("brocoli") || n.includes("chou-fleur")) return imgBrocoli;
-    if (n.includes("tomate")) return imgTomates;
+    if (n.includes("tomate") && !n.includes("sauce")) return imgTomates;
+    if (n.includes("laitue") || n.includes("romaine") || n.includes("épinard") || n.includes("epinard")) return imgLaitue;
+    if (n.includes("oignon")) return imgOignons;
+    if (n.includes("poivron")) return imgPoivrons;
+    // Conserves & épicerie sèche
+    if (n.includes("sauce tomate") || n.includes("sauce pasta") || n.includes("classico")) return imgSauceTomate;
+    if (n.includes("pâte") || n.includes("pate") || n.includes("spaghetti") || n.includes("macaroni") || n.includes("fusilli")) return imgPates;
+    if (n.includes("riz") && !n.includes("lait")) return imgRiz;
+    if (n.includes("beurre d'arachide") || n.includes("beurre arachide")) return imgBeurreArachide;
+    if (n.includes("gruau") || n.includes("avoine") || n.includes("oatmeal")) return imgGruau;
+    // Boulangerie
+    if (n.includes("bagel")) return imgBagels;
+    if (n.includes("croissant")) return imgCroissants;
     if (n.includes("pain") && !n.includes("pizza")) return imgPain;
+    // Boissons
+    if (n.includes("café") || n.includes("cafe") || n.includes("maxwell") || n.includes("folgers")) return imgCafe;
     if (n.includes("jus")) return imgJusOrange;
+    // Sucreries & collations
+    if (n.includes("crème glacée") || n.includes("creme glacee") || n.includes("gelato") || n.includes("sorbet")) return imgCremeGlacee;
     if (n.includes("chocolat") || n.includes("twix") || n.includes("reese") || n.includes("cadbury") || n.includes("kit kat") || n.includes("oh henry") || n.includes("aero") || n.includes("caramilk") || n.includes("coffee crisp") || n.includes("lindt")) return imgChocolat;
     if (n.includes("chips") || n.includes("lays") || n.includes("ruffles") || n.includes("doritos") || n.includes("pringles") || n.includes("cheetos")) return imgChips;
   }

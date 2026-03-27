@@ -568,9 +568,10 @@ export class DatabaseStorage implements IStorage {
 
     const id = randomUUID();
     const defaultAmounts = { ...DEFAULT_EXPENSE_AMOUNTS };
+    const predBudget = input.predefinedBudget ?? null;
     const rows = await this.sql`
-      INSERT INTO classes (id, code, teacher_name, expense_amounts, mode)
-      VALUES (${id}, ${upperCode}, ${input.teacherName}, ${JSON.stringify(defaultAmounts)}, 'predefined')
+      INSERT INTO classes (id, code, teacher_name, expense_amounts, mode, predefined_budget)
+      VALUES (${id}, ${upperCode}, ${input.teacherName}, ${JSON.stringify(defaultAmounts)}, 'predefined', ${predBudget})
       RETURNING *
     `;
     return toClass(rows[0]);
@@ -986,10 +987,12 @@ export class DatabaseStorage implements IStorage {
 
   async getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]> {
     const rows = await this.sql`
-      SELECT * FROM teacher_messages
-      WHERE class_id = ${classId}
-        AND (student_id IS NULL OR student_id = ${studentId})
-      ORDER BY timestamp DESC
+      SELECT tm.* FROM teacher_messages tm
+      JOIN students s ON s.id = ${studentId}
+      WHERE tm.class_id = ${classId}
+        AND (tm.student_id IS NULL OR tm.student_id = ${studentId})
+        AND tm.timestamp >= s.created_at
+      ORDER BY tm.timestamp DESC
     `;
     return rows.map(toTeacherMessage);
   }

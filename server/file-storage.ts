@@ -368,6 +368,7 @@ export class FileStorage implements IStorage {
         "Assurance Voiture": 10, "Assurance Maison": 7, "Essence": 12,
         "Nourriture": 20, "Sortie": 5,
       },
+      ...(input.predefinedBudget ? { predefinedBudget: input.predefinedBudget } : {}),
     };
     this.classes.set(id, classData);
     this.save();
@@ -856,8 +857,12 @@ export class FileStorage implements IStorage {
   }
 
   async getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]> {
+    const student = this.students.get(studentId);
+    const joinedAt = student?.createdAt ? new Date(student.createdAt) : new Date(0);
     return Array.from(this.teacherMessages.values()).filter(m =>
-      m.classId === classId && (!m.studentId || m.studentId === studentId)
+      m.classId === classId &&
+      (!m.studentId || m.studentId === studentId) &&
+      new Date(m.timestamp) >= joinedAt
     );
   }
 

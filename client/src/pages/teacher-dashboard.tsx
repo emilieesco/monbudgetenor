@@ -407,6 +407,48 @@ export default function TeacherDashboard() {
           </div>
         </div>
 
+        {/* Budget configuré visible */}
+        <div className="mb-6 flex flex-wrap gap-4">
+          <Card className="p-4 flex items-center gap-3 flex-1 min-w-[200px]">
+            <div className="p-2 bg-primary/10 rounded-lg">
+              <DollarSign className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Budget mensuel élèves</p>
+              {classData.predefinedBudget ? (
+                <p className="text-xl font-bold text-primary">{classData.predefinedBudget} $</p>
+              ) : (
+                <p className="text-sm font-semibold text-muted-foreground">
+                  Auto — {Math.round(Object.values(classData.expenseAmounts).reduce((a, b) => a + b, 0) * 1.5)} $
+                </p>
+              )}
+              <p className="text-[10px] text-muted-foreground">
+                {classData.predefinedBudget ? "Défini par toi" : "Calculé automatiquement (dépenses × 1.5)"}
+              </p>
+            </div>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => { setActiveTab("config"); setExpenseAmounts({ ...classData.expenseAmounts }); setPredefinedBudget(classData.predefinedBudget || ""); }}
+              className="ml-auto"
+              data-testid="button-edit-budget-shortcut"
+            >
+              Modifier
+            </Button>
+          </Card>
+
+          <Card className="p-4 flex items-center gap-3 flex-1 min-w-[200px]">
+            <div className="p-2 bg-green-500/10 rounded-lg">
+              <Users className="w-5 h-5 text-green-600" />
+            </div>
+            <div>
+              <p className="text-xs text-muted-foreground font-medium">Élèves inscrits</p>
+              <p className="text-xl font-bold">{students.length}</p>
+              <p className="text-[10px] text-muted-foreground">Code : <span className="font-mono font-bold">{classData.code}</span></p>
+            </div>
+          </Card>
+        </div>
+
         {/* Tabs */}
         <div className="flex gap-2 mb-8 flex-wrap">
           {["students", "challenges", "messages", "events", "leaderboard", "historique", "config"].map(tab => (

@@ -214,6 +214,7 @@ export const insertStudentSchema = z.object({
 export const createClassSchema = z.object({
   code: z.string().min(3).max(10),
   teacherName: z.string().min(1),
+  predefinedBudget: z.number().positive().optional(),
 });
 
 export const joinClassSchema = z.object({

@@ -15,6 +15,7 @@ export default function TeacherSetup() {
   const [mode, setMode] = useState<Mode>("choice");
   const [teacherName, setTeacherName] = useState("");
   const [classCode, setClassCode] = useState("");
+  const [predefinedBudget, setPredefinedBudget] = useState("");
   const [error, setError] = useState("");
 
   // Invite code state
@@ -25,10 +26,12 @@ export default function TeacherSetup() {
   const createClassMutation = useMutation({
     mutationFn: async () => {
       // Pass inviteCode to the server — it validates and consumes atomically
+      const budgetNum = parseInt(predefinedBudget);
       const res = await apiRequest("POST", "/api/classes", {
         teacherName,
         code: classCode,
         inviteCode: inviteCode.trim(),
+        ...(budgetNum > 0 ? { predefinedBudget: budgetNum } : {}),
       });
       return res.json();
     },
@@ -280,6 +283,22 @@ export default function TeacherSetup() {
                   />
                   <p className="text-xs text-muted-foreground mt-2">
                     Un code unique pour tes élèves (3-10 caractères)
+                  </p>
+                </div>
+
+                <div>
+                  <Label htmlFor="budget">Budget mensuel des élèves ($)</Label>
+                  <Input
+                    id="budget"
+                    type="number"
+                    placeholder="Ex: 2000"
+                    value={predefinedBudget}
+                    onChange={(e) => setPredefinedBudget(e.target.value)}
+                    min={1}
+                    data-testid="input-predefined-budget"
+                  />
+                  <p className="text-xs text-muted-foreground mt-2">
+                    Le budget mensuel que chaque élève recevra. Si vide, il sera calculé automatiquement selon les dépenses fixes.
                   </p>
                 </div>
 

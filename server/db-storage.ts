@@ -601,15 +601,16 @@ export class DatabaseStorage implements IStorage {
       UPDATE classes SET expense_amounts = ${JSON.stringify(amountsObj)} WHERE id = ${classId} RETURNING *
     `;
     if (!rows[0]) return undefined;
-    // Update all fixed expenses for students in this class
+    // Update all fixed expenses for students in this class — one query per category (parallel)
     const students = await this.getClassStudents(classId);
-    for (const student of students) {
-      for (const [cat, amt] of amounts.entries()) {
-        await this.sql`
-          UPDATE fixed_expenses SET amount = ${amt} WHERE student_id = ${student.id} AND category = ${cat}
-        `;
-      }
-    }
+    await Promise.all(
+      Array.from(amounts.entries()).map(([cat, amt]) =>
+        this.sql`
+          UPDATE fixed_expenses SET amount = ${amt}
+          WHERE student_id = ANY(${students.map(s => s.id)}) AND category = ${cat}
+        `
+      )
+    );
     return toClass(rows[0]);
   }
 
@@ -654,24 +655,6 @@ export class DatabaseStorage implements IStorage {
       )
       RETURNING *
     `;
-
-    const classData = await this.getClass(input.classId);
-    let amounts: Record<string, number> = classData?.expenseAmounts ?? { ...DEFAULT_EXPENSE_AMOUNTS };
-    if (input.customExpenses) amounts = input.customExpenses;
-
-    const fixedExpensesList = [
-      "Loyer", "Internet", "Téléphone", "Hydro", "Assurance Voiture",
-      "Assurance Maison", "Essence", "Nourriture", "Sortie"
-    ];
-    for (const cat of fixedExpensesList) {
-      const amt = amounts[cat] ?? DEFAULT_EXPENSE_AMOUNTS[cat] ?? 0;
-      const fxId = randomUUID();
-      const dueDate = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
-      await this.sql`
-        INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date)
-        VALUES (${fxId}, ${id}, ${cat}, ${amt}, false, ${dueDate})
-      `;
-    }
 
     return toStudent(rows[0]);
   }
@@ -731,15 +714,16 @@ export class DatabaseStorage implements IStorage {
     if (!rows[0]) return undefined;
     // Delete expenses
     await this.sql`DELETE FROM expenses WHERE student_id = ${id}`;
-    // Delete and recreate fixed expenses
-    await this.sql`DELETE FROM fixed_expenses WHERE student_id = ${id}`;
-    const classData = await this.getClass(student.classId);
+    // Delete and recreate fixed expenses — parallel
+    const [, classData] = await Promise.all([
+      this.sql`DELETE FROM fixed_expenses WHERE student_id = ${id}`,
+      this.getClass(student.classId),
+    ]);
     const amounts: Record<string, number> = student.customExpenses ?? classData?.expenseAmounts ?? DEFAULT_EXPENSE_AMOUNTS;
-    for (const [cat, amt] of Object.entries(amounts)) {
-      await this.createFixedExpense(id, cat, Number(amt));
-    }
-    // Delete badges
-    await this.sql`DELETE FROM badges WHERE student_id = ${id}`;
+    await Promise.all([
+      ...Object.entries(amounts).map(([cat, amt]) => this.createFixedExpense(id, cat, Number(amt))),
+      this.sql`DELETE FROM badges WHERE student_id = ${id}`,
+    ]);
     return toStudent(rows[0]);
   }
 
@@ -884,9 +868,11 @@ export class DatabaseStorage implements IStorage {
   async setDefaultExpenseAmounts(_amounts: Map<string, number>): Promise<void> {}
 
   async updateAllStudentExpenseAmounts(amounts: Map<string, number>): Promise<void> {
-    for (const [cat, amt] of amounts.entries()) {
-      await this.sql`UPDATE fixed_expenses SET amount = ${amt} WHERE category = ${cat}`;
-    }
+    await Promise.all(
+      Array.from(amounts.entries()).map(([cat, amt]) =>
+        this.sql`UPDATE fixed_expenses SET amount = ${amt} WHERE category = ${cat} AND is_custom = false`
+      )
+    );
   }
 
   // ── Bonus Expenses ────────────────────────────────────────────────
@@ -1103,45 +1089,36 @@ export class DatabaseStorage implements IStorage {
       WHERE id = ${snapshot.studentId} RETURNING *
     `;
 
-    // Restore expenses
-    await this.sql`DELETE FROM expenses WHERE student_id = ${snapshot.studentId}`;
-    for (const exp of snapshot.expenses) {
-      await this.sql`
+    // Delete all related data in parallel, then restore in parallel
+    await Promise.all([
+      this.sql`DELETE FROM expenses WHERE student_id = ${snapshot.studentId}`,
+      this.sql`DELETE FROM fixed_expenses WHERE student_id = ${snapshot.studentId}`,
+      this.sql`DELETE FROM bonus_expenses WHERE student_id = ${snapshot.studentId}`,
+      this.sql`DELETE FROM challenges WHERE student_id = ${snapshot.studentId}`,
+    ]);
+
+    await Promise.all([
+      ...snapshot.expenses.map(exp => this.sql`
         INSERT INTO expenses (id, student_id, item_id, amount, category, is_essential, timestamp, feedback, message)
         VALUES (${exp.id}, ${exp.studentId}, ${exp.itemId}, ${exp.amount}, ${exp.category}, ${exp.isEssential}, ${exp.timestamp}, ${exp.feedback}, ${exp.message})
         ON CONFLICT (id) DO NOTHING
-      `;
-    }
-
-    // Restore fixed expenses
-    await this.sql`DELETE FROM fixed_expenses WHERE student_id = ${snapshot.studentId}`;
-    for (const fe of snapshot.fixedExpenses) {
-      await this.sql`
+      `),
+      ...snapshot.fixedExpenses.map(fe => this.sql`
         INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date)
         VALUES (${fe.id}, ${fe.studentId}, ${fe.category}, ${fe.amount}, ${fe.isPaid}, ${fe.dueDate})
         ON CONFLICT (id) DO NOTHING
-      `;
-    }
-
-    // Restore bonus expenses
-    await this.sql`DELETE FROM bonus_expenses WHERE student_id = ${snapshot.studentId}`;
-    for (const be of snapshot.bonusExpenses) {
-      await this.sql`
+      `),
+      ...snapshot.bonusExpenses.map(be => this.sql`
         INSERT INTO bonus_expenses (id, student_id, class_id, title, description, amount, category, created_at, is_paid)
         VALUES (${be.id}, ${be.studentId}, ${be.classId}, ${be.title}, ${be.description}, ${be.amount}, ${be.category}, ${be.createdAt}, ${be.isPaid})
         ON CONFLICT (id) DO NOTHING
-      `;
-    }
-
-    // Restore challenges
-    await this.sql`DELETE FROM challenges WHERE student_id = ${snapshot.studentId}`;
-    for (const ch of snapshot.challenges) {
-      await this.sql`
+      `),
+      ...snapshot.challenges.map(ch => this.sql`
         INSERT INTO challenges (id, student_id, title, description, type, target_value, completed, created_at)
         VALUES (${ch.id}, ${ch.studentId}, ${ch.title}, ${ch.description}, ${ch.type}, ${ch.targetValue}, ${ch.completed}, ${ch.createdAt})
         ON CONFLICT (id) DO NOTHING
-      `;
-    }
+      `),
+    ]);
 
     return toStudent(updated[0]);
   }

@@ -117,40 +117,35 @@ export async function registerRoutes(
       // Check if student with same name already exists in this class
       const existingStudent = await storage.getStudentByNameAndClass(data.name, classData.id);
       if (existingStudent) {
-        // Update the student's budget, custom expenses and add to history
-        const updatedStudent = await storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget);
-        
-        // Update custom expenses if provided
-        if (data.customExpenses) {
-          await storage.updateStudentCustomExpenses(existingStudent.id, data.customExpenses);
-        }
-        
-        // Recreate challenges for the new budget
         const newChallenges = [
           { title: "Économe", description: "Dépense moins de 30% de ton budget", type: "spending" as const, target: Math.round(data.budget * 0.3) },
           { title: "Essentiel d'abord", description: "Achète 3 articles essentiels", type: "essential" as const, target: 3 },
           { title: "Responsable", description: "Paye toutes tes dépenses fixes", type: "fixed" as const, target: 100 },
           { title: "Sage", description: "Économise 50% de ton budget", type: "savings" as const, target: Math.round(data.budget * 0.5) },
         ];
-        
-        // Delete old challenges and create new ones
-        await storage.deleteStudentChallenges(existingStudent.id);
-        for (const ch of newChallenges) {
-          await storage.createChallenge({
+
+        // Run budget update, custom expenses update, and deletes all in parallel
+        const [updatedStudent] = await Promise.all([
+          storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget),
+          data.customExpenses ? storage.updateStudentCustomExpenses(existingStudent.id, data.customExpenses) : Promise.resolve(),
+          storage.deleteStudentChallenges(existingStudent.id),
+          storage.deleteStudentFixedExpenses(existingStudent.id),
+        ]);
+
+        // Now create all challenges + fixed expenses in parallel
+        await Promise.all([
+          ...newChallenges.map(ch => storage.createChallenge({
             studentId: existingStudent.id,
             title: ch.title,
             description: ch.description,
             type: ch.type,
             targetValue: ch.target,
-          });
-        }
-        
-        // Delete old fixed expenses and create new ones with custom or class amounts
-        await storage.deleteStudentFixedExpenses(existingStudent.id);
-        for (const [category, amount] of Object.entries(expenseAmounts)) {
-          await storage.createFixedExpense(existingStudent.id, category, amount as number);
-        }
-        
+          })),
+          ...Object.entries(expenseAmounts).map(([category, amount]) =>
+            storage.createFixedExpense(existingStudent.id, category, amount as number)
+          ),
+        ]);
+
         return res.json(updatedStudent || existingStudent);
       }
       
@@ -170,20 +165,19 @@ export async function registerRoutes(
         { title: "Sage", description: "Économise 50% de ton budget", type: "savings" as const, target: Math.round(data.budget * 0.5) },
       ];
       
-      for (const ch of challenges) {
-        await storage.createChallenge({
+      // Create all challenges and fixed expenses in parallel (single round-trip latency)
+      await Promise.all([
+        ...challenges.map(ch => storage.createChallenge({
           studentId: student.id,
           title: ch.title,
           description: ch.description,
           type: ch.type,
           targetValue: ch.target,
-        });
-      }
-      
-      // Create fixed expenses with custom or class amounts
-      for (const [category, amount] of Object.entries(expenseAmounts)) {
-        await storage.createFixedExpense(student.id, category, amount as number);
-      }
+        })),
+        ...Object.entries(expenseAmounts).map(([category, amount]) =>
+          storage.createFixedExpense(student.id, category, amount as number)
+        ),
+      ]);
       
       res.json(student);
     } catch (error) {
@@ -767,19 +761,18 @@ export async function registerRoutes(
         return res.status(400).json({ error: "No students in class" });
       }
       
-      const results = [];
-      for (const student of students) {
-        // Apply event to student budget
-        let newBudget = student.budget;
-        if (event.type === "bonus_salary") {
-          newBudget += event.amount;
-        } else if (event.type === "emergency_expense") {
-          newBudget -= event.amount;
-        }
-        await storage.updateStudentBudget(student.id, newBudget);
-        await storage.applyStudentSurpriseEvent(req.params.id, student.id);
-        results.push({ studentId: student.id, studentName: student.name, newBudget });
-      }
+      const results = await Promise.all(
+        students.map(async student => {
+          let newBudget = student.budget;
+          if (event.type === "bonus_salary") newBudget += event.amount;
+          else if (event.type === "emergency_expense") newBudget -= event.amount;
+          await Promise.all([
+            storage.updateStudentBudget(student.id, newBudget),
+            storage.applyStudentSurpriseEvent(req.params.id, student.id),
+          ]);
+          return { studentId: student.id, studentName: student.name, newBudget };
+        })
+      );
       
       res.json({ 
         event, 
@@ -843,14 +836,8 @@ export async function registerRoutes(
       }
       
       const students = await storage.getClassStudents(req.params.id);
-      const updatedStudents = [];
-      
-      for (const student of students) {
-        const updated = await storage.startNewMonth(student.id);
-        if (updated) {
-          updatedStudents.push(updated);
-        }
-      }
+      const results = await Promise.all(students.map(s => storage.startNewMonth(s.id)));
+      const updatedStudents = results.filter(Boolean);
       
       res.json({ 
         success: true, 
@@ -1009,17 +996,15 @@ export async function registerRoutes(
   app.get("/api/classes/:id/bonus-expenses", async (req, res) => {
     try {
       const students = await storage.getClassStudents(req.params.id);
-      const allExpenses: Array<BonusExpense & { studentName: string }> = [];
-      
-      for (const student of students) {
-        const expenses = await storage.getStudentBonusExpenses(student.id);
-        expenses.forEach(exp => {
-          allExpenses.push({ ...exp, studentName: student.name });
-        });
-      }
-      
-      // Sort by date, most recent first
-      allExpenses.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+      const perStudent = await Promise.all(
+        students.map(async student => {
+          const expenses = await storage.getStudentBonusExpenses(student.id);
+          return expenses.map(exp => ({ ...exp, studentName: student.name }));
+        })
+      );
+      const allExpenses = perStudent.flat().sort(
+        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
       res.json(allExpenses);
     } catch (error) {
       res.status(500).json({ error: "Erreur lors de la récupération des dépenses" });
@@ -1030,17 +1015,15 @@ export async function registerRoutes(
   app.get("/api/classes/:id/expenses", async (req, res) => {
     try {
       const students = await storage.getClassStudents(req.params.id);
-      const allExpenses: Array<Expense & { studentName: string }> = [];
-      
-      for (const student of students) {
-        const expenses = await storage.getStudentExpenses(student.id);
-        expenses.forEach(exp => {
-          allExpenses.push({ ...exp, studentName: student.name });
-        });
-      }
-      
-      // Sort by date, most recent first
-      allExpenses.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+      const perStudent = await Promise.all(
+        students.map(async student => {
+          const expenses = await storage.getStudentExpenses(student.id);
+          return expenses.map(exp => ({ ...exp, studentName: student.name }));
+        })
+      );
+      const allExpenses = perStudent.flat().sort(
+        (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+      );
       res.json(allExpenses);
     } catch (error) {
       res.status(500).json({ error: "Erreur lors de la récupération des dépenses" });

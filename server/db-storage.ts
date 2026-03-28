@@ -220,8 +220,41 @@ export class DatabaseStorage implements IStorage {
 
   async initialize() {
     await this.createTables();
+    await this.deduplicateCatalog();
     await this.seedCatalogIfEmpty();
     console.log("Database storage initialized");
+  }
+
+  private async deduplicateCatalog() {
+    // Remove items with duplicate-sounding names — keep the one with the longest name (more accents)
+    // Strategy: find items whose names are duplicates when normalized (remove accents)
+    const rows = await this.sql`SELECT id, name FROM catalog_items ORDER BY name`;
+    const seen = new Map<string, { id: string; name: string }>();
+    const toDelete: string[] = [];
+    for (const row of rows) {
+      const normalized = (row.name as string)
+        .toLowerCase()
+        .normalize("NFD")
+        .replace(/[\u0300-\u036f]/g, "");
+      if (seen.has(normalized)) {
+        const existing = seen.get(normalized)!;
+        // Keep the one with more accents (longer after normalization difference)
+        const existingAccents = (existing.name as string).replace(/[a-zA-Z0-9\s]/g, "").length;
+        const newAccents = (row.name as string).replace(/[a-zA-Z0-9\s]/g, "").length;
+        if (newAccents >= existingAccents) {
+          toDelete.push(existing.id);
+          seen.set(normalized, row as { id: string; name: string });
+        } else {
+          toDelete.push(row.id as string);
+        }
+      } else {
+        seen.set(normalized, row as { id: string; name: string });
+      }
+    }
+    if (toDelete.length > 0) {
+      await this.sql`DELETE FROM catalog_items WHERE id = ANY(${toDelete})`;
+      console.log(`Removed ${toDelete.length} duplicate catalog items`);
+    }
   }
 
   private async createTables() {
@@ -411,11 +444,15 @@ export class DatabaseStorage implements IStorage {
     `;
   }
 
-  private async seedCatalogIfEmpty() {
-    const count = await this.sql`SELECT COUNT(*) as cnt FROM catalog_items`;
-    if (Number(count[0].cnt) > 0) return;
+  private normalizeForComparison(name: string): string {
+    return name.toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
 
-    const items: CatalogItem[] = [
+  private async seedCatalogIfEmpty() {
+    const existingRows = await this.sql`SELECT name FROM catalog_items`;
+    const existingNormalized = new Set(existingRows.map((r: any) => this.normalizeForComparison(r.name as string)));
+
+    const allDefaultItems: CatalogItem[] = [
       // Produits laitiers
       { id: randomUUID(), name: "Lait 2% 2L", price: 4.99, category: "food", subcategory: "Produits Laitiers", description: "Lait partiellement écrémé", isEssential: true, isTaxable: false },
       { id: randomUUID(), name: "Lait 3.25% 2L", price: 5.29, category: "food", subcategory: "Produits Laitiers", description: "Lait entier homogénéisé", isEssential: true, isTaxable: false },
@@ -551,7 +588,55 @@ export class DatabaseStorage implements IStorage {
       { id: randomUUID(), name: "Casque velo", price: 40.00, category: "leisure", description: "Casque de protection", isEssential: true, isTaxable: true },
       { id: randomUUID(), name: "Planche a roulettes", price: 60.00, category: "leisure", description: "Skateboard complet", isEssential: false, isTaxable: true },
       { id: randomUUID(), name: "Guitare acoustique", price: 150.00, category: "leisure", description: "Guitare debutant", isEssential: false, isTaxable: true },
+      // Hygiène
+      { id: randomUUID(), name: "Shampoing 400ml", price: 4.99, category: "food", subcategory: "Hygiène", description: "Shampoing tous types de cheveux", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Après-shampoing 400ml", price: 4.49, category: "food", subcategory: "Hygiène", description: "Après-shampoing hydratant", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Savon corporel 709ml", price: 3.99, category: "food", subcategory: "Hygiène", description: "Gel douche corps et mains", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Dentifrice 100ml", price: 3.49, category: "food", subcategory: "Hygiène", description: "Dentifrice blancheur", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Brosse à dents", price: 2.49, category: "food", subcategory: "Hygiène", description: "Brosse à dents souple", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Déodorant 50ml", price: 5.49, category: "food", subcategory: "Hygiène", description: "Anti-transpirant 48h", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Papier hygiénique 12 rouleaux", price: 9.99, category: "food", subcategory: "Hygiène", description: "Papier hygiénique double épaisseur", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Rasoir jetable 5 unités", price: 5.99, category: "food", subcategory: "Hygiène", description: "Rasoir jetable 3 lames", isEssential: false, isTaxable: false },
+      { id: randomUUID(), name: "Serviettes hygiéniques 16 unités", price: 6.99, category: "food", subcategory: "Hygiène", description: "Serviettes hygiéniques ultra", isEssential: true, isTaxable: false },
+      { id: randomUUID(), name: "Savon à main 200ml", price: 2.99, category: "food", subcategory: "Hygiène", description: "Savon liquide pour les mains", isEssential: true, isTaxable: false },
+      // Pharmacie
+      { id: randomUUID(), name: "Tylenol extra-fort 100 comprimés", price: 9.99, category: "food", subcategory: "Pharmacie", description: "Acétaminophène 500mg", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Advil 40 comprimés", price: 8.99, category: "food", subcategory: "Pharmacie", description: "Ibuprofène 200mg", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Vitamine D 1000UI 90 comprimés", price: 7.99, category: "food", subcategory: "Pharmacie", description: "Supplément vitamine D", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bain de bouche 500ml", price: 4.99, category: "food", subcategory: "Pharmacie", description: "Bain de bouche antiseptique", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Crème hydratante 200ml", price: 6.99, category: "food", subcategory: "Pharmacie", description: "Lotion hydratante corps", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bandages 30 unités", price: 4.49, category: "food", subcategory: "Pharmacie", description: "Pansements adhésifs assortis", isEssential: false, isTaxable: true },
+      // Restauration
+      { id: randomUUID(), name: "Tim Hortons café moyen", price: 2.49, category: "leisure", subcategory: "Restauration", description: "Café régulier ou décaféiné", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Tim Hortons Bagel BELT", price: 6.99, category: "leisure", subcategory: "Restauration", description: "Bagel avec bacon, oeuf, laitue, tomate", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "McDonald's Big Mac menu", price: 13.99, category: "leisure", subcategory: "Restauration", description: "Big Mac + frites + boisson", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "McDonald's McFlurry", price: 4.49, category: "leisure", subcategory: "Restauration", description: "Dessert glacé Oreo ou Smarties", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Poutine restaurant", price: 10.99, category: "leisure", subcategory: "Restauration", description: "Frites, fromage en grains, sauce brune", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Subway 30cm", price: 11.49, category: "leisure", subcategory: "Restauration", description: "Sous-marin 30cm garni", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Sushi 12 morceaux", price: 15.99, category: "leisure", subcategory: "Restauration", description: "Assortiment de sushis et makis", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bubble tea 700ml", price: 7.49, category: "leisure", subcategory: "Restauration", description: "Thé aux perles de tapioca", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Pizza poche", price: 2.99, category: "leisure", subcategory: "Restauration", description: "Pizza en croûte format individuel", isEssential: false, isTaxable: true },
+      // Loisirs supplémentaires
+      { id: randomUUID(), name: "Abonnement Disney+", price: 11.99, category: "leisure", description: "Disney, Marvel, Star Wars et plus", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Musée Montréal entrée", price: 12.00, category: "leisure", description: "Entrée musée (MAM, Pointe-à-Callière…)", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Parc d'attractions journée", price: 45.00, category: "leisure", description: "Accès illimité aux manèges", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Karting 20 minutes", price: 32.00, category: "leisure", description: "Karting électrique en circuit", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Yoga cours mensuel", price: 40.00, category: "leisure", description: "Abonnement mensuel cours de yoga", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Ski alpin journée", price: 55.00, category: "leisure", description: "Forfait journée de ski alpin", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Spectacle humour billet", price: 35.00, category: "leisure", description: "Billet de show d'humour ou spectacle", isEssential: false, isTaxable: true },
+      // Vêtements supplémentaires
+      { id: randomUUID(), name: "Sous-vêtements pack 5", price: 22.00, category: "clothing", description: "Pack de 5 sous-vêtements coton", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Collants hiver", price: 12.00, category: "clothing", description: "Collants thermiques pour l'hiver", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Imperméable léger", price: 55.00, category: "clothing", description: "Veste imperméable légère printemps", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Sandales d'été", price: 28.00, category: "clothing", description: "Sandales légères pour l'été", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Lunettes de soleil", price: 25.00, category: "clothing", description: "Lunettes de soleil protection UV", isEssential: false, isTaxable: true },
     ];
+
+    const items = allDefaultItems.filter(item => !existingNormalized.has(this.normalizeForComparison(item.name)));
+    if (items.length === 0) {
+      console.log("Catalog already up to date");
+      return;
+    }
 
     for (const item of items) {
       await this.sql`
@@ -560,7 +645,7 @@ export class DatabaseStorage implements IStorage {
         ON CONFLICT (id) DO NOTHING
       `;
     }
-    console.log(`Seeded ${items.length} catalog items`);
+    console.log(`Seeded ${items.length} new catalog items (total: ${existingNames.size + items.length})`);
   }
 
   // ── Classes ──────────────────────────────────────────────────────

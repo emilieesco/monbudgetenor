@@ -70,6 +70,8 @@ const FOOD_SUBCATEGORIES = [
   { id: "Boulangerie", icon: "🍞" },
   { id: "Bonbons & Sucreries", icon: "🍬" },
   { id: "Boissons", icon: "🥤" },
+  { id: "Hygiène", icon: "🧴" },
+  { id: "Pharmacie", icon: "💊" },
 ];
 
 const ITEMS_PER_PAGE = 18;
@@ -238,6 +240,29 @@ function getProductEmoji(name: string, category: string): string {
         n.includes("7-up") || n.includes("red bull") || n.includes("monster") ||
         n.includes("soda") || n.includes("v8")) return "🥤";
 
+    // === Hygiène ===
+    if (n.includes("shampoing") || n.includes("shampooing")) return "🧴";
+    if (n.includes("après-shampoing") || n.includes("apres-shampoing") || n.includes("conditionneur")) return "🧴";
+    if (n.includes("savon à main") || n.includes("savon corporel") || n.includes("gel douche")) return "🧼";
+    if (n.includes("savon")) return "🧼";
+    if (n.includes("dentifrice") || n.includes("pâte dentifrice")) return "🪥";
+    if (n.includes("brosse à dents") || n.includes("brosse a dents")) return "🪥";
+    if (n.includes("déodorant") || n.includes("deodorant") || n.includes("anti-transpirant")) return "🧴";
+    if (n.includes("papier hygiénique") || n.includes("papier hygienique") || n.includes("mouchoir")) return "🧻";
+    if (n.includes("rasoir")) return "🪒";
+    if (n.includes("serviette hygiénique") || n.includes("tampon") || n.includes("pad ")) return "🩹";
+    if (n.includes("coton-tige") || n.includes("q-tip")) return "🩹";
+    if (n.includes("crème à raser") || n.includes("mousse à raser")) return "🧴";
+
+    // === Pharmacie ===
+    if (n.includes("tylenol") || n.includes("advil") || n.includes("ibuprofène") || n.includes("aspirine") || n.includes("capsule") || n.includes("comprimé")) return "💊";
+    if (n.includes("vitamine") || n.includes("supplément")) return "💊";
+    if (n.includes("bain de bouche")) return "🫧";
+    if (n.includes("crème hydratante") || n.includes("lotion")) return "🧴";
+    if (n.includes("bandage") || n.includes("pansement")) return "🩹";
+    if (n.includes("thermomètre")) return "🌡️";
+    if (n.includes("médicament")) return "💊";
+
     return "🛒";
   }
 
@@ -265,34 +290,56 @@ function getProductEmoji(name: string, category: string): string {
   }
 
   if (category === "leisure") {
-    if (n.includes("zoo")) return "🦒";
+    // Restauration
+    if (n.includes("tim hortons")) return "☕";
+    if (n.includes("mcdonald") || n.includes("mcflurry") || n.includes("big mac")) return "🍔";
+    if (n.includes("poutine")) return "🍟";
+    if (n.includes("subway")) return "🥖";
+    if (n.includes("sushi")) return "🍱";
+    if (n.includes("bubble tea") || n.includes("boba")) return "🧋";
+    if (n.includes("pizza poche") || n.includes("pizza")) return "🍕";
+    if (n.includes("restaurant") || n.includes("repas")) return "🍽️";
+    if (n.includes("hamburger") || n.includes("burger")) return "🍔";
+    if (n.includes("hot-dog") || n.includes("hot dog")) return "🌭";
+    if (n.includes("taco") || n.includes("burrito")) return "🌮";
+    // Abonnements & tech
+    if (n.includes("disney+") || n.includes("disney plus") || n.includes("disney+")) return "🎬";
+    if (n.includes("netflix")) return "📺";
+    if (n.includes("spotify")) return "🎧";
+    if (n.includes("youtube") || n.includes("abonnement")) return "📺";
+    // Sports & activités
+    if (n.includes("ski")) return "⛷️";
+    if (n.includes("karting")) return "🏎️";
+    if (n.includes("yoga") || n.includes("pilates")) return "🧘";
     if (n.includes("natation") || n.includes("piscine")) return "🏊";
+    if (n.includes("gym") || n.includes("fitness") || n.includes("musculation")) return "🏋️";
+    if (n.includes("bowling")) return "🎳";
+    if (n.includes("escape")) return "🔐";
+    if (n.includes("ballon") || n.includes("soccer")) return "⚽";
+    if (n.includes("raquette") || n.includes("tennis")) return "🎾";
+    if (n.includes("casque vélo") || n.includes("vélo") || n.includes("velo")) return "🚲";
+    if (n.includes("ski alpin") || n.includes("patinage")) return "⛷️";
+    if (n.includes("salle de sport") || n.includes("cours de sport")) return "🏋️";
+    // Culture & divertissement
     if (n.includes("guitare")) return "🎸";
     if (n.includes("parc d'attractions") || n.includes("parc d")) return "🎡";
     if (n.includes("musée")) return "🏛️";
-    if (n.includes("ski")) return "⛷️";
-    if (n.includes("youtube") || n.includes("abonnement")) return "📺";
+    if (n.includes("zoo")) return "🦒";
     if (n.includes("cinéma") || n.includes("cinema")) return "🎬";
-    if (n.includes("netflix")) return "📺";
-    if (n.includes("spotify")) return "🎧";
-    if (n.includes("concert") || n.includes("ticket")) return "🎵";
+    if (n.includes("concert") || n.includes("ticket") || n.includes("spectacle")) return "🎵";
     if (n.includes("karaoké") || n.includes("karaoke")) return "🎤";
     if (n.includes("jeu vidéo") || n.includes("jeu video")) return "🎮";
-    if (n.includes("bowling")) return "🎳";
-    if (n.includes("gym")) return "🏋️";
-    if (n.includes("cours")) return "📖";
     if (n.includes("livre")) return "📚";
-    if (n.includes("pizza")) return "🍕";
-    if (n.includes("mcdonald") || n.includes("repas")) return "🍔";
+    if (n.includes("cours")) return "📖";
+    // Soins & beauté
     if (n.includes("café") || n.includes("starbucks")) return "☕";
-    if (n.includes("escape")) return "🔐";
     if (n.includes("manucure")) return "💅";
     if (n.includes("coupe")) return "✂️";
-    if (n.includes("uber")) return "🚗";
-    if (n.includes("autobus") || n.includes("billet")) return "🚌";
-    if (n.includes("vélo") || n.includes("velo")) return "🚲";
     if (n.includes("tatouage")) return "🎨";
     if (n.includes("piercing")) return "💎";
+    // Transport
+    if (n.includes("uber") || n.includes("taxi")) return "🚗";
+    if (n.includes("autobus") || n.includes("billet") || n.includes("opus")) return "🚌";
     return "🎮";
   }
 

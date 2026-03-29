@@ -222,7 +222,76 @@ export class DatabaseStorage implements IStorage {
     await this.createTables();
     await this.deduplicateCatalog();
     await this.seedCatalogIfEmpty();
+    await this.classifyLeisureSubcategories();
     console.log("Database storage initialized");
+  }
+
+  private async classifyLeisureSubcategories() {
+    // Assign subcategories to leisure items that don't have one yet
+    const mapping: { pattern: string; subcategory: string }[] = [
+      // Restauration
+      { pattern: "tim hortons", subcategory: "Restauration" },
+      { pattern: "mcdonald", subcategory: "Restauration" },
+      { pattern: "mcflurry", subcategory: "Restauration" },
+      { pattern: "poutine", subcategory: "Restauration" },
+      { pattern: "subway", subcategory: "Restauration" },
+      { pattern: "sushi", subcategory: "Restauration" },
+      { pattern: "bubble tea", subcategory: "Restauration" },
+      { pattern: "pizza poche", subcategory: "Restauration" },
+      { pattern: "café starbucks", subcategory: "Restauration" },
+      { pattern: "cafe starbucks", subcategory: "Restauration" },
+      // Abonnements numériques
+      { pattern: "netflix", subcategory: "Abonnements numériques" },
+      { pattern: "spotify", subcategory: "Abonnements numériques" },
+      { pattern: "disney+", subcategory: "Abonnements numériques" },
+      { pattern: "disney ", subcategory: "Abonnements numériques" },
+      { pattern: "jeu vid", subcategory: "Abonnements numériques" },
+      { pattern: "jeu video", subcategory: "Abonnements numériques" },
+      // Sports & Plein air
+      { pattern: "bowling", subcategory: "Sports & Plein air" },
+      { pattern: "paintball", subcategory: "Sports & Plein air" },
+      { pattern: "karting", subcategory: "Sports & Plein air" },
+      { pattern: "salle de sport", subcategory: "Sports & Plein air" },
+      { pattern: "velo stationnaire", subcategory: "Sports & Plein air" },
+      { pattern: "vélo stationnaire", subcategory: "Sports & Plein air" },
+      { pattern: "raquette", subcategory: "Sports & Plein air" },
+      { pattern: "ballon soccer", subcategory: "Sports & Plein air" },
+      { pattern: "casque v", subcategory: "Sports & Plein air" },
+      { pattern: "planche a roulettes", subcategory: "Sports & Plein air" },
+      { pattern: "planche à roulettes", subcategory: "Sports & Plein air" },
+      { pattern: "guitare", subcategory: "Sports & Plein air" },
+      { pattern: "entree piscine", subcategory: "Sports & Plein air" },
+      { pattern: "entrée piscine", subcategory: "Sports & Plein air" },
+      { pattern: "yoga", subcategory: "Sports & Plein air" },
+      { pattern: "ski alpin", subcategory: "Sports & Plein air" },
+      // Culture & Sorties
+      { pattern: "cinema", subcategory: "Culture & Sorties" },
+      { pattern: "cinéma", subcategory: "Culture & Sorties" },
+      { pattern: "ticket concert", subcategory: "Culture & Sorties" },
+      { pattern: "spectacle", subcategory: "Culture & Sorties" },
+      { pattern: "musée", subcategory: "Culture & Sorties" },
+      { pattern: "musee", subcategory: "Culture & Sorties" },
+      { pattern: "billet musee", subcategory: "Culture & Sorties" },
+      { pattern: "livre", subcategory: "Culture & Sorties" },
+      { pattern: "escape game", subcategory: "Culture & Sorties" },
+      { pattern: "parc d'attractions", subcategory: "Culture & Sorties" },
+      { pattern: "parc d attractions", subcategory: "Culture & Sorties" },
+    ];
+
+    const leisureItems = await this.sql`SELECT id, name, subcategory FROM catalog_items WHERE category = 'leisure'`;
+    let updated = 0;
+    for (const item of leisureItems) {
+      if (item.subcategory) continue; // already classified
+      const nameLower = (item.name as string).toLowerCase();
+      for (const { pattern, subcategory } of mapping) {
+        if (nameLower.includes(pattern.toLowerCase())) {
+          await this.sql`UPDATE catalog_items SET subcategory = ${subcategory} WHERE id = ${item.id}`;
+          updated++;
+          break;
+        }
+      }
+    }
+    if (updated > 0) console.log(`Classified ${updated} leisure items into subcategories`);
   }
 
   private async deduplicateCatalog() {

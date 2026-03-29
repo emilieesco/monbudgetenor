@@ -74,6 +74,13 @@ const FOOD_SUBCATEGORIES = [
   { id: "Pharmacie", icon: "💊" },
 ];
 
+const LEISURE_SUBCATEGORIES = [
+  { id: "Restauration", icon: "🍽️" },
+  { id: "Sports & Plein air", icon: "⚽" },
+  { id: "Culture & Sorties", icon: "🎬" },
+  { id: "Abonnements numériques", icon: "📺" },
+];
+
 const ITEMS_PER_PAGE = 18;
 
 interface CatalogItemWithPromo extends CatalogItem {
@@ -657,13 +664,15 @@ export default function Catalog() {
   let filteredItems = selectedCategory === "sale"
     ? allItems.filter(item => !!item.originalPrice)
     : allItems.filter(item => item.category === selectedCategory);
-  if (selectedCategory === "food" && selectedSubcategory) {
+  if ((selectedCategory === "food" || selectedCategory === "leisure") && selectedSubcategory) {
     filteredItems = filteredItems.filter(item => item.subcategory === selectedSubcategory);
   }
 
   const totalPages = Math.ceil(filteredItems.length / ITEMS_PER_PAGE);
   const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const pageItems = filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  // When showing grouped view (Tout), don't paginate — show all grouped items
+  const isGroupedMode = (selectedCategory === "food" || selectedCategory === "leisure") && !selectedSubcategory;
+  const pageItems = isGroupedMode ? filteredItems : filteredItems.slice(startIndex, startIndex + ITEMS_PER_PAGE);
 
   const currentCategory = CATEGORIES.find(c => c.id === selectedCategory);
 
@@ -727,9 +736,12 @@ export default function Catalog() {
   const remaining = student.budget - student.spent;
   const canAffordCart = remaining >= cartTotals.total;
 
-  // Group items by subcategory for food display
+  // Group items by subcategory for food/leisure display
   const groupedItems: { subcat: string | null; icon: string; items: CatalogItemWithPromo[] }[] = [];
-  if (selectedCategory === "food" && !selectedSubcategory) {
+  const isCategoryWithSubcats = (selectedCategory === "food" || selectedCategory === "leisure") && !selectedSubcategory;
+  if (isCategoryWithSubcats) {
+    const subcatList = selectedCategory === "food" ? FOOD_SUBCATEGORIES : LEISURE_SUBCATEGORIES;
+    const fallbackIcon = selectedCategory === "food" ? "🛒" : "🎮";
     const grouped: Record<string, CatalogItemWithPromo[]> = {};
     const noSubcat: CatalogItemWithPromo[] = [];
     pageItems.forEach(item => {
@@ -740,17 +752,17 @@ export default function Catalog() {
         noSubcat.push(item);
       }
     });
-    FOOD_SUBCATEGORIES.forEach(sc => {
+    subcatList.forEach(sc => {
       if (grouped[sc.id] && grouped[sc.id].length > 0) {
         groupedItems.push({ subcat: sc.id, icon: sc.icon, items: grouped[sc.id] });
       }
     });
     if (noSubcat.length > 0) {
-      groupedItems.push({ subcat: null, icon: "🛒", items: noSubcat });
+      groupedItems.push({ subcat: null, icon: fallbackIcon, items: noSubcat });
     }
   }
 
-  const useGrouped = selectedCategory === "food" && !selectedSubcategory && groupedItems.length > 0;
+  const useGrouped = isCategoryWithSubcats && groupedItems.length > 0;
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-950">
@@ -969,37 +981,43 @@ export default function Catalog() {
       </div>
 
       {/* ── SUBCATEGORY FILTERS ── */}
-      {selectedCategory === "food" && (
-        <div className="bg-white dark:bg-gray-900 border-b shadow-sm sticky top-0 z-30">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
-            <button
-              onClick={() => handleSubcategoryChange(null)}
-              className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all ${
-                selectedSubcategory === null
-                  ? "bg-red-600 text-white border-red-600"
-                  : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground hover:border-red-400"
-              }`}
-              data-testid="button-subcategory-all"
-            >
-              🛒 Tout
-            </button>
-            {FOOD_SUBCATEGORIES.map(subcat => (
+      {(selectedCategory === "food" || selectedCategory === "leisure") && (() => {
+        const subcats = selectedCategory === "food" ? FOOD_SUBCATEGORIES : LEISURE_SUBCATEGORIES;
+        const activeColor = selectedCategory === "food" ? "bg-red-600 border-red-600" : "bg-purple-600 border-purple-600";
+        const hoverColor = selectedCategory === "food" ? "hover:border-red-400" : "hover:border-purple-400";
+        const allIcon = selectedCategory === "food" ? "🛒" : "🎮";
+        return (
+          <div className="bg-white dark:bg-gray-900 border-b shadow-sm sticky top-0 z-30">
+            <div className="max-w-7xl mx-auto px-4 py-2 flex gap-2 overflow-x-auto">
               <button
-                key={subcat.id}
-                onClick={() => handleSubcategoryChange(subcat.id)}
-                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all whitespace-nowrap ${
-                  selectedSubcategory === subcat.id
-                    ? "bg-red-600 text-white border-red-600"
-                    : "bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground hover:border-red-400"
+                onClick={() => handleSubcategoryChange(null)}
+                className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all ${
+                  selectedSubcategory === null
+                    ? `${activeColor} text-white`
+                    : `bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground ${hoverColor}`
                 }`}
-                data-testid={`button-subcategory-${subcat.id}`}
+                data-testid="button-subcategory-all"
               >
-                <span>{subcat.icon}</span> {subcat.id}
+                {allIcon} Tout
               </button>
-            ))}
+              {subcats.map(subcat => (
+                <button
+                  key={subcat.id}
+                  onClick={() => handleSubcategoryChange(subcat.id)}
+                  className={`shrink-0 flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold border transition-all whitespace-nowrap ${
+                    selectedSubcategory === subcat.id
+                      ? `${activeColor} text-white`
+                      : `bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-foreground ${hoverColor}`
+                  }`}
+                  data-testid={`button-subcategory-${subcat.id}`}
+                >
+                  <span>{subcat.icon}</span> {subcat.id}
+                </button>
+              ))}
+            </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
 
       {/* ── MAIN CONTENT ── */}
       <div className="max-w-7xl mx-auto px-3 md:px-4 py-6">

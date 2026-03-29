@@ -31,7 +31,7 @@ export interface CatalogItem {
   id: string;
   name: string;
   price: number;
-  category: "food" | "clothing" | "leisure";
+  category: "food" | "clothing" | "leisure" | "transport";
   subcategory?: string;
   description: string;
   isEssential: boolean;
@@ -248,7 +248,7 @@ export const catalogItemSchema = z.object({
   id: z.string(),
   name: z.string().min(1),
   price: z.number().positive(),
-  category: z.enum(["food", "clothing", "leisure"]),
+  category: z.enum(["food", "clothing", "leisure", "transport"]),
   subcategory: z.string().optional(),
   description: z.string(),
   isEssential: z.boolean(),
@@ -258,7 +258,7 @@ export const catalogItemSchema = z.object({
 export const insertCatalogItemSchema = z.object({
   name: z.string().min(1),
   price: z.number().positive(),
-  category: z.enum(["food", "clothing", "leisure"]),
+  category: z.enum(["food", "clothing", "leisure", "transport"]),
   subcategory: z.string().optional(),
   description: z.string(),
   isEssential: z.boolean(),
@@ -269,7 +269,7 @@ export const insertExpenseSchema = z.object({
   studentId: z.string().min(1),
   itemId: z.string().min(1),
   amount: z.number().positive(),
-  category: z.enum(["food", "clothing", "leisure", "rent"]),
+  category: z.enum(["food", "clothing", "leisure", "rent", "transport"]),
   isEssential: z.boolean(),
   feedback: z.enum(["success", "warning"]).optional(),
   message: z.string().optional(),

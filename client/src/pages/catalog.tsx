@@ -59,6 +59,7 @@ const CATEGORIES = [
   { id: "food", name: "Épicerie", icon: "🛒", color: "bg-red-700", accent: "bg-red-600" },
   { id: "clothing", name: "Vêtements", icon: "👕", color: "bg-blue-700", accent: "bg-blue-600" },
   { id: "leisure", name: "Loisirs", icon: "🎮", color: "bg-purple-700", accent: "bg-purple-600" },
+  { id: "transport", name: "Transport", icon: "🚌", color: "bg-green-700", accent: "bg-green-600" },
   { id: "sale", name: "Soldes", icon: "🏷️", color: "bg-yellow-600", accent: "bg-yellow-500" },
 ];
 
@@ -72,6 +73,9 @@ const FOOD_SUBCATEGORIES = [
   { id: "Boissons", icon: "🥤" },
   { id: "Hygiène", icon: "🧴" },
   { id: "Pharmacie", icon: "💊" },
+  { id: "Fournitures scolaires", icon: "📚" },
+  { id: "Maison & Ménage", icon: "🧹" },
+  { id: "Animaux de compagnie", icon: "🐾" },
 ];
 
 const LEISURE_SUBCATEGORIES = [
@@ -270,7 +274,49 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("thermomètre")) return "🌡️";
     if (n.includes("médicament")) return "💊";
 
+    // === Fournitures scolaires ===
+    if (n.includes("agenda scolaire") || n.includes("agenda")) return "📅";
+    if (n.includes("cahier")) return "📓";
+    if (n.includes("calculatrice")) return "🧮";
+    if (n.includes("clé usb") || n.includes("cle usb")) return "💾";
+    if (n.includes("surligneurs") || n.includes("surligneur")) return "🖊️";
+    if (n.includes("stylos") || n.includes("stylo") || n.includes("crayons") || n.includes("crayon")) return "✏️";
+    if (n.includes("reliure") || n.includes("classeur")) return "📋";
+    if (n.includes("colle") || n.includes("ciseaux")) return "✂️";
+    if (n.includes("règle") || n.includes("regle")) return "📏";
+
+    // === Maison & Ménage ===
+    if (n.includes("détergent à lessive") || n.includes("detergent a lessive") || n.includes("lessive")) return "🧺";
+    if (n.includes("savon à vaisselle") || n.includes("savon a vaisselle") || n.includes("vaisselle")) return "🍽️";
+    if (n.includes("nettoyant") || n.includes("liquide à plancher") || n.includes("liquide a plancher")) return "🧹";
+    if (n.includes("sacs poubelle") || n.includes("poubelle")) return "🗑️";
+    if (n.includes("ampoule")) return "💡";
+    if (n.includes("rouleaux de cuisine") || n.includes("essuie-tout")) return "🧻";
+    if (n.includes("film alimentaire") || n.includes("fil alimentaire") || n.includes("sacs ziplock")) return "🫙";
+    if (n.includes("balai") || n.includes("serpillière")) return "🧹";
+
+    // === Animaux de compagnie ===
+    if (n.includes("nourriture chien") || n.includes("croquettes chien")) return "🐕";
+    if (n.includes("nourriture chat") || n.includes("croquettes chat")) return "🐈";
+    if (n.includes("litière")) return "🐱";
+    if (n.includes("jouet pour") || n.includes("jouet animal")) return "🐾";
+    if (n.includes("consultation vétérinaire") || n.includes("veterinaire") || n.includes("vétérinaire")) return "🏥";
+    if (n.includes("collier pour") || n.includes("laisse")) return "🐾";
+
     return "🛒";
+  }
+
+  if (category === "transport") {
+    if (n.includes("opus mensuelle") || n.includes("passe opus")) return "🚌";
+    if (n.includes("opus 10") || n.includes("recharge opus")) return "🎫";
+    if (n.includes("billet de métro") || n.includes("billet de bus") || n.includes("billet metro")) return "🎟️";
+    if (n.includes("taxi") || n.includes("uber")) return "🚕";
+    if (n.includes("essence")) return "⛽";
+    if (n.includes("vélo en libre") || n.includes("bixi")) return "🚲";
+    if (n.includes("entretien vélo") || n.includes("crevaison") || n.includes("réparation vélo")) return "🔧";
+    if (n.includes("stationnement") || n.includes("parking")) return "🅿️";
+    if (n.includes("covoiturage")) return "🚗";
+    return "🚌";
   }
 
   if (category === "clothing") {

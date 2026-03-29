@@ -699,6 +699,41 @@ export class DatabaseStorage implements IStorage {
       { id: randomUUID(), name: "Imperméable léger", price: 55.00, category: "clothing", description: "Veste imperméable légère printemps", isEssential: false, isTaxable: true },
       { id: randomUUID(), name: "Sandales d'été", price: 28.00, category: "clothing", description: "Sandales légères pour l'été", isEssential: false, isTaxable: true },
       { id: randomUUID(), name: "Lunettes de soleil", price: 25.00, category: "clothing", description: "Lunettes de soleil protection UV", isEssential: false, isTaxable: true },
+
+      // === TRANSPORT ===
+      { id: randomUUID(), name: "Passe OPUS mensuelle", price: 100.00, category: "transport" as const, description: "Accès illimité au métro et autobus de la STM", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Recharge OPUS 10 trajets", price: 33.50, category: "transport" as const, description: "10 trajets en commun à Montréal", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Billet de métro/autobus", price: 3.75, category: "transport" as const, description: "Un trajet simple en transport en commun", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Taxi/Uber course", price: 20.00, category: "transport" as const, description: "Course moyenne en taxi ou Uber", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Essence sans-plomb 40L", price: 72.00, category: "transport" as const, description: "Plein d'essence pour voiture (prix variable)", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "BIXI vélo mensuel", price: 21.25, category: "transport" as const, description: "Abonnement mensuel vélo en libre-service BIXI", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Réparation vélo crevaison", price: 18.00, category: "transport" as const, description: "Réparation d'un pneu crevé chez le vélociste", isEssential: false, isTaxable: true },
+
+      // === FOURNITURES SCOLAIRES ===
+      { id: randomUUID(), name: "Cahier de notes 80 pages", price: 3.49, category: "food" as const, subcategory: "Fournitures scolaires", description: "Cahier à spirale ligné", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Stylos et crayons pack", price: 4.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Lot de stylos bleus, noirs et crayons", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Calculatrice scientifique", price: 24.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Casio FX-300ES ou équivalent", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Reliure à anneaux", price: 8.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Classeur 2 anneaux format lettre", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Clé USB 64GB", price: 12.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Clé USB pour transférer des travaux scolaires", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Surligneurs 5 couleurs", price: 5.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Surligneurs fluo assortis", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Agenda scolaire", price: 7.99, category: "food" as const, subcategory: "Fournitures scolaires", description: "Agenda pour planifier devoirs et examens", isEssential: true, isTaxable: true },
+
+      // === MAISON & MÉNAGE ===
+      { id: randomUUID(), name: "Détergent à lessive 1.47L", price: 12.99, category: "food" as const, subcategory: "Maison & Ménage", description: "Détergent liquide pour laveuse", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Savon à vaisselle 591ml", price: 3.49, category: "food" as const, subcategory: "Maison & Ménage", description: "Liquide vaisselle concentré", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Nettoyant tout-usage 650ml", price: 4.99, category: "food" as const, subcategory: "Maison & Ménage", description: "Nettoyant multi-surfaces cuisine/salle de bain", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Sacs poubelle 20 unités", price: 5.99, category: "food" as const, subcategory: "Maison & Ménage", description: "Sacs-poubelle 45 litres résistants", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Ampoule DEL 60W", price: 6.99, category: "food" as const, subcategory: "Maison & Ménage", description: "Ampoule à DEL économique 800 lumens", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Rouleaux de cuisine 2 unités", price: 4.49, category: "food" as const, subcategory: "Maison & Ménage", description: "Essuie-tout absorbants double épaisseur", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Liquide à plancher 946ml", price: 5.99, category: "food" as const, subcategory: "Maison & Ménage", description: "Nettoyant pour planchers de bois ou céramique", isEssential: false, isTaxable: true },
+
+      // === ANIMAUX DE COMPAGNIE ===
+      { id: randomUUID(), name: "Nourriture chien 4kg", price: 32.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Croquettes pour chien adulte", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Nourriture chat 2kg", price: 24.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Croquettes pour chat adulte", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Litière pour chat 10kg", price: 15.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Litière agglomérante sans parfum", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Jouet pour animal", price: 9.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Jouet interactif pour chien ou chat", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Consultation vétérinaire", price: 80.00, category: "food" as const, subcategory: "Animaux de compagnie", description: "Visite chez le vétérinaire pour examen général", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Collier pour animal", price: 12.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Collier ajustable pour chien ou chat", isEssential: false, isTaxable: true },
     ];
 
     const items = allDefaultItems.filter(item => !existingNormalized.has(this.normalizeForComparison(item.name)));

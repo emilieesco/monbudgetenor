@@ -476,8 +476,8 @@ export default function Dashboard() {
   });
 
   // Expense breakdown by category (catalog purchases only)
-  const categoryBreakdown = ["food", "clothing", "leisure", "rent"].map(category => ({
-    name: category === "food" ? "Nourriture" : category === "clothing" ? "Vêtements" : category === "leisure" ? "Loisirs" : "Loyer",
+  const categoryBreakdown = ["food", "clothing", "leisure", "transport", "rent"].map(category => ({
+    name: category === "food" ? "Nourriture" : category === "clothing" ? "Vêtements" : category === "leisure" ? "Loisirs" : category === "transport" ? "Transport" : "Loyer",
     value: expenses
       .filter(e => e.category === category)
       .reduce((sum, e) => sum + e.amount, 0),
@@ -520,7 +520,7 @@ export default function Dashboard() {
     const catalogRows = expenses.map(e => [
       new Date(e.timestamp).toLocaleDateString("fr-CA"),
       e.message,
-      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category,
+      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category === "transport" ? "Transport" : e.category,
       e.amount.toFixed(2),
       "Variable",
       e.isEssential ? "Oui" : "Non",

@@ -405,7 +405,7 @@ export default function TeacherDashboard() {
       new Date(e.timestamp).toLocaleDateString("fr-CA"),
       e.studentName,
       e.message,
-      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category,
+      e.category === "food" ? "Nourriture" : e.category === "clothing" ? "Vêtements" : e.category === "leisure" ? "Loisirs" : e.category === "transport" ? "Transport" : e.category,
       e.amount.toFixed(2),
       e.isEssential ? "Oui" : "Non",
     ]);

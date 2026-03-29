@@ -1,7 +1,7 @@
 import { useLocation } from "wouter";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, TrendingUp, ShoppingCart, Users } from "lucide-react";
+import { Wallet, TrendingUp, ShoppingCart, Users, KeyRound } from "lucide-react";
 import walletImg from "@assets/poo_1764362219794.png";
 
 export default function Landing() {
@@ -194,6 +194,16 @@ export default function Landing() {
           </Button>
         </div>
       </div>
+
+      {/* Floating admin button */}
+      <button
+        onClick={() => navigate("/admin-panel")}
+        title="Accès administrateur"
+        data-testid="button-admin-access"
+        className="fixed bottom-5 right-5 z-50 w-10 h-10 rounded-full bg-muted/60 hover:bg-muted text-muted-foreground hover:text-foreground flex items-center justify-center transition-colors shadow-sm"
+      >
+        <KeyRound className="w-4 h-4" />
+      </button>
     </div>
   );
 }

@@ -1132,10 +1132,10 @@ export async function registerRoutes(
     }
   });
 
-  // Admin middleware helper
-  const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
-  function checkAdminPassword(req: any, res: any): boolean {
+  // Admin middleware helper (async — reads password from DB)
+  async function checkAdminPassword(req: any, res: any): Promise<boolean> {
     const pwd = req.body?.adminPassword || req.query?.adminPassword;
+    const ADMIN_PASSWORD = await storage.getAdminPassword();
     if (pwd !== ADMIN_PASSWORD) {
       res.status(401).json({ error: "Mot de passe administrateur invalide" });
       return false;
@@ -1144,15 +1144,15 @@ export async function registerRoutes(
   }
 
   // Admin: verify password
-  app.post("/api/admin/verify", (req, res) => {
-    if (checkAdminPassword(req, res)) {
+  app.post("/api/admin/verify", async (req, res) => {
+    if (await checkAdminPassword(req, res)) {
       res.json({ ok: true });
     }
   });
 
   // Admin: list all teacher invite codes
   app.get("/api/admin/teacher-invites", async (req, res) => {
-    if (!checkAdminPassword(req, res)) return;
+    if (!await checkAdminPassword(req, res)) return;
     try {
       const invites = await storage.getTeacherInvites();
       res.json(invites);
@@ -1163,7 +1163,7 @@ export async function registerRoutes(
 
   // Admin: create a new invite code
   app.post("/api/admin/teacher-invites", async (req, res) => {
-    if (!checkAdminPassword(req, res)) return;
+    if (!await checkAdminPassword(req, res)) return;
     try {
       const { note } = req.body;
       const invite = await storage.createTeacherInvite(note);
@@ -1175,7 +1175,7 @@ export async function registerRoutes(
 
   // Admin: delete an invite code
   app.delete("/api/admin/teacher-invites/:id", async (req, res) => {
-    if (!checkAdminPassword(req, res)) return;
+    if (!await checkAdminPassword(req, res)) return;
     try {
       const deleted = await storage.deleteTeacherInvite(req.params.id);
       res.json({ deleted });

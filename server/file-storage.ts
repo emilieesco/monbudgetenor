@@ -1247,4 +1247,10 @@ export class FileStorage implements IStorage {
     if (deleted) this.save();
     return deleted;
   }
+  async getAdminPassword(): Promise<string> {
+    return process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
+  }
+  async setAdminPassword(_newPassword: string): Promise<void> {
+    // File storage: env var or default; no persistence needed
+  }
 }

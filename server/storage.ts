@@ -93,6 +93,10 @@ export interface IStorage {
   validateTeacherInvite(code: string): Promise<TeacherInvite | null>;
   useTeacherInvite(code: string): Promise<boolean>;
   deleteTeacherInvite(id: string): Promise<boolean>;
+
+  // Admin config
+  getAdminPassword(): Promise<string>;
+  setAdminPassword(newPassword: string): Promise<void>;
 }
 
 export class MemStorage implements IStorage {
@@ -1100,6 +1104,12 @@ export class MemStorage implements IStorage {
   }
   async deleteTeacherInvite(id: string): Promise<boolean> {
     return this.teacherInvites.delete(id);
+  }
+  async getAdminPassword(): Promise<string> {
+    return process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
+  }
+  async setAdminPassword(_newPassword: string): Promise<void> {
+    // In-memory: no persistence; env var takes precedence
   }
 }
 

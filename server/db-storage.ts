@@ -520,6 +520,34 @@ export class DatabaseStorage implements IStorage {
         used_at TIMESTAMPTZ
       )
     `;
+
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS admin_config (
+        key TEXT PRIMARY KEY,
+        value TEXT NOT NULL
+      )
+    `;
+
+    // Seed admin password if not already set
+    const existing = await this.sql`SELECT key FROM admin_config WHERE key = 'admin_password'`;
+    if (existing.length === 0) {
+      const defaultPassword = process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
+      await this.sql`INSERT INTO admin_config (key, value) VALUES ('admin_password', ${defaultPassword})`;
+      console.log("Admin password seeded in database");
+    }
+  }
+
+  async getAdminPassword(): Promise<string> {
+    const rows = await this.sql`SELECT value FROM admin_config WHERE key = 'admin_password'`;
+    if (rows.length > 0) return rows[0].value as string;
+    return process.env.ADMIN_PASSWORD || "MonBudgetAdmin2025";
+  }
+
+  async setAdminPassword(newPassword: string): Promise<void> {
+    await this.sql`
+      INSERT INTO admin_config (key, value) VALUES ('admin_password', ${newPassword})
+      ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value
+    `;
   }
 
   private normalizeForComparison(name: string): string {

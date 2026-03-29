@@ -276,6 +276,15 @@ export class DatabaseStorage implements IStorage {
       { pattern: "escape game", subcategory: "Culture & Sorties" },
       { pattern: "parc d'attractions", subcategory: "Culture & Sorties" },
       { pattern: "parc d attractions", subcategory: "Culture & Sorties" },
+      // Cadeaux & Occasions
+      { pattern: "carte-cadeau", subcategory: "Cadeaux & Occasions" },
+      { pattern: "carte cadeau", subcategory: "Cadeaux & Occasions" },
+      { pattern: "bouquet de fleurs", subcategory: "Cadeaux & Occasions" },
+      { pattern: "jeu de societe", subcategory: "Cadeaux & Occasions" },
+      { pattern: "jeu de société", subcategory: "Cadeaux & Occasions" },
+      { pattern: "peluche", subcategory: "Cadeaux & Occasions" },
+      { pattern: "boite de chocolats", subcategory: "Cadeaux & Occasions" },
+      { pattern: "boîte de chocolats", subcategory: "Cadeaux & Occasions" },
     ];
 
     const leisureItems = await this.sql`SELECT id, name, subcategory FROM catalog_items WHERE category = 'leisure'`;
@@ -734,6 +743,22 @@ export class DatabaseStorage implements IStorage {
       { id: randomUUID(), name: "Jouet pour animal", price: 9.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Jouet interactif pour chien ou chat", isEssential: false, isTaxable: true },
       { id: randomUUID(), name: "Consultation vétérinaire", price: 80.00, category: "food" as const, subcategory: "Animaux de compagnie", description: "Visite chez le vétérinaire pour examen général", isEssential: false, isTaxable: true },
       { id: randomUUID(), name: "Collier pour animal", price: 12.99, category: "food" as const, subcategory: "Animaux de compagnie", description: "Collier ajustable pour chien ou chat", isEssential: false, isTaxable: true },
+
+      // === COMMUNICATIONS ===
+      { id: randomUUID(), name: "Recharge prépayé cellulaire $15", price: 15.00, category: "food" as const, subcategory: "Communications", description: "Recharge prépayée pour téléphone cellulaire", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Recharge prépayé cellulaire $25", price: 25.00, category: "food" as const, subcategory: "Communications", description: "Recharge prépayée grande capacité", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Forfait données mensuel", price: 45.00, category: "food" as const, subcategory: "Communications", description: "Forfait mobile 10GB données + appels illimités", isEssential: true, isTaxable: true },
+      { id: randomUUID(), name: "Étui pour téléphone", price: 14.99, category: "food" as const, subcategory: "Communications", description: "Coque de protection pour cellulaire", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Chargeur USB-C", price: 12.99, category: "food" as const, subcategory: "Communications", description: "Chargeur rapide USB-C 20W", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Écouteurs intra-auriculaires", price: 24.99, category: "food" as const, subcategory: "Communications", description: "Écouteurs filaires haute qualité sonore", isEssential: false, isTaxable: true },
+
+      // === CADEAUX & OCCASIONS ===
+      { id: randomUUID(), name: "Carte-cadeau restaurant $25", price: 25.00, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Carte-cadeau pour offrir un repas au restaurant", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Carte-cadeau Amazon $50", price: 50.00, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Carte-cadeau Amazon pour achats en ligne", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Bouquet de fleurs", price: 24.99, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Bouquet de fleurs fraîches pour une occasion spéciale", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Jeu de société", price: 32.99, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Jeu de société pour soirée en famille ou entre amis", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Peluche", price: 19.99, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Peluche douce à offrir en cadeau", isEssential: false, isTaxable: true },
+      { id: randomUUID(), name: "Boîte de chocolats", price: 16.99, category: "leisure" as const, subcategory: "Cadeaux & Occasions", description: "Assortiment de chocolats fins pour offrir", isEssential: false, isTaxable: true },
     ];
 
     const items = allDefaultItems.filter(item => !existingNormalized.has(this.normalizeForComparison(item.name)));

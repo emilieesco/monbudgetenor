@@ -76,6 +76,7 @@ const FOOD_SUBCATEGORIES = [
   { id: "Fournitures scolaires", icon: "📚" },
   { id: "Maison & Ménage", icon: "🧹" },
   { id: "Animaux de compagnie", icon: "🐾" },
+  { id: "Communications", icon: "📱" },
 ];
 
 const LEISURE_SUBCATEGORIES = [
@@ -83,6 +84,7 @@ const LEISURE_SUBCATEGORIES = [
   { id: "Sports & Plein air", icon: "⚽" },
   { id: "Culture & Sorties", icon: "🎬" },
   { id: "Abonnements numériques", icon: "📺" },
+  { id: "Cadeaux & Occasions", icon: "🎁" },
 ];
 
 const ITEMS_PER_PAGE = 18;
@@ -303,6 +305,14 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("consultation vétérinaire") || n.includes("veterinaire") || n.includes("vétérinaire")) return "🏥";
     if (n.includes("collier pour") || n.includes("laisse")) return "🐾";
 
+    // === Communications ===
+    if (n.includes("recharge prépayé") || n.includes("recharge prepaye") || n.includes("recharge cellulaire")) return "📱";
+    if (n.includes("forfait données") || n.includes("forfait donnees") || n.includes("forfait mobile")) return "📶";
+    if (n.includes("étui") || n.includes("etui") || n.includes("coque")) return "📱";
+    if (n.includes("chargeur")) return "🔌";
+    if (n.includes("écouteurs") || n.includes("ecouteurs") || n.includes("casque audio")) return "🎧";
+    if (n.includes("câble") || n.includes("cable usb")) return "🔌";
+
     return "🛒";
   }
 
@@ -393,6 +403,13 @@ function getProductEmoji(name: string, category: string): string {
     // Transport
     if (n.includes("uber") || n.includes("taxi")) return "🚗";
     if (n.includes("autobus") || n.includes("billet") || n.includes("opus")) return "🚌";
+    // Cadeaux & Occasions
+    if (n.includes("carte-cadeau") || n.includes("carte cadeau")) return "🎁";
+    if (n.includes("bouquet") || n.includes("fleurs")) return "💐";
+    if (n.includes("jeu de société") || n.includes("jeu de societe")) return "🎲";
+    if (n.includes("chocolat cadeau") || n.includes("boîte de chocolat")) return "🍫";
+    if (n.includes("peluche") || n.includes("toutou")) return "🧸";
+    if (n.includes("cadeau d'anniversaire") || n.includes("cadeau anniversaire")) return "🎂";
     return "🎮";
   }
 

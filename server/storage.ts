@@ -1118,18 +1118,44 @@ import { FileStorage } from "./file-storage";
 export let storage: IStorage = new FileStorage();
 
 export async function initializeStorage(): Promise<void> {
-  const dbUrl = process.env.RAILWAY_DATABASE_URL || process.env.DATABASE_URL;
+  // Railway injects the DB url under several possible names
+  const dbUrl =
+    process.env.RAILWAY_DATABASE_URL ||
+    process.env.DATABASE_URL ||
+    process.env.POSTGRES_URL ||
+    process.env.DATABASE_PRIVATE_URL;
+
+  const isProduction = process.env.NODE_ENV === "production";
+
   if (dbUrl) {
-    try {
-      const { DatabaseStorage } = await import("./db-storage");
-      const dbStorage = new DatabaseStorage(dbUrl);
-      await dbStorage.initialize();
-      storage = dbStorage;
-      console.log("Using PostgreSQL storage (Railway)");
-    } catch (err) {
-      console.error("Failed to initialize PostgreSQL, falling back to file storage:", err);
+    let lastError: unknown;
+    // Retry up to 5 times with 2s delay — Railway DB may take a moment to be ready
+    for (let attempt = 1; attempt <= 5; attempt++) {
+      try {
+        const { DatabaseStorage } = await import("./db-storage");
+        const dbStorage = new DatabaseStorage(dbUrl);
+        await dbStorage.initialize();
+        storage = dbStorage;
+        console.log("Using PostgreSQL storage (Railway)");
+        return;
+      } catch (err) {
+        lastError = err;
+        console.warn(`PostgreSQL connection attempt ${attempt}/5 failed:`, err);
+        if (attempt < 5) await new Promise(r => setTimeout(r, 2000));
+      }
     }
+    // All retries exhausted
+    if (isProduction) {
+      // In production, no database = crash immediately so Railway restarts the service
+      console.error("FATAL: Could not connect to PostgreSQL after 5 attempts. Crashing.");
+      process.exit(1);
+    }
+    console.error("Failed to initialize PostgreSQL after 5 attempts, falling back to file storage:", lastError);
+  } else if (isProduction) {
+    // In production, a database URL is required
+    console.error("FATAL: No DATABASE_URL or RAILWAY_DATABASE_URL set in production. Crashing.");
+    process.exit(1);
   } else {
-    console.log("Using File storage (no DATABASE_URL)");
+    console.log("Using File storage (no DATABASE_URL — development only)");
   }
 }

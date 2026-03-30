@@ -23,7 +23,7 @@ export default function TeacherDashboard() {
   // Class Challenge form states
   const [classChallengeTitle, setClassChallengeTitle] = useState("");
   const [classChallengeDesc, setClassChallengeDesc] = useState("");
-  const [classChallengeType, setClassChallengeType] = useState<"spending" | "savings" | "custom">("savings");
+  const [classChallengeType, setClassChallengeType] = useState<"save_amount" | "limit_spending" | "essential_ratio" | "custom">("save_amount");
   const [classChallengeTarget, setClassChallengeTarget] = useState("");
   const [classChallengeReward, setClassChallengeReward] = useState("");
 
@@ -792,9 +792,10 @@ export default function TeacherDashboard() {
                     className="w-full h-9 rounded-md border border-input bg-background px-3 py-1 text-sm"
                     data-testid="select-class-challenge-type"
                   >
-                    <option value="savings">Objectif d'épargne</option>
-                    <option value="spending">Limite de dépenses</option>
-                    <option value="custom">Personnalisé</option>
+                    <option value="save_amount">Objectif d'épargne ($)</option>
+                    <option value="limit_spending">Limite de dépenses ($)</option>
+                    <option value="essential_ratio">Ratio d'achats essentiels (%)</option>
+                    <option value="custom">Personnalisé (validation manuelle)</option>
                   </select>
                 </div>
                 <div className="space-y-2 md:col-span-2">
@@ -808,11 +809,13 @@ export default function TeacherDashboard() {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="class-challenge-target">Valeur cible ($)</Label>
+                  <Label htmlFor="class-challenge-target">
+                    {classChallengeType === "essential_ratio" ? "Objectif (%)" : classChallengeType === "limit_spending" ? "Limite maximale ($)" : "Montant cible ($)"}
+                  </Label>
                   <Input
                     id="class-challenge-target"
                     type="number"
-                    placeholder="100"
+                    placeholder={classChallengeType === "essential_ratio" ? "70" : "100"}
                     value={classChallengeTarget}
                     onChange={(e) => setClassChallengeTarget(e.target.value)}
                     data-testid="input-class-challenge-target"

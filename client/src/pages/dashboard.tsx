@@ -136,6 +136,7 @@ export default function Dashboard() {
     onSuccess: () => {
       const classId = (studentQuery.data as any)?.classId;
       queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "challenges"] });
+      classChallengesQuery.refetch();
     },
   });
 
@@ -1437,6 +1438,38 @@ export default function Dashboard() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {classChallenges.map(challenge => {
                 const alreadyCompleted = challenge.completedBy?.includes(studentId);
+
+                // Compute progress based on challenge type
+                let currentValue = 0;
+                let progressPct = 0;
+                let isAchieved = false;
+                let progressLabel = "";
+                const target = challenge.targetValue;
+
+                if (challenge.type === "save_amount") {
+                  currentValue = student?.savings ?? 0;
+                  progressPct = Math.min(100, (currentValue / target) * 100);
+                  isAchieved = currentValue >= target;
+                  progressLabel = `${currentValue.toFixed(2)}$ / ${target.toFixed(2)}$ épargné`;
+                } else if (challenge.type === "limit_spending") {
+                  currentValue = student?.spent ?? 0;
+                  progressPct = Math.min(100, currentValue <= target ? 100 : (target / currentValue) * 100);
+                  isAchieved = currentValue <= target;
+                  progressLabel = `${currentValue.toFixed(2)}$ dépensé (max ${target.toFixed(2)}$)`;
+                } else if (challenge.type === "essential_ratio") {
+                  const totalExp = expenses.length;
+                  const essentialCount = expenses.filter(e => e.isEssential).length;
+                  currentValue = totalExp > 0 ? Math.round((essentialCount / totalExp) * 100) : 0;
+                  progressPct = Math.min(100, (currentValue / target) * 100);
+                  isAchieved = currentValue >= target;
+                  progressLabel = `${currentValue}% essentiels (objectif: ${target}%)`;
+                } else {
+                  // custom: always allow manual validation
+                  isAchieved = true;
+                  progressPct = 100;
+                  progressLabel = "Validation manuelle";
+                }
+
                 return (
                   <div
                     key={challenge.id}
@@ -1444,16 +1477,18 @@ export default function Dashboard() {
                     className={`p-4 rounded-lg border-2 transition ${
                       alreadyCompleted
                         ? "bg-green-50 dark:bg-green-950 border-green-500"
-                        : "bg-amber-50 dark:bg-amber-950 border-amber-300 hover-elevate"
+                        : isAchieved
+                        ? "bg-amber-50 dark:bg-amber-950 border-amber-400"
+                        : "bg-amber-50/60 dark:bg-amber-950/60 border-amber-200 dark:border-amber-800"
                     }`}
                   >
-                    <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start justify-between gap-2 mb-3">
                       <div className="flex-1">
-                        <div className="flex items-center gap-2 mb-2">
-                          <Target className="w-4 h-4 text-amber-500" />
+                        <div className="flex items-center gap-2 mb-1">
+                          <Target className="w-4 h-4 text-amber-500 shrink-0" />
                           <p className="font-bold text-sm" data-testid={`text-class-challenge-title-${challenge.id}`}>{challenge.title}</p>
                         </div>
-                        <p className="text-sm text-muted-foreground">{challenge.description}</p>
+                        <p className="text-xs text-muted-foreground">{challenge.description}</p>
                         {challenge.reward && (
                           <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">Récompense: {challenge.reward}</p>
                         )}
@@ -1462,19 +1497,40 @@ export default function Dashboard() {
                         )}
                       </div>
                       {alreadyCompleted ? (
-                        <Badge className="bg-green-500 text-white ml-2">Complété!</Badge>
+                        <Badge className="bg-green-500 text-white ml-2 shrink-0">Complété!</Badge>
                       ) : (
                         <Button
                           size="sm"
                           onClick={() => completeClassChallengeMutation.mutate(challenge.id)}
-                          disabled={completeClassChallengeMutation.isPending}
-                          className="ml-2"
+                          disabled={!isAchieved || completeClassChallengeMutation.isPending}
+                          className="ml-2 shrink-0"
                           data-testid={`button-complete-class-challenge-${challenge.id}`}
                         >
                           Valider
                         </Button>
                       )}
                     </div>
+
+                    {/* Progress bar */}
+                    {!alreadyCompleted && challenge.type !== "custom" && (
+                      <div className="mt-2">
+                        <div className="flex justify-between items-center mb-1">
+                          <span className="text-xs text-muted-foreground">{progressLabel}</span>
+                          <span className={`text-xs font-bold ${isAchieved ? "text-green-600 dark:text-green-400" : "text-amber-600 dark:text-amber-400"}`}>
+                            {Math.round(progressPct)}%
+                          </span>
+                        </div>
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div
+                            className={`h-2 rounded-full transition-all duration-500 ${isAchieved ? "bg-green-500" : "bg-amber-400"}`}
+                            style={{ width: `${progressPct}%` }}
+                          />
+                        </div>
+                        {isAchieved && (
+                          <p className="text-xs text-green-600 dark:text-green-400 mt-1 font-semibold">Objectif atteint! Tu peux valider.</p>
+                        )}
+                      </div>
+                    )}
                   </div>
                 );
               })}

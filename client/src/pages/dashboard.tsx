@@ -88,6 +88,19 @@ export default function Dashboard() {
     queryKey: ["/api/challenges", studentId],
   });
 
+  const classChallengesQuery = useQuery({
+    queryKey: ["/api/classes", (studentQuery.data as any)?.classId, "challenges"],
+    queryFn: async () => {
+      const classId = (studentQuery.data as any)?.classId;
+      if (!classId) return [];
+      const res = await fetch(`/api/classes/${classId}/challenges`);
+      if (!res.ok) throw new Error("Erreur");
+      return res.json();
+    },
+    enabled: !!(studentQuery.data as any)?.classId,
+    staleTime: 0,
+  });
+
   const snapshotsQuery = useQuery({
     queryKey: ["/api/students", studentId, "snapshots"],
     queryFn: async () => {
@@ -112,6 +125,17 @@ export default function Dashboard() {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/api/challenges", studentId] });
+    },
+  });
+
+  const completeClassChallengeMutation = useMutation({
+    mutationFn: async (challengeId: string) => {
+      const res = await apiRequest("PATCH", `/api/class-challenges/${challengeId}/complete`, { studentId });
+      return res.json();
+    },
+    onSuccess: () => {
+      const classId = (studentQuery.data as any)?.classId;
+      queryClient.invalidateQueries({ queryKey: ["/api/classes", classId, "challenges"] });
     },
   });
 
@@ -394,6 +418,7 @@ export default function Dashboard() {
   const bonusExpenses = (bonusExpensesQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; isPaid: boolean; createdAt: string }>;
   const appliedEvents = (appliedEventsQuery.data || []) as Array<{ id: string; title: string; description: string; amount: number; type: string; appliedAt: string }>;
   const challenges = challengesQuery.data as Challenge[] || [];
+  const classChallenges = (classChallengesQuery.data || []) as ClassChallenge[];
   const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
   const badges = badgesQuery.data as Array<BadgeType & { name: string; icon: string; tier: string }> || [];
   const savingsGoals = savingsGoalsQuery.data as SavingsGoal[] || [];
@@ -1402,6 +1427,62 @@ export default function Dashboard() {
         )}
 
         {/* Challenges */}
+        {/* Défis de classe (créés par l'enseignant) */}
+        {classChallenges.length > 0 && (
+          <Card className="p-6 mb-8">
+            <div className="flex items-center gap-2 mb-4">
+              <Target className="w-6 h-6 text-amber-500" />
+              <h2 className="text-xl font-semibold">Défis de ton Enseignant</h2>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              {classChallenges.map(challenge => {
+                const alreadyCompleted = challenge.completedBy?.includes(studentId);
+                return (
+                  <div
+                    key={challenge.id}
+                    data-testid={`card-class-challenge-${challenge.id}`}
+                    className={`p-4 rounded-lg border-2 transition ${
+                      alreadyCompleted
+                        ? "bg-green-50 dark:bg-green-950 border-green-500"
+                        : "bg-amber-50 dark:bg-amber-950 border-amber-300 hover-elevate"
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Target className="w-4 h-4 text-amber-500" />
+                          <p className="font-bold text-sm" data-testid={`text-class-challenge-title-${challenge.id}`}>{challenge.title}</p>
+                        </div>
+                        <p className="text-sm text-muted-foreground">{challenge.description}</p>
+                        {challenge.reward && (
+                          <p className="text-xs text-amber-600 dark:text-amber-400 mt-1 font-medium">Récompense: {challenge.reward}</p>
+                        )}
+                        {challenge.deadline && (
+                          <p className="text-xs text-muted-foreground mt-1">Avant le: {new Date(challenge.deadline).toLocaleDateString("fr-CA")}</p>
+                        )}
+                      </div>
+                      {alreadyCompleted ? (
+                        <Badge className="bg-green-500 text-white ml-2">Complété!</Badge>
+                      ) : (
+                        <Button
+                          size="sm"
+                          onClick={() => completeClassChallengeMutation.mutate(challenge.id)}
+                          disabled={completeClassChallengeMutation.isPending}
+                          className="ml-2"
+                          data-testid={`button-complete-class-challenge-${challenge.id}`}
+                        >
+                          Valider
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </Card>
+        )}
+
+        {/* Défis personnels */}
         {challenges.length > 0 && (
           <Card className="p-6 mb-8">
             <div className="flex items-center gap-2 mb-4">

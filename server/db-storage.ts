@@ -1234,12 +1234,10 @@ export class DatabaseStorage implements IStorage {
 
   async getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]> {
     const rows = await this.sql`
-      SELECT tm.* FROM teacher_messages tm
-      JOIN students s ON s.id = ${studentId}
-      WHERE tm.class_id = ${classId}
-        AND (tm.student_id IS NULL OR tm.student_id = ${studentId})
-        AND tm.timestamp >= s.created_at
-      ORDER BY tm.timestamp DESC
+      SELECT * FROM teacher_messages
+      WHERE class_id = ${classId}
+        AND (student_id IS NULL OR student_id = ${studentId})
+      ORDER BY timestamp DESC
     `;
     return rows.map(toTeacherMessage);
   }

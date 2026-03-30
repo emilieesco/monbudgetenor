@@ -1014,12 +1014,12 @@ export class DatabaseStorage implements IStorage {
       VALUES (${id}, ${expense.studentId}, ${expense.itemId}, ${expense.amount}, ${expense.category}, ${expense.isEssential}, ${expense.feedback ?? "success"}, ${expense.message ?? ""})
       RETURNING *
     `;
-    // Update student spent
-    const student = await this.getStudent(expense.studentId);
-    if (student) {
-      const newSpent = (student.spent || 0) + expense.amount;
-      await this.updateStudentBudgetAndSpent(expense.studentId, student.budget, newSpent);
-    }
+    // Atomic increment — prevents race condition when multiple expenses are saved concurrently
+    await this.sql`
+      UPDATE students
+      SET spent = COALESCE(spent, 0) + ${expense.amount}
+      WHERE id = ${expense.studentId}
+    `;
     return toExpense(rows[0]);
   }
 
@@ -1037,12 +1037,13 @@ export class DatabaseStorage implements IStorage {
     const expRows = await this.sql`SELECT * FROM expenses WHERE id = ${id}`;
     if (!expRows[0]) return false;
     const expense = toExpense(expRows[0]);
-    const student = await this.getStudent(expense.studentId);
-    if (student) {
-      const newSpent = Math.max(0, (student.spent || 0) - expense.amount);
-      await this.updateStudentBudgetAndSpent(expense.studentId, student.budget, newSpent);
-    }
     await this.sql`DELETE FROM expenses WHERE id = ${id}`;
+    // Atomic decrement — prevents race condition
+    await this.sql`
+      UPDATE students
+      SET spent = GREATEST(0, COALESCE(spent, 0) - ${expense.amount})
+      WHERE id = ${expense.studentId}
+    `;
     return true;
   }
 

@@ -426,13 +426,14 @@ function getProductImage(name: string, category: string): string | null {
     if (n.includes("yogourt") || n.includes("yaourt") || n.includes("kéfir")) return imgYogourt;
     if (n.includes("beurre") && !n.includes("arachide")) return imgBeurre;
     // Viandes & protéines
-    if (n.includes("oeuf") || n.includes("œuf")) return imgOeufs;
+    // IMPORTANT: vérifier bœuf/boeuf AVANT œuf/oeuf car "bœuf" contient "œuf"
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette") || n.includes("cotelette")) return imgBoeuf;
     if (n.includes("bacon")) return imgBacon;
+    if (n.includes("oeuf") || n.includes("œuf")) return imgOeufs;
     if (n.includes("saumon")) return imgSaumon;
     if (n.includes("crevette")) return imgCrevettes;
     if (n.includes("thon")) return imgThon;
     if (n.includes("poulet") || n.includes("dinde") || n.includes("poitrines")) return imgPoulet;
-    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette") || n.includes("cotelette")) return imgBoeuf;
     // Fruits
     if (n.includes("banane")) return imgBananes;
     if (n.includes("fraise")) return imgFraises;

@@ -31,24 +31,46 @@ export default function StudentJoin() {
     },
   });
 
+  const [checking, setChecking] = useState(false);
+
   const handleSubmit = async () => {
     if (!studentName || !classCode) {
       setError("Tous les champs sont requis");
       return;
     }
     setError("");
-    
-    // Validate that the class code exists
+    setChecking(true);
+
     try {
-      const res = await fetch(`/api/classes/code/${classCode.toUpperCase()}`);
-      if (!res.ok) {
+      // 1. Valider que la classe existe
+      const classRes = await fetch(`/api/classes/code/${classCode.toUpperCase()}`);
+      if (!classRes.ok) {
         setError("Code de classe invalide. Vérifie et réessaie.");
+        setChecking(false);
         return;
       }
-      // If valid, redirect to welcome page
-      navigate(`/student/welcome?classCode=${classCode.toUpperCase()}&name=${encodeURIComponent(studentName)}`);
+      const classData = await classRes.json();
+
+      // 2. Vérifier la capacité (sauf si l'élève se reconnecte)
+      const studentsRes = await fetch(`/api/classes/${classData.id}/students`);
+      if (studentsRes.ok) {
+        const students = await studentsRes.json();
+        const alreadyInClass = students.some(
+          (s: any) => s.name.toLowerCase() === studentName.trim().toLowerCase()
+        );
+        if (!alreadyInClass && students.length >= 25) {
+          setError("Cette classe est complète (maximum 25 élèves).");
+          setChecking(false);
+          return;
+        }
+      }
+
+      // 3. Rediriger vers la page de bienvenue
+      navigate(`/student/welcome?classCode=${classCode.toUpperCase()}&name=${encodeURIComponent(studentName.trim())}`);
     } catch (err) {
       setError("Erreur lors de la vérification du code. Réessaie.");
+    } finally {
+      setChecking(false);
     }
   };
 
@@ -113,12 +135,12 @@ export default function StudentJoin() {
 
             <Button
               onClick={handleSubmit}
-              disabled={joinMutation.isPending || !studentName || !classCode}
+              disabled={checking || joinMutation.isPending || !studentName || !classCode}
               className="w-full bg-primary hover:bg-primary/90"
               size="lg"
               data-testid="button-join-class"
             >
-              {joinMutation.isPending ? "Connexion..." : "Rejoindre"}
+              {checking ? "Vérification..." : joinMutation.isPending ? "Connexion..." : "Rejoindre"}
             </Button>
           </div>
         </Card>

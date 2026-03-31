@@ -148,6 +148,12 @@ export async function registerRoutes(
 
         return res.json(updatedStudent || existingStudent);
       }
+
+      // Vérifier la limite de 25 élèves par classe
+      const existingStudents = await storage.getStudentsByClass(classData.id);
+      if (existingStudents.length >= 25) {
+        return res.status(400).json({ error: "Cette classe est complète (maximum 25 élèves)." });
+      }
       
       const student = await storage.createStudent({
         name: data.name,

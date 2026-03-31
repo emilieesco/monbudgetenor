@@ -528,6 +528,19 @@ export class DatabaseStorage implements IStorage {
       )
     `;
 
+    // Index pour les performances avec 1000+ élèves
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_students_class_id ON students(class_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_expenses_student_id ON expenses(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_fixed_expenses_student_id ON fixed_expenses(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_challenges_student_id ON challenges(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_badges_student_id ON badges(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_savings_goals_student_id ON savings_goals(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_budget_snapshots_student_id ON budget_snapshots(student_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_teacher_messages_class_id ON teacher_messages(class_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_bonus_expenses_class_id ON bonus_expenses(class_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_class_challenges_class_id ON class_challenges(class_id)`;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_surprise_events_class_id ON surprise_events(class_id)`;
+
     // Seed admin password if not already set
     const existing = await this.sql`SELECT key FROM admin_config WHERE key = 'admin_password'`;
     if (existing.length === 0) {

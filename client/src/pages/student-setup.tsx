@@ -73,14 +73,21 @@ export default function StudentSetup() {
     }
   };
 
+  const [joinError, setJoinError] = useState("");
+
   const joinMutation = useMutation({
     mutationFn: async (data: any) => {
       const res = await apiRequest("POST", "/api/students/join", data);
-      return res.json();
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || "Erreur lors de l'inscription");
+      return json;
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/students"] });
       navigate(`/student/${data.id}`);
+    },
+    onError: (err: any) => {
+      setJoinError(err.message || "Erreur lors de l'inscription. Réessaie.");
     },
   });
 
@@ -342,8 +349,14 @@ export default function StudentSetup() {
               </div>
             )}
 
+            {joinError && (
+              <div className="p-3 bg-destructive/10 border border-destructive/30 rounded-lg">
+                <p className="text-sm text-destructive">{joinError}</p>
+              </div>
+            )}
+
             <Button
-              onClick={handleJoin}
+              onClick={() => { setJoinError(""); handleJoin(); }}
               disabled={
                 joinMutation.isPending ||
                 !studentName ||
@@ -353,7 +366,7 @@ export default function StudentSetup() {
               className="w-full bg-primary hover:bg-primary/90"
               data-testid="button-join-class"
             >
-              Rejoindre la Classe
+              {joinMutation.isPending ? "Connexion..." : "Rejoindre la Classe"}
             </Button>
           </div>
         </Card>

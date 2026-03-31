@@ -1,0 +1,8 @@
+uploads = []
+outputs = []
+
+[[generated]]
+id = "05VTWuQXOvRZkrxVcGlbd"
+uri = "file://attached_assets/catalog/porc.png"
+type = "image"
+title = "raw pork chops product photo"

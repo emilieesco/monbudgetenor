@@ -33,6 +33,7 @@ import imgJeans from "@assets/catalog/jeans.png";
 import imgEspadrilles from "@assets/catalog/espadrilles.png";
 import imgCinema from "@assets/catalog/cinema.png";
 import imgOeufs from "@assets/catalog/oeufs.png";
+import imgPorc from "@assets/catalog/porc.png";
 import imgBacon from "@assets/catalog/bacon.png";
 import imgSaumon from "@assets/catalog/saumon.png";
 import imgCrevettes from "@assets/catalog/crevettes.png";
@@ -427,7 +428,8 @@ function getProductImage(name: string, category: string): string | null {
     if (n.includes("beurre") && !n.includes("arachide")) return imgBeurre;
     // Viandes & protéines
     // IMPORTANT: vérifier bœuf/boeuf AVANT œuf/oeuf car "bœuf" contient "œuf"
-    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon") || n.includes("porc") || n.includes("côtelette") || n.includes("cotelette")) return imgBoeuf;
+    if (n.includes("porc") || n.includes("côtelette") || n.includes("cotelette") || n.includes("rôti") || n.includes("roti")) return imgPorc;
+    if (n.includes("bœuf") || n.includes("boeuf") || n.includes("steak") || n.includes("veau") || n.includes("jambon")) return imgBoeuf;
     if (n.includes("bacon")) return imgBacon;
     if (n.includes("oeuf") || n.includes("œuf")) return imgOeufs;
     if (n.includes("saumon")) return imgSaumon;

@@ -44,9 +44,11 @@ export default function TeacherDashboard() {
   const [expenseCategory, setExpenseCategory] = useState<"transport" | "education" | "health" | "entertainment" | "utilities" | "food" | "clothing" | "emergency" | "other">("other");
 
   // Queries
-  const classQuery = useQuery({ queryKey: ["/api/classes", classId] });
+  const classQuery = useQuery({ queryKey: ["/api/classes", classId], staleTime: 0 });
   const studentsQuery = useQuery({
     queryKey: ["/api/classes", classId, "students"],
+    staleTime: 0,
+    refetchInterval: 30000,
   });
   const customChallengesQuery = useQuery({
     queryKey: ["/api/custom-challenges", classId],

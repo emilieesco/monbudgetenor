@@ -49,10 +49,12 @@ export default function Dashboard() {
 
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
+    staleTime: 0,
   });
 
   const expensesQuery = useQuery({
     queryKey: ["/api/expenses", studentId],
+    staleTime: 0,
   });
 
   const fixedExpensesQuery = useQuery({

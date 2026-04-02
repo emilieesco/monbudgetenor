@@ -1,5 +1,6 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
 import { useParams, useLocation } from "wouter";
+import { useToast } from "@/hooks/use-toast";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -673,6 +674,7 @@ function getPurchaseFeedback(cart: CartItem[]): PurchaseFeedback {
 export default function Catalog() {
   const { studentId } = useParams();
   const [location, navigate] = useLocation();
+  const { toast } = useToast();
   const [selectedCategory, setSelectedCategory] = useState("food");
   const [selectedSubcategory, setSelectedSubcategory] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
@@ -691,7 +693,7 @@ export default function Catalog() {
     }
   }, [location]);
 
-  const studentQuery = useQuery({ queryKey: ["/api/students", studentId] });
+  const studentQuery = useQuery({ queryKey: ["/api/students", studentId], staleTime: 0 });
   const catalogQuery = useQuery({ queryKey: ["/api/catalog"] });
 
   const addExpenseMutation = useMutation({
@@ -721,6 +723,14 @@ export default function Catalog() {
       setShowCheckoutConfirm(false);
       setIsCartOpen(false);
       setShowPurchaseFeedback(true);
+    },
+    onError: (error: Error) => {
+      setShowCheckoutConfirm(false);
+      toast({
+        title: "Erreur lors de l'achat",
+        description: error.message || "Une erreur est survenue. Veuillez réessayer.",
+        variant: "destructive",
+      });
     },
   });
 

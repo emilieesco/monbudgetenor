@@ -696,6 +696,17 @@ export async function registerRoutes(
     }
   });
 
+  app.patch("/api/messages/:messageId/read", async (req, res) => {
+    try {
+      const { studentId } = req.body;
+      if (!studentId) return res.status(400).json({ error: "studentId required" });
+      await storage.markMessageAsRead(req.params.messageId, studentId);
+      res.json({ success: true });
+    } catch (error) {
+      res.status(500).json({ error: "Failed to mark message as read" });
+    }
+  });
+
   // Surprise Event endpoints
   app.post("/api/surprise-events", async (req, res) => {
     try {

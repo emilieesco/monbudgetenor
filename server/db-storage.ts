@@ -142,6 +142,7 @@ function toTeacherMessage(row: any): TeacherMessage {
     content: row.content,
     type: row.type,
     timestamp: new Date(row.timestamp),
+    isRead: row.is_read ?? false,
   };
 }
 
@@ -527,6 +528,17 @@ export class DatabaseStorage implements IStorage {
         value TEXT NOT NULL
       )
     `;
+
+    // Table de suivi des messages lus par élève
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS message_reads (
+        message_id TEXT NOT NULL,
+        student_id TEXT NOT NULL,
+        read_at TIMESTAMPTZ DEFAULT NOW(),
+        PRIMARY KEY (message_id, student_id)
+      )
+    `;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_message_reads_student_id ON message_reads(student_id)`;
 
     // Table de suivi des événements appliqués par élève (many-to-many)
     await this.sql`
@@ -1271,12 +1283,24 @@ export class DatabaseStorage implements IStorage {
 
   async getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]> {
     const rows = await this.sql`
-      SELECT * FROM teacher_messages
-      WHERE class_id = ${classId}
-        AND (student_id IS NULL OR student_id = ${studentId})
-      ORDER BY timestamp DESC
+      SELECT tm.*,
+        CASE WHEN mr.message_id IS NOT NULL THEN true ELSE false END as is_read
+      FROM teacher_messages tm
+      LEFT JOIN message_reads mr
+        ON mr.message_id = tm.id AND mr.student_id = ${studentId}
+      WHERE tm.class_id = ${classId}
+        AND (tm.student_id IS NULL OR tm.student_id = ${studentId})
+      ORDER BY tm.timestamp DESC
     `;
     return rows.map(toTeacherMessage);
+  }
+
+  async markMessageAsRead(messageId: string, studentId: string): Promise<void> {
+    await this.sql`
+      INSERT INTO message_reads (message_id, student_id)
+      VALUES (${messageId}, ${studentId})
+      ON CONFLICT (message_id, student_id) DO NOTHING
+    `;
   }
 
   // ── Surprise Events ───────────────────────────────────────────────

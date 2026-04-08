@@ -53,6 +53,7 @@ export interface IStorage {
   createTeacherMessage(input: CreateTeacherMessage): Promise<TeacherMessage>;
   getClassMessages(classId: string): Promise<TeacherMessage[]>;
   getStudentMessages(studentId: string, classId: string): Promise<TeacherMessage[]>;
+  markMessageAsRead(messageId: string, studentId: string): Promise<void>;
   createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent>;
   getSurpriseEvent(eventId: string): Promise<SurpriseEvent | undefined>;
   getClassSurpriseEvents(classId: string): Promise<SurpriseEvent[]>;
@@ -760,6 +761,10 @@ export class MemStorage implements IStorage {
       (!m.studentId || m.studentId === studentId) &&
       new Date(m.timestamp) >= joinedAt
     );
+  }
+
+  async markMessageAsRead(_messageId: string, _studentId: string): Promise<void> {
+    // In-memory: not persisted, messages will re-appear on reload (acceptable for dev)
   }
 
   async createSurpriseEvent(input: CreateSurpriseEvent): Promise<SurpriseEvent> {

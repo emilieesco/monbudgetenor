@@ -103,6 +103,7 @@ export interface TeacherMessage {
   content: string;
   type: "congratulations" | "warning" | "info";
   timestamp: Date;
+  isRead?: boolean;
 }
 
 export interface SurpriseEvent {

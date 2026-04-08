@@ -85,7 +85,18 @@ export default function Dashboard() {
       if (!res.ok) throw new Error("Erreur");
       return res.json();
     },
-    staleTime: 0, // Always re-fetch to catch new teacher messages
+    staleTime: 0,
+    refetchInterval: 30000,
+  });
+
+  const markAsReadMutation = useMutation({
+    mutationFn: async (messageId: string) => {
+      const res = await apiRequest("PATCH", `/api/messages/${messageId}/read`, { studentId });
+      return res.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["/api/messages/student", studentId] });
+    },
   });
 
   const challengesQuery = useQuery({
@@ -427,7 +438,8 @@ export default function Dashboard() {
   const snapshots = snapshotsQuery.data as BudgetSnapshot[] || [];
   const badges = badgesQuery.data as Array<BadgeType & { name: string; icon: string; tier: string }> || [];
   const savingsGoals = savingsGoalsQuery.data as SavingsGoal[] || [];
-  const messages = (messagesQuery.data || []) as Array<{ id: string; content: string; type: "congratulations" | "warning" | "info"; timestamp: string }>;
+  const messages = (messagesQuery.data || []) as Array<{ id: string; content: string; type: "congratulations" | "warning" | "info"; timestamp: string; isRead: boolean }>;
+  const unreadCount = messages.filter(m => !m.isRead).length;
 
   // Offline support - cache data
   useEffect(() => {
@@ -1098,13 +1110,17 @@ export default function Dashboard() {
             <div className="flex items-center gap-2 mb-4">
               <AlertCircle className="w-5 h-5 text-primary" />
               <h3 className="font-semibold text-lg">Messages de ton enseignant</h3>
-              <Badge variant="secondary">{messages.length}</Badge>
+              {unreadCount > 0 && (
+                <Badge variant="destructive" data-testid="badge-unread-messages">{unreadCount} non lu{unreadCount > 1 ? "s" : ""}</Badge>
+              )}
             </div>
             <div className="space-y-3">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`p-4 rounded-lg border text-sm ${
+                  className={`p-4 rounded-lg border text-sm transition-opacity ${
+                    msg.isRead ? "opacity-50" : ""
+                  } ${
                     msg.type === "congratulations"
                       ? "bg-green-50 dark:bg-green-950 border-green-200 dark:border-green-800"
                       : msg.type === "warning"
@@ -1112,17 +1128,33 @@ export default function Dashboard() {
                       : "bg-blue-50 dark:bg-blue-950 border-blue-200 dark:border-blue-800"
                   }`}
                 >
-                  <p className={`font-medium ${
-                    msg.type === "congratulations" ? "text-green-800 dark:text-green-200"
-                    : msg.type === "warning" ? "text-amber-800 dark:text-amber-200"
-                    : "text-blue-800 dark:text-blue-200"
-                  }`}>
-                    {msg.type === "congratulations" ? "Félicitations" : msg.type === "warning" ? "Avertissement" : "Info"}
-                  </p>
-                  <p className="text-foreground mt-1">{msg.content}</p>
-                  <p className="text-muted-foreground text-xs mt-1">
-                    {new Date(msg.timestamp).toLocaleDateString("fr-CA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}
-                  </p>
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex-1">
+                      <p className={`font-medium ${
+                        msg.type === "congratulations" ? "text-green-800 dark:text-green-200"
+                        : msg.type === "warning" ? "text-amber-800 dark:text-amber-200"
+                        : "text-blue-800 dark:text-blue-200"
+                      }`}>
+                        {msg.type === "congratulations" ? "Félicitations" : msg.type === "warning" ? "Avertissement" : "Info"}
+                      </p>
+                      <p className="text-foreground mt-1">{msg.content}</p>
+                      <p className="text-muted-foreground text-xs mt-1">
+                        {new Date(msg.timestamp).toLocaleDateString("fr-CA", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })}
+                      </p>
+                    </div>
+                    {!msg.isRead && (
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => markAsReadMutation.mutate(msg.id)}
+                        disabled={markAsReadMutation.isPending}
+                        data-testid={`button-mark-read-${msg.id}`}
+                        className="shrink-0 text-xs"
+                      >
+                        Marquer comme lu
+                      </Button>
+                    )}
+                  </div>
                 </div>
               ))}
             </div>

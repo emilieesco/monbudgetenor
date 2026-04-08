@@ -1261,6 +1261,8 @@ export default function Catalog() {
           const price = c.item.isTaxable ? c.item.price * (1 + QUEBEC_TAX_RATE) : c.item.price;
           return s + price * c.quantity;
         }, 0);
+        const subtotalPaid = purchasedCart.reduce((s, c) => s + c.item.price * c.quantity, 0);
+        const taxesPaid = totalPaid - subtotalPaid;
 
         const gradeConfig = {
           excellent: { Icon: CheckCircle2, bg: "bg-green-50 dark:bg-green-900/20", border: "border-green-300 dark:border-green-700", iconColor: "text-green-600", titleColor: "text-green-700 dark:text-green-400", badgeClass: "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200" },
@@ -1300,18 +1302,26 @@ export default function Catalog() {
                         <p className="font-bold text-sm text-green-700 dark:text-green-400">Essentiels ({essentialItems.length} article{essentialItems.length > 1 ? "s" : ""})</p>
                       </div>
                       <div className="space-y-1.5">
-                        {essentialItems.map(cartItem => (
+                        {essentialItems.map(cartItem => {
+                          const itemPrice = cartItem.item.isTaxable
+                            ? cartItem.item.price * (1 + QUEBEC_TAX_RATE)
+                            : cartItem.item.price;
+                          return (
                           <div key={cartItem.item.id} className="flex items-center gap-2 p-2 rounded-lg bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800">
                             <span className="text-xl w-8 text-center shrink-0">{getProductEmoji(cartItem.item.name, cartItem.item.category)}</span>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold truncate">{cartItem.quantity > 1 ? `${cartItem.quantity}x ` : ""}{cartItem.item.name}</p>
-                              <p className="text-xs text-green-700 dark:text-green-400">Besoin essentiel — bon choix!</p>
+                              <p className="text-xs text-green-700 dark:text-green-400">
+                                Besoin essentiel — bon choix!
+                                {cartItem.item.isTaxable && <span className="ml-1 text-muted-foreground">(taxes incluses)</span>}
+                              </p>
                             </div>
                             <Badge variant="outline" className="shrink-0 text-xs border-green-400 text-green-700 dark:text-green-400">
-                              {(cartItem.item.price * cartItem.quantity).toFixed(2)} $
+                              {(itemPrice * cartItem.quantity).toFixed(2)} $
                             </Badge>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
@@ -1324,21 +1334,55 @@ export default function Catalog() {
                         <p className="font-bold text-sm text-amber-700 dark:text-amber-400">Plaisirs ({nonEssentialItems.length} article{nonEssentialItems.length > 1 ? "s" : ""})</p>
                       </div>
                       <div className="space-y-1.5">
-                        {nonEssentialItems.map(cartItem => (
+                        {nonEssentialItems.map(cartItem => {
+                          const itemPrice = cartItem.item.isTaxable
+                            ? cartItem.item.price * (1 + QUEBEC_TAX_RATE)
+                            : cartItem.item.price;
+                          return (
                           <div key={cartItem.item.id} className="flex items-start gap-2 p-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800">
                             <span className="text-xl w-8 text-center shrink-0 mt-0.5">{getProductEmoji(cartItem.item.name, cartItem.item.category)}</span>
                             <div className="flex-1 min-w-0">
                               <p className="text-sm font-semibold truncate">{cartItem.quantity > 1 ? `${cartItem.quantity}x ` : ""}{cartItem.item.name}</p>
-                              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">{getItemExplanation(cartItem.item)}</p>
+                              <p className="text-xs text-amber-700 dark:text-amber-400 mt-0.5">
+                                {getItemExplanation(cartItem.item)}
+                                {cartItem.item.isTaxable && <span className="ml-1 text-muted-foreground">(taxes incluses)</span>}
+                              </p>
                             </div>
                             <Badge variant="outline" className="shrink-0 text-xs border-amber-400 text-amber-700 dark:text-amber-400">
-                              {(cartItem.item.price * cartItem.quantity).toFixed(2)} $
+                              {(itemPrice * cartItem.quantity).toFixed(2)} $
                             </Badge>
                           </div>
-                        ))}
+                          );
+                        })}
                       </div>
                     </div>
                   )}
+
+                  {/* Tax breakdown */}
+                  <div className="rounded-lg border bg-card p-3 space-y-1.5">
+                    <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-2">Récapitulatif</p>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Sous-total</span>
+                      <span>{subtotalPaid.toFixed(2)} $</span>
+                    </div>
+                    {taxesPaid > 0.001 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">TPS + TVQ (14,975 %)</span>
+                        <span>{taxesPaid.toFixed(2)} $</span>
+                      </div>
+                    )}
+                    {taxesPaid <= 0.001 && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-muted-foreground">Taxes</span>
+                        <span className="text-muted-foreground">0,00 $ (aliments de base)</span>
+                      </div>
+                    )}
+                    <Separator />
+                    <div className="flex justify-between text-sm font-bold">
+                      <span>Total payé</span>
+                      <span>{totalPaid.toFixed(2)} $</span>
+                    </div>
+                  </div>
 
                   {/* Tip */}
                   <div className="flex items-start gap-3 p-4 rounded-lg bg-muted border">

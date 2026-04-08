@@ -528,6 +528,30 @@ export class DatabaseStorage implements IStorage {
       )
     `;
 
+    // Table de suivi des événements appliqués par élève (many-to-many)
+    await this.sql`
+      CREATE TABLE IF NOT EXISTS student_event_log (
+        id TEXT PRIMARY KEY DEFAULT gen_random_uuid()::text,
+        event_id TEXT NOT NULL,
+        student_id TEXT NOT NULL,
+        title TEXT NOT NULL,
+        description TEXT NOT NULL,
+        amount NUMERIC NOT NULL,
+        type TEXT NOT NULL,
+        applied_at TIMESTAMPTZ DEFAULT NOW(),
+        UNIQUE(event_id, student_id)
+      )
+    `;
+    await this.sql`CREATE INDEX IF NOT EXISTS idx_student_event_log_student_id ON student_event_log(student_id)`;
+    // Migrate existing applied events to the new log table
+    await this.sql`
+      INSERT INTO student_event_log (event_id, student_id, title, description, amount, type, applied_at)
+      SELECT id, student_id, title, description, amount, type, applied_at
+      FROM surprise_events
+      WHERE student_id IS NOT NULL AND applied_at IS NOT NULL
+      ON CONFLICT (event_id, student_id) DO NOTHING
+    `;
+
     // Index pour les performances avec 1000+ élèves
     await this.sql`CREATE INDEX IF NOT EXISTS idx_students_class_id ON students(class_id)`;
     await this.sql`CREATE INDEX IF NOT EXISTS idx_expenses_student_id ON expenses(student_id)`;
@@ -1277,17 +1301,44 @@ export class DatabaseStorage implements IStorage {
   }
 
   async applyStudentSurpriseEvent(eventId: string, studentId: string): Promise<SurpriseEvent | undefined> {
-    const rows = await this.sql`
-      UPDATE surprise_events SET applied_at = NOW(), student_id = ${studentId} WHERE id = ${eventId} RETURNING *
+    // Get the event first
+    const eventRows = await this.sql`SELECT * FROM surprise_events WHERE id = ${eventId}`;
+    if (!eventRows[0]) return undefined;
+    const event = toSurpriseEvent(eventRows[0]);
+
+    // Log this application per student (many-to-many, UNIQUE prevents duplicates)
+    await this.sql`
+      INSERT INTO student_event_log (event_id, student_id, title, description, amount, type)
+      VALUES (${eventId}, ${studentId}, ${event.title}, ${event.description}, ${event.amount}, ${event.type})
+      ON CONFLICT (event_id, student_id) DO NOTHING
     `;
-    return rows[0] ? toSurpriseEvent(rows[0]) : undefined;
+
+    // Also mark the original event as applied (for backward compatibility)
+    await this.sql`
+      UPDATE surprise_events SET applied_at = NOW(), student_id = ${studentId} WHERE id = ${eventId}
+    `;
+
+    return event;
   }
 
   async getStudentAppliedEvents(studentId: string): Promise<SurpriseEvent[]> {
     const rows = await this.sql`
-      SELECT * FROM surprise_events WHERE student_id = ${studentId} AND applied_at IS NOT NULL ORDER BY applied_at DESC
+      SELECT event_id as id, student_id, title, description, amount, type, applied_at, '' as class_id
+      FROM student_event_log
+      WHERE student_id = ${studentId}
+      ORDER BY applied_at DESC
     `;
-    return rows.map(toSurpriseEvent);
+    return rows.map((r: any) => ({
+      id: r.id,
+      classId: r.class_id || '',
+      studentId: r.student_id,
+      type: r.type,
+      title: r.title,
+      description: r.description,
+      amount: parseFloat(r.amount),
+      createdAt: r.applied_at,
+      appliedAt: r.applied_at,
+    }));
   }
 
   // ── Snapshots ─────────────────────────────────────────────────────

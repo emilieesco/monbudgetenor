@@ -50,6 +50,7 @@ export default function Dashboard() {
   const studentQuery = useQuery({
     queryKey: ["/api/students", studentId],
     staleTime: 0,
+    refetchInterval: 30000,
   });
 
   const expensesQuery = useQuery({
@@ -74,6 +75,7 @@ export default function Dashboard() {
       return res.json();
     },
     staleTime: 0,
+    refetchInterval: 30000,
   });
 
   const messagesQuery = useQuery({

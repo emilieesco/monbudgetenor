@@ -215,7 +215,7 @@ export class DatabaseStorage implements IStorage {
   private sql: ReturnType<typeof postgres>;
 
   constructor(databaseUrl: string) {
-    this.sql = postgres(databaseUrl, { ssl: "require" });
+    this.sql = postgres(databaseUrl, { ssl: "require", max: 20, idle_timeout: 30 });
   }
 
   async initialize() {

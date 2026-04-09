@@ -499,6 +499,9 @@ export default function Dashboard() {
   }, [student?.savings, expenses.length]);
 
   if (!student) {
+    if (studentQuery.isLoading) {
+      return <div className="p-8 text-center text-muted-foreground">Chargement...</div>;
+    }
     const cachedStudent = localStorage.getItem(`student_${studentId}`);
     if (cachedStudent) {
       return <div className="p-8 text-center">

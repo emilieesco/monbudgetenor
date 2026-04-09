@@ -186,7 +186,7 @@ export default function StudentSetup() {
           <div className="space-y-6">
             {/* Name Input */}
             <div>
-              <Label htmlFor="name">Ton Prénom</Label>
+              <Label htmlFor="name">Mon Prénom</Label>
               <Input
                 id="name"
                 placeholder="Ex: Jean"
@@ -197,7 +197,7 @@ export default function StudentSetup() {
 
             {/* Mode Selection */}
             <div>
-              <Label className="mb-4 block">Choisir ton Mode Budgétaire</Label>
+              <Label className="mb-4 block">Choisir mon Mode Budgétaire</Label>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 {/* Prédéfini */}
                 <button
@@ -210,7 +210,7 @@ export default function StudentSetup() {
                   data-testid="button-mode-predefined"
                 >
                   <p className="font-semibold mb-1">Budget Prédéfini</p>
-                  <p className="text-sm text-muted-foreground mb-3">Défini par ton prof</p>
+                  <p className="text-sm text-muted-foreground mb-3">Défini par l'enseignant</p>
                   <p className="text-lg font-bold text-primary">${defaultBudget}</p>
                 </button>
 
@@ -250,7 +250,7 @@ export default function StudentSetup() {
             {mode === "custom" && (
               <div className="space-y-6 p-4 bg-blue-50 dark:bg-blue-950 rounded-lg border border-blue-200 dark:border-blue-800">
                 <div>
-                  <Label htmlFor="budget">Ton Budget Personnel ($)</Label>
+                  <Label htmlFor="budget">Mon Budget Personnel ($)</Label>
                   <Input
                     id="budget"
                     type="number"

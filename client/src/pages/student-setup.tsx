@@ -34,7 +34,7 @@ interface CustomExpense {
 
 export default function StudentSetup() {
   const [_location, navigate] = useLocation();
-  const classCode = new URLSearchParams(window.location.search).get("classCode");
+  const classCode = (new URLSearchParams(window.location.search).get("classCode") || "").trim().toUpperCase() || null;
   const nameParam = decodeURIComponent(new URLSearchParams(window.location.search).get("name") || "");
   const [studentName, setStudentName] = useState(nameParam);
   const [mode, setMode] = useState<"predefined" | "custom" | "scenario">("predefined");
@@ -84,6 +84,8 @@ export default function StudentSetup() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["/api/students"] });
+      localStorage.setItem("studentId", data.id);
+      localStorage.setItem("studentName", data.name || "");
       navigate(`/student/${data.id}`);
     },
     onError: (err: any) => {
@@ -119,6 +121,10 @@ export default function StudentSetup() {
   const handleJoin = () => {
     if (!studentName) {
       alert("Entre ton prénom");
+      return;
+    }
+    if (!classCode) {
+      alert("Code de classe manquant. Retourne à la page précédente.");
       return;
     }
 

@@ -117,7 +117,7 @@ export default function StudentJoin() {
                 placeholder="Ex: MATH2024"
                 value={classCode}
                 onChange={(e) => {
-                  setClassCode(e.target.value.toUpperCase());
+                  setClassCode(e.target.value.trim().toUpperCase());
                   setError("");
                 }}
                 data-testid="input-class-code"

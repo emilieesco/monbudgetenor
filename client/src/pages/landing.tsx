@@ -1,11 +1,23 @@
 import { useLocation } from "wouter";
+import { useState, useEffect } from "react";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Wallet, TrendingUp, ShoppingCart, Users, KeyRound } from "lucide-react";
+import { Wallet, TrendingUp, ShoppingCart, Users, KeyRound, ArrowRight } from "lucide-react";
 import walletImg from "@assets/poo_1764362219794.png";
 
 export default function Landing() {
   const [_location, navigate] = useLocation();
+  const [savedStudentId, setSavedStudentId] = useState<string | null>(null);
+  const [savedStudentName, setSavedStudentName] = useState<string | null>(null);
+
+  useEffect(() => {
+    const id = localStorage.getItem("studentId");
+    const name = localStorage.getItem("studentName");
+    if (id) {
+      setSavedStudentId(id);
+      setSavedStudentName(name);
+    }
+  }, []);
 
   return (
     <div className="min-h-screen bg-background">
@@ -23,14 +35,28 @@ export default function Landing() {
               <p className="text-lg text-muted-foreground mb-12">
                 Un jeu éducatif immersif où vous gérez des budgets réalistes, payez des dépenses et faites des choix intelligents
               </p>
-              <Button
-                onClick={() => navigate("/auth")}
-                className="bg-primary hover:bg-primary/90 text-lg px-8 py-6"
-                size="lg"
-                data-testid="button-get-started"
-              >
-                Commencer Maintenant 🚀
-              </Button>
+              <div className="flex flex-col sm:flex-row gap-4 flex-wrap">
+                <Button
+                  onClick={() => navigate("/auth")}
+                  className="bg-primary hover:bg-primary/90 text-lg px-8 py-6"
+                  size="lg"
+                  data-testid="button-get-started"
+                >
+                  Commencer Maintenant
+                </Button>
+                {savedStudentId && (
+                  <Button
+                    onClick={() => navigate(`/student/${savedStudentId}`)}
+                    variant="outline"
+                    size="lg"
+                    className="text-lg px-8 py-6"
+                    data-testid="button-return-dashboard"
+                  >
+                    <ArrowRight className="mr-2 h-5 w-5" />
+                    {savedStudentName ? `Retourner (${savedStudentName})` : "Retourner à mon tableau de bord"}
+                  </Button>
+                )}
+              </div>
             </div>
             <div className="flex justify-center">
               <img

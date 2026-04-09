@@ -106,8 +106,10 @@ export async function registerRoutes(
   app.post("/api/students/join", async (req, res) => {
     try {
       const data = joinClassSchema.parse(req.body);
-      const classData = await storage.getClassByCode(data.classCode);
+      const trimmedCode = data.classCode.trim().toUpperCase();
+      const classData = await storage.getClassByCode(trimmedCode);
       if (!classData) {
+        console.warn(`[join] Class not found for code: "${trimmedCode}" (raw: "${data.classCode}")`);
         return res.status(404).json({ error: "Class not found" });
       }
       

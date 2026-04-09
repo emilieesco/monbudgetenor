@@ -445,6 +445,8 @@ export default function Dashboard() {
   useEffect(() => {
     if (student) {
       localStorage.setItem(`student_${studentId}`, JSON.stringify(student));
+      localStorage.setItem("studentId", (student as any).id || studentId || "");
+      localStorage.setItem("studentName", (student as any).name || "");
     }
     if (expenses.length > 0) {
       localStorage.setItem(`expenses_${studentId}`, JSON.stringify(expenses));

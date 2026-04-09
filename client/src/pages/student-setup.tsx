@@ -165,6 +165,39 @@ export default function StudentSetup() {
   const calculatedBudget = Math.round(Object.values(classData.expenseAmounts).reduce((a: any, b: any) => a + b, 0) * 1.5) || 50;
   const defaultBudget = classData.predefinedBudget || calculatedBudget;
 
+  // If student already has a session saved, offer to return directly to their dashboard
+  const savedId = localStorage.getItem("studentId");
+  const savedName = localStorage.getItem("studentName");
+  const nameMatches = savedName && studentName && savedName.trim().toLowerCase() === studentName.trim().toLowerCase();
+  if (savedId && nameMatches) {
+    return (
+      <div className="min-h-screen bg-background p-4 md:p-8 flex items-center justify-center">
+        <Card className="p-8 max-w-md w-full text-center">
+          <h2 className="text-2xl font-bold text-primary mb-3">Bienvenue, {savedName} !</h2>
+          <p className="text-muted-foreground mb-6">
+            Tu es déjà inscrit(e) dans cette classe. Tu peux retourner à ton tableau de bord pour continuer où tu en étais.
+          </p>
+          <div className="flex flex-col gap-3">
+            <Button
+              onClick={() => navigate(`/student/${savedId}`)}
+              size="lg"
+              data-testid="button-return-existing"
+            >
+              Continuer ma progression
+            </Button>
+            <Button
+              onClick={() => navigate("/")}
+              variant="outline"
+              size="lg"
+            >
+              Retour à l'accueil
+            </Button>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-background p-4 md:p-8">
       <div className="max-w-4xl mx-auto">
@@ -178,7 +211,7 @@ export default function StudentSetup() {
         </Button>
 
         <h1 className="text-3xl font-bold text-primary mb-2">
-          Choisis ton Mode Budgétaire
+          Choisir mon Mode Budgétaire
         </h1>
         <p className="text-muted-foreground mb-8">Classe: {classData.teacherName}</p>
 

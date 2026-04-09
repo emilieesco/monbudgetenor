@@ -117,38 +117,10 @@ export async function registerRoutes(
       const expenseAmounts = data.customExpenses || classData.expenseAmounts || {};
       
       // Check if student with same name already exists in this class
+      // If so, just return them as-is — never reset savings/spent on reconnect
       const existingStudent = await storage.getStudentByNameAndClass(data.name, classData.id);
       if (existingStudent) {
-        const newChallenges = [
-          { title: "Économe", description: "Dépense moins de 30% de ton budget", type: "spending" as const, target: Math.round(data.budget * 0.3) },
-          { title: "Essentiel d'abord", description: "Achète 3 articles essentiels", type: "essential" as const, target: 3 },
-          { title: "Responsable", description: "Paye toutes tes dépenses fixes", type: "fixed" as const, target: 100 },
-          { title: "Sage", description: "Économise 50% de ton budget", type: "savings" as const, target: Math.round(data.budget * 0.5) },
-        ];
-
-        // Run budget update, custom expenses update, and deletes all in parallel
-        const [updatedStudent] = await Promise.all([
-          storage.updateStudentBudgetWithHistory(existingStudent.id, data.budget),
-          data.customExpenses ? storage.updateStudentCustomExpenses(existingStudent.id, data.customExpenses) : Promise.resolve(),
-          storage.deleteStudentChallenges(existingStudent.id),
-          storage.deleteStudentFixedExpenses(existingStudent.id),
-        ]);
-
-        // Now create all challenges + fixed expenses in parallel
-        await Promise.all([
-          ...newChallenges.map(ch => storage.createChallenge({
-            studentId: existingStudent.id,
-            title: ch.title,
-            description: ch.description,
-            type: ch.type,
-            targetValue: ch.target,
-          })),
-          ...Object.entries(expenseAmounts).map(([category, amount]) =>
-            storage.createFixedExpense(existingStudent.id, category, amount as number)
-          ),
-        ]);
-
-        return res.json(updatedStudent || existingStudent);
+        return res.json(existingStudent);
       }
 
       // Vérifier la limite de 25 élèves par classe

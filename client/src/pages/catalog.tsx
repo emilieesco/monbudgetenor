@@ -177,22 +177,22 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("carotte")) return "🥕";
     if (n.includes("brocoli")) return "🥦";
     if (n.includes("chou-fleur")) return "🥦";
-    if (n.includes("laitue") || n.includes("romaine") || n.includes("épinard")) return "🥬";
+    if (n.includes("laitue") || n.includes("romaine") || n.includes("épinard") || n.includes("epinard")) return "🥬";
     if (n.includes("concombre") || n.includes("courgette")) return "🥒";
     if (n.includes("poivron")) return "🫑";
     if (n.includes("champignon")) return "🍄";
-    if (n.includes("maïs en épi")) return "🌽";
-    if (n.includes("pois vert") || n.includes("pois surgelé")) return "🫛";
+    if (n.includes("maïs en épi") || n.includes("mais en epi")) return "🌽";
+    if (n.includes("pois vert") || n.includes("pois surgelé") || n.includes("pois surgele")) return "🫛";
     if (n.includes("ail")) return "🧄";
     if (n.includes("oignon")) return "🧅";
-    if (n.includes("céleri")) return "🌿";
+    if (n.includes("céleri") || n.includes("celeri")) return "🌿";
 
     // === Conserves & Épicerie ===
     if (n.includes("spaghetti") || n.includes("macaroni") || n.includes("pâtes")) return "🍝";
     if (n.includes("riz")) return "🍚";
     if (n.includes("soupe")) return "🍜";
     if (n.includes("thon")) return "🐟";
-    if (n.includes("maïs")) return "🌽";
+    if (n.includes("maïs") || n.includes("mais")) return "🌽";
     if (n.includes("haricot") || n.includes("pois chiche") || n.includes("lentille")) return "🫘";
     if (n.includes("sirop d'érable")) return "🍁";
     if (n.includes("miel")) return "🍯";
@@ -249,7 +249,7 @@ function getProductEmoji(name: string, category: string): string {
     if (n.includes("thé glacé") || n.includes("nestea")) return "🧋";
     if (n.includes("thé")) return "🍵";
     if (n.includes("jus")) return "🧃";
-    if (n.includes("gatorade")) return "🧴";
+    if (n.includes("gatorade")) return "🥤";
     if (n.includes("limonade")) return "🍋";
     if (n.includes("pepsi") || n.includes("coca") || n.includes("sprite") ||
         n.includes("7-up") || n.includes("red bull") || n.includes("monster") ||
@@ -436,7 +436,7 @@ function getProductImage(name: string, category: string): string | null {
     if (n.includes("saumon")) return imgSaumon;
     if (n.includes("crevette")) return imgCrevettes;
     if (n.includes("thon")) return imgThon;
-    if (n.includes("poulet") || n.includes("dinde") || n.includes("poitrines")) return imgPoulet;
+    if ((n.includes("poulet") || n.includes("dinde") || n.includes("poitrines")) && !n.includes("soupe") && !n.includes("bouillon")) return imgPoulet;
     // Fruits
     if (n.includes("banane")) return imgBananes;
     if (n.includes("fraise")) return imgFraises;
@@ -463,7 +463,7 @@ function getProductImage(name: string, category: string): string | null {
     if (n.includes("pain") && !n.includes("pizza")) return imgPain;
     // Boissons
     if (n.includes("café") || n.includes("cafe") || n.includes("maxwell") || n.includes("folgers")) return imgCafe;
-    if (n.includes("jus")) return imgJusOrange;
+    if (n.includes("jus") && (n.includes("orange") || n.includes("d'orange"))) return imgJusOrange;
     // Sucreries & collations
     if (n.includes("crème glacée") || n.includes("creme glacee") || n.includes("gelato") || n.includes("sorbet")) return imgCremeGlacee;
     if (n.includes("chocolat") || n.includes("twix") || n.includes("reese") || n.includes("cadbury") || n.includes("kit kat") || n.includes("oh henry") || n.includes("aero") || n.includes("caramilk") || n.includes("coffee crisp") || n.includes("lindt")) return imgChocolat;
@@ -473,7 +473,7 @@ function getProductImage(name: string, category: string): string | null {
   if (category === "clothing") {
     if (n.includes("t-shirt") || n.includes("chandail") || n.includes("pull") || n.includes("capuche")) return imgTshirt;
     if (n.includes("jeans") || n.includes("pantalon") || n.includes("jogging") || n.includes("bermuda")) return imgJeans;
-    if (n.includes("espadrille") || n.includes("chaussure") || n.includes("sandales") || n.includes("bottes")) return imgEspadrilles;
+    if (n.includes("espadrille") || n.includes("chaussure") || n.includes("sandales")) return imgEspadrilles;
   }
 
   if (category === "leisure") {

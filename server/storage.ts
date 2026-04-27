@@ -19,6 +19,7 @@ export interface IStorage {
   resetStudentBudget(id: string, newBudget: number): Promise<Student | undefined>;
   fullResetStudent(id: string): Promise<Student | undefined>;
   updateStudentSavings(id: string, savings: number): Promise<Student | undefined>;
+  updateStudentSavingsAndSpent(id: string, savings: number, spent: number): Promise<Student | undefined>;
   updateStudentCustomExpenses(id: string, customExpenses: Record<string, number>): Promise<Student | undefined>;
   getCatalogItems(category?: string): Promise<CatalogItem[]>;
   getCatalogItem(id: string): Promise<CatalogItem | undefined>;
@@ -453,6 +454,14 @@ export class MemStorage implements IStorage {
     const student = this.students.get(id);
     if (!student) return undefined;
     const updated = { ...student, savings: Math.max(0, savings) };
+    this.students.set(id, updated);
+    return updated;
+  }
+
+  async updateStudentSavingsAndSpent(id: string, savings: number, spent: number): Promise<Student | undefined> {
+    const student = this.students.get(id);
+    if (!student) return undefined;
+    const updated = { ...student, savings: Math.max(0, savings), spent: Math.max(0, spent) };
     this.students.set(id, updated);
     return updated;
   }

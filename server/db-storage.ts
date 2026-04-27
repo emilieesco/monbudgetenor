@@ -1066,6 +1066,13 @@ export class DatabaseStorage implements IStorage {
     return rows[0] ? toStudent(rows[0]) : undefined;
   }
 
+  async updateStudentSavingsAndSpent(id: string, savings: number, spent: number): Promise<Student | undefined> {
+    const rows = await this.sql`
+      UPDATE students SET savings = ${savings}, spent = ${spent} WHERE id = ${id} RETURNING *
+    `;
+    return rows[0] ? toStudent(rows[0]) : undefined;
+  }
+
   async updateStudentCustomExpenses(id: string, customExpenses: Record<string, number>): Promise<Student | undefined> {
     const rows = await this.sql`
       UPDATE students SET custom_expenses = ${JSON.stringify(customExpenses)} WHERE id = ${id} RETURNING *

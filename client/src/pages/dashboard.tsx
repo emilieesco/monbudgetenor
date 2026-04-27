@@ -992,7 +992,12 @@ export default function Dashboard() {
                       savingsMutation.mutate(amount);
                     }
                   }}
-                  disabled={savingsMutation.isPending || !savingsAmount}
+                  disabled={
+                    savingsMutation.isPending ||
+                    !savingsAmount ||
+                    parseFloat(savingsAmount) <= 0 ||
+                    parseFloat(savingsAmount) > remaining
+                  }
                   className="bg-purple-600 hover:bg-purple-700"
                 >
                   Épargner

@@ -567,15 +567,20 @@ export async function registerRoutes(
   app.patch("/api/students/:id/savings", async (req, res) => {
     try {
       const { amount } = req.body;
-      if (amount === undefined || amount < 0) {
+      if (amount === undefined || typeof amount !== "number" || amount <= 0) {
         return res.status(400).json({ error: "Invalid amount" });
       }
       const student = await storage.getStudent(req.params.id);
       if (!student) {
         return res.status(404).json({ error: "Student not found" });
       }
+      const available = student.budget - student.spent;
+      if (amount > available + 0.001) {
+        return res.status(400).json({ error: "Insufficient funds — cannot save more than available budget" });
+      }
       const newSavings = student.savings + amount;
-      const updated = await storage.updateStudentSavings(req.params.id, newSavings);
+      const newSpent = student.spent + amount;
+      const updated = await storage.updateStudentSavingsAndSpent(req.params.id, newSavings, newSpent);
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to update savings" });
@@ -585,18 +590,19 @@ export async function registerRoutes(
   app.patch("/api/students/:id/withdraw", async (req, res) => {
     try {
       const { amount } = req.body;
-      if (amount === undefined || amount < 0) {
+      if (amount === undefined || typeof amount !== "number" || amount <= 0) {
         return res.status(400).json({ error: "Invalid amount" });
       }
       const student = await storage.getStudent(req.params.id);
       if (!student) {
         return res.status(404).json({ error: "Student not found" });
       }
-      if (student.savings < amount) {
+      if (student.savings < amount - 0.001) {
         return res.status(400).json({ error: "Insufficient savings" });
       }
       const newSavings = student.savings - amount;
-      const updated = await storage.updateStudentSavings(req.params.id, newSavings);
+      const newSpent = Math.max(0, student.spent - amount);
+      const updated = await storage.updateStudentSavingsAndSpent(req.params.id, newSavings, newSpent);
       res.json(updated);
     } catch (error) {
       res.status(500).json({ error: "Failed to withdraw savings" });

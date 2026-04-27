@@ -887,21 +887,64 @@ export class DatabaseStorage implements IStorage {
   }
 
   async updateClassExpenseAmounts(classId: string, amounts: Map<string, number>): Promise<Class | undefined> {
+    // 1. Get the current class to know old categories
+    const currentRows = await this.sql`SELECT expense_amounts FROM classes WHERE id = ${classId}`;
+    if (!currentRows[0]) return undefined;
+    const oldAmounts: Record<string, number> = parseJson(currentRows[0].expense_amounts, {});
+
+    // 2. Update the class record
     const amountsObj = Object.fromEntries(amounts);
     const rows = await this.sql`
       UPDATE classes SET expense_amounts = ${JSON.stringify(amountsObj)} WHERE id = ${classId} RETURNING *
     `;
     if (!rows[0]) return undefined;
-    // Update all fixed expenses for students in this class — one query per category (parallel)
+
+    // 3. Get all students in the class
     const students = await this.getClassStudents(classId);
-    await Promise.all(
-      Array.from(amounts.entries()).map(([cat, amt]) =>
-        this.sql`
+    if (students.length === 0) return toClass(rows[0]);
+
+    const studentIds = students.map(s => s.id);
+    const oldKeys = new Set(Object.keys(oldAmounts));
+    const newKeys = new Set(amounts.keys());
+
+    // 4. Detect added categories (in new but not old)
+    const addedCategories = [...newKeys].filter(k => !oldKeys.has(k));
+    // 5. Detect removed categories (in old but not new)
+    const removedCategories = [...oldKeys].filter(k => !newKeys.has(k));
+
+    const ops: Promise<any>[] = [];
+
+    // Update existing categories
+    for (const [cat, amt] of amounts.entries()) {
+      if (oldKeys.has(cat)) {
+        ops.push(this.sql`
           UPDATE fixed_expenses SET amount = ${amt}
-          WHERE student_id = ANY(${students.map(s => s.id)}) AND category = ${cat}
-        `
-      )
-    );
+          WHERE student_id = ANY(${studentIds}) AND category = ${cat} AND is_custom = false
+        `);
+      }
+    }
+
+    // Delete removed categories for all students
+    if (removedCategories.length > 0) {
+      ops.push(this.sql`
+        DELETE FROM fixed_expenses
+        WHERE student_id = ANY(${studentIds}) AND category = ANY(${removedCategories}) AND is_custom = false
+      `);
+    }
+
+    // Insert added categories for all students
+    for (const cat of addedCategories) {
+      const amt = amounts.get(cat)!;
+      for (const student of students) {
+        ops.push(this.sql`
+          INSERT INTO fixed_expenses (id, student_id, category, amount, is_paid, due_date, is_custom)
+          VALUES (${randomUUID()}, ${student.id}, ${cat}, ${amt}, false, NOW(), false)
+          ON CONFLICT DO NOTHING
+        `);
+      }
+    }
+
+    await Promise.all(ops);
     return toClass(rows[0]);
   }
 

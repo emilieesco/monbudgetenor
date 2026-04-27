@@ -18,7 +18,9 @@ export default function TeacherDashboard() {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState<"students" | "challenges" | "messages" | "events" | "leaderboard" | "historique" | "config">("students");
   const [expenseAmounts, setExpenseAmounts] = useState<{ [key: string]: number }>({});
-  const [predefinedBudget, setPredefinedBudget] = useState<number | "">(""); 
+  const [predefinedBudget, setPredefinedBudget] = useState<number | "">("");
+  const [newCategoryName, setNewCategoryName] = useState("");
+  const [newCategoryAmount, setNewCategoryAmount] = useState(""); 
   
   // Class Challenge form states
   const [classChallengeTitle, setClassChallengeTitle] = useState("");
@@ -1393,41 +1395,116 @@ export default function TeacherDashboard() {
 
             {/* Dépenses Fixes */}
             <Card className="p-6">
-              <h2 className="text-2xl font-bold mb-4">Dépenses Fixes Mensuelles</h2>
+              <h2 className="text-2xl font-bold mb-2">Dépenses Fixes Mensuelles</h2>
               <p className="text-muted-foreground mb-6">
-                Modifiez les montants des dépenses fixes que les élèves devront payer.
+                Modifiez les montants ou ajoutez de nouvelles catégories. Les changements s'appliquent à tous les élèves de la classe.
               </p>
-              
+
+              {/* Existing categories */}
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 {Object.entries(expenseAmounts).map(([name, amount]) => (
-                  <div key={name} className="space-y-2">
-                    <Label htmlFor={`expense-${name}`}>{name}</Label>
-                    <Input
-                      id={`expense-${name}`}
-                      type="number"
-                      value={amount}
-                      onChange={(e) => setExpenseAmounts(prev => ({
-                        ...prev,
-                        [name]: parseFloat(e.target.value) || 0
-                      }))}
-                      data-testid={`input-expense-${name}`}
-                    />
+                  <div key={name} className="space-y-1">
+                    <div className="flex items-center justify-between gap-2">
+                      <Label htmlFor={`expense-${name}`} className="truncate">{name}</Label>
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        onClick={() => setExpenseAmounts(prev => {
+                          const next = { ...prev };
+                          delete next[name];
+                          return next;
+                        })}
+                        data-testid={`button-delete-category-${name}`}
+                        title={`Supprimer ${name}`}
+                      >
+                        <Trash2 className="w-3 h-3 text-destructive" />
+                      </Button>
+                    </div>
+                    <div className="flex items-center gap-1">
+                      <span className="text-sm text-muted-foreground">$</span>
+                      <Input
+                        id={`expense-${name}`}
+                        type="number"
+                        value={amount}
+                        min={0}
+                        onChange={(e) => setExpenseAmounts(prev => ({
+                          ...prev,
+                          [name]: parseFloat(e.target.value) || 0
+                        }))}
+                        data-testid={`input-expense-${name}`}
+                      />
+                    </div>
                   </div>
                 ))}
               </div>
 
+              {/* Add new category */}
+              <div className="border rounded-lg p-4 mb-6 bg-muted/30">
+                <p className="text-sm font-semibold mb-3 flex items-center gap-2">
+                  <Plus className="w-4 h-4" />
+                  Ajouter une catégorie
+                </p>
+                <div className="flex flex-wrap gap-3 items-end">
+                  <div className="flex-1 min-w-40 space-y-1">
+                    <Label htmlFor="new-category-name">Nom de la catégorie</Label>
+                    <Input
+                      id="new-category-name"
+                      placeholder="ex: Petit-déjeuner, Transport…"
+                      value={newCategoryName}
+                      onChange={(e) => setNewCategoryName(e.target.value)}
+                      data-testid="input-new-category-name"
+                    />
+                  </div>
+                  <div className="w-32 space-y-1">
+                    <Label htmlFor="new-category-amount">Montant ($)</Label>
+                    <Input
+                      id="new-category-amount"
+                      type="number"
+                      placeholder="0"
+                      min={0}
+                      value={newCategoryAmount}
+                      onChange={(e) => setNewCategoryAmount(e.target.value)}
+                      data-testid="input-new-category-amount"
+                    />
+                  </div>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      const trimmed = newCategoryName.trim();
+                      const amt = parseFloat(newCategoryAmount) || 0;
+                      if (!trimmed) {
+                        toast({ title: "Nom requis", description: "Entrez un nom pour la catégorie.", variant: "destructive" });
+                        return;
+                      }
+                      if (expenseAmounts[trimmed] !== undefined) {
+                        toast({ title: "Catégorie existante", description: "Cette catégorie existe déjà.", variant: "destructive" });
+                        return;
+                      }
+                      setExpenseAmounts(prev => ({ ...prev, [trimmed]: amt }));
+                      setNewCategoryName("");
+                      setNewCategoryAmount("");
+                    }}
+                    data-testid="button-add-category"
+                  >
+                    <Plus className="w-4 h-4 mr-1" />
+                    Ajouter
+                  </Button>
+                </div>
+              </div>
+
               <div className="p-4 bg-muted rounded-lg mb-6">
                 <p className="text-sm text-muted-foreground">Total dépenses fixes:</p>
-                <p className="text-2xl font-bold">${Object.values(expenseAmounts).reduce((a, b) => a + b, 0)}</p>
+                <p className="text-2xl font-bold">${Object.values(expenseAmounts).reduce((a, b) => a + b, 0).toFixed(2)}</p>
               </div>
 
               <Button
                 onClick={() => updateExpensesMutation.mutate(expenseAmounts)}
                 disabled={updateExpensesMutation.isPending}
                 className="flex items-center gap-2"
+                data-testid="button-save-expenses"
               >
                 <Settings className="w-4 h-4" />
-                Sauvegarder les Dépenses
+                {updateExpensesMutation.isPending ? "Sauvegarde…" : "Sauvegarder et appliquer à tous les élèves"}
               </Button>
             </Card>
           </div>
